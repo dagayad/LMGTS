@@ -2,16 +2,1412 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+<meta name="description" content="Classroom - Private Learning Portal">
+<meta name="theme-color" content="#0b1020">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Classroom — Private Learning Portal</title>
 <style>
-:root{--bg:#0b1020;--panel:#111a2e;--panel2:#16223a;--line:#263550;--text:#f4f7ff;--muted:#9aabc7;--blue:#6d8dff;--cyan:#42d6c7;--danger:#ff7386;--shadow:0 18px 50px #0003}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% -10%,#1c3260 0,transparent 35%),var(--bg);color:var(--text);font:15px/1.5 Inter,system-ui,-apple-system,Segoe UI,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}.hidden{display:none!important}.muted{color:var(--muted)}.small{font-size:12px}.brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:20px;letter-spacing:-.4px}.brandmark{display:grid;place-items:center;width:38px;height:38px;border-radius:13px;background:linear-gradient(135deg,var(--blue),var(--cyan));color:#071323;font-weight:900}.screen{min-height:100vh}.login-wrap{display:grid;place-items:center;padding:28px}.login-card{width:min(100%,460px);background:#111a2eeF;border:1px solid var(--line);padding:32px;border-radius:24px;box-shadow:var(--shadow)}.login-card h1{font-size:30px;line-height:1.15;margin:24px 0 8px;letter-spacing:-1px}.field{display:grid;gap:7px;margin:16px 0}.field label{font-size:13px;color:#b9c7df;font-weight:650}.field input,.field select,.field textarea{width:100%;background:#0a1223;border:1px solid #2a3b58;color:var(--text);border-radius:11px;padding:12px 13px;outline:none}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue)}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 15px;border-radius:11px;font-weight:750;transition:.18s}.btn-primary{background:linear-gradient(135deg,#7895ff,#5b7cff);color:#081126}.btn-secondary{background:#1b2943;color:#e9efff;border:1px solid #304362}.btn-danger{background:#482331;color:#ffdbe0;border:1px solid #743445}.btn:disabled{opacity:.5;cursor:not-allowed}.full{width:100%}.notice{padding:12px 14px;border:1px solid #40517a;background:#172541;border-radius:12px;color:#c7d6f4;font-size:12px;margin-top:18px}.app{display:grid;grid-template-columns:250px 1fr;min-height:100vh}.sidebar{padding:24px 16px;border-right:1px solid var(--line);background:#0b1324;display:flex;flex-direction:column;gap:25px}.side-label{color:#7083a4;font-size:10px;font-weight:800;letter-spacing:1.4px;padding:0 12px}.nav{display:grid;gap:6px}.nav button{display:flex;gap:12px;align-items:center;text-align:left;background:transparent;color:#9eb0ce;padding:12px;border-radius:12px;font-weight:650}.nav button.active,.nav button:hover{background:#1a2946;color:white}.nav .ico{width:22px;text-align:center}.sidebar-bottom{margin-top:auto}.main{min-width:0;padding:28px clamp(16px,3vw,42px) 50px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:28px}.topbar h1{font-size:clamp(24px,3vw,34px);margin:0;letter-spacing:-1px}.top-right{display:flex;align-items:center;gap:10px}.avatar{width:38px;height:38px;border-radius:13px;background:#25385d;display:grid;place-items:center;font-weight:800;color:#b9caff}.welcome{padding:25px;border-radius:20px;background:linear-gradient(115deg,#1e3261,#17243e 68%,#173c4b);border:1px solid #344d78;margin-bottom:22px;position:relative;overflow:hidden}.welcome:after{content:"";position:absolute;width:210px;height:210px;border:35px solid #ffffff0a;border-radius:50%;right:-40px;top:-100px}.welcome h2{font-size:24px;margin:0 0 6px}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:25px}.stat,.card{background:linear-gradient(145deg,#121d32,#10192b);border:1px solid var(--line);border-radius:17px;padding:18px}.stat .num{font-size:27px;font-weight:850;letter-spacing:-1px}.stat .label{color:var(--muted);font-size:12px}.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:24px 0 14px}.section-head h2{font-size:19px;margin:0}.course-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}.course{padding:0;overflow:hidden}.course-art{height:112px;padding:16px;display:flex;align-items:flex-end;background:linear-gradient(135deg,#273e77,#19264a);font-size:12px;font-weight:800;letter-spacing:1px;color:#d7e2ff}.course:nth-child(3n+2) .course-art{background:linear-gradient(135deg,#185d65,#172d4d)}.course:nth-child(3n) .course-art{background:linear-gradient(135deg,#61416f,#2a274e)}.course-body{padding:15px}.course-body h3{margin:0 0 5px;font-size:16px}.course-meta{font-size:12px;color:var(--muted);margin-bottom:14px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.pill{display:inline-flex;padding:4px 8px;border-radius:20px;background:#1e304f;color:#c4d4f5;font-size:11px;font-weight:750}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}.toolbar input,.toolbar select{background:#101a2e;border:1px solid var(--line);border-radius:10px;color:white;padding:10px 12px}.toolbar input{flex:1;min-width:180px}.lesson-layout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(240px,.8fr);gap:18px}.video-frame{aspect-ratio:16/9;background:#050914;border-radius:15px;overflow:hidden;border:1px solid #2a3b58;display:grid;place-items:center}.video-frame{position:relative}.video-frame iframe{width:100%;height:100%;border:0;pointer-events:none}.custom-player-shell:fullscreen{background:#050914;display:flex;flex-direction:column;justify-content:center;padding:12px}.custom-player-shell:fullscreen .video-frame{width:100%;height:auto;max-height:calc(100vh - 90px);aspect-ratio:16/9;border-radius:12px}.custom-player-shell:fullscreen .custom-player-controls{width:100%;max-width:1200px;margin:0 auto}.custom-player-shell:fullscreen .video-frame iframe{width:100%;height:100%}.custom-player-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#0b1324;border:1px solid #2a3b58;border-top:0;border-radius:0 0 12px 12px;padding:10px 12px}.custom-player-controls button{background:#1b2943;color:#e9efff;border:1px solid #304362;border-radius:8px;padding:7px 11px;font-weight:700}.custom-player-controls input[type=range]{accent-color:#7895ff;min-width:65px;flex:1}.custom-player-controls .time{font-variant-numeric:tabular-nums;font-size:12px;color:#c7d6f4;white-space:nowrap}.video-frame:has(+ .custom-player-controls){border-radius:15px 15px 0 0}.video-placeholder{text-align:center;padding:20px;max-width:440px}.video-placeholder .play{font-size:44px;color:var(--blue)}.video-placeholder h3{margin:6px 0}.lesson-list{display:grid;gap:9px}.lesson-item{display:flex;align-items:center;gap:10px;padding:12px;border-radius:12px;background:#111c30;border:1px solid var(--line);color:#eaf0ff;text-align:left;width:100%}.lesson-item.active{border-color:var(--blue);background:#1a2947}.lesson-item .lesson-num{display:grid;place-items:center;width:32px;height:32px;border-radius:9px;background:#25385d;flex-shrink:0}.lesson-item small{display:block;color:var(--muted)}.resource-list{display:grid;gap:10px}.resource{display:flex;align-items:center;gap:12px;padding:13px;border-radius:12px;background:#111c30;border:1px solid var(--line)}.resource .fileico{font-size:22px}.resource .resinfo{min-width:0;flex:1}.resource .resinfo strong{display:block;overflow-wrap:anywhere}.empty{padding:30px;text-align:center;border:1px dashed #354663;border-radius:15px;color:var(--muted)}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px}.table{width:100%;border-collapse:collapse;min-width:620px}.table th,.table td{padding:13px 15px;border-bottom:1px solid var(--line);text-align:left}.table th{font-size:11px;letter-spacing:.7px;text-transform:uppercase;color:#91a5c6;background:#111b2f}.table td{font-size:13px}.table tr:last-child td{border-bottom:0}.actions{display:flex;gap:7px;flex-wrap:wrap}.modal-backdrop{position:fixed;inset:0;background:#030712c9;display:grid;place-items:center;padding:18px;z-index:10}.modal{width:min(100%,600px);max-height:90vh;overflow:auto;background:#111b2f;border:1px solid #344866;border-radius:20px;padding:24px;box-shadow:var(--shadow)}.modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px}.modal-head h2{margin:0}.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}.toast{position:fixed;right:20px;bottom:20px;z-index:20;background:#183d3a;border:1px solid #2b746a;color:#d5fff6;padding:13px 17px;border-radius:12px;box-shadow:var(--shadow)}.mobile-menu{display:none}.student-chip{display:flex;align-items:center;gap:10px}.footer-note{margin-top:30px;color:#7083a4;font-size:11px;text-align:center}
-@media(max-width:1050px){.course-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.lesson-layout{grid-template-columns:1fr}.lesson-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:760px){.app{grid-template-columns:1fr}.sidebar{display:none;position:fixed;z-index:8;inset:0 auto 0 0;width:260px;box-shadow:var(--shadow)}.sidebar.open{display:flex}.mobile-menu{display:inline-flex}.main{padding:18px 14px 35px}.topbar{margin-bottom:20px}.stats{gap:8px}.stat{padding:12px}.stat .num{font-size:22px}.course-grid{grid-template-columns:1fr}.course-art{height:90px}.lesson-list{grid-template-columns:1fr}.modal-grid{grid-template-columns:1fr}.login-card{padding:24px}.welcome{padding:20px}}
+:root {
+  --bg: #0b1020;
+  --panel: #111a2e;
+  --panel2: #16223a;
+  --line: #263550;
+  --text: #f4f7ff;
+  --muted: #9aabc7;
+  --blue: #6d8dff;
+  --cyan: #42d6c7;
+  --danger: #ff7386;
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
 
-.content-type-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:18px 0}.content-type-card{padding:20px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,#17243d,#10182b);box-shadow:var(--shadow)}.content-type-card h3{margin:8px 0 4px}.content-type-card .type-icon{font-size:27px}.permission-btn{font-size:11px!important;padding:6px 8px!important}.lesson-item{min-width:0}.section-head{gap:12px}.toolbar{gap:10px}.pill{white-space:nowrap}
-@media(max-width:760px){.app{grid-template-columns:1fr}.sidebar{padding:12px;position:sticky;top:0;z-index:20}.lesson-layout{grid-template-columns:1fr!important}.content-type-grid{grid-template-columns:1fr}}
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: radial-gradient(circle at 80% -10%, #1c3260 0, transparent 35%), var(--bg);
+  color: var(--text);
+  font: 16px / 1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+input, button, select, textarea {
+  font: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+button {
+  cursor: pointer;
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--panel);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--blue);
+}
+
+.hidden {
+  display: none !important;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.small {
+  font-size: 14px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  font-weight: 800;
+  font-size: clamp(16px, 5vw, 20px);
+  letter-spacing: -0.4px;
+}
+
+.brandmark {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, var(--blue), var(--cyan));
+  color: #071323;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.screen {
+  min-height: 100vh;
+}
+
+.login-wrap {
+  display: grid;
+  place-items: center;
+  padding: max(20px, var(--safe-top)) 16px max(20px, var(--safe-bottom)) 16px;
+  min-height: 100vh;
+}
+
+.login-card {
+  width: min(100%, 460px);
+  background: rgba(17, 26, 46, 0.95);
+  border: 1px solid var(--line);
+  padding: clamp(20px, 6vw, 32px);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+}
+
+.login-card h1 {
+  font-size: clamp(24px, 6vw, 30px);
+  line-height: 1.2;
+  margin: 20px 0 8px;
+  letter-spacing: -1px;
+}
+
+.login-card p {
+  margin: 0 0 20px;
+}
+
+.field {
+  display: grid;
+  gap: 7px;
+  margin: 16px 0;
+}
+
+.field label {
+  font-size: 13px;
+  color: #b9c7df;
+  font-weight: 650;
+  display: block;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  background: #0a1223;
+  border: 1px solid #2a3b58;
+  color: var(--text);
+  border-radius: 11px;
+  padding: 12px 13px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-size: 16px;
+  min-height: 44px;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(109, 141, 255, 0.1);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 15px;
+  border-radius: 11px;
+  font-weight: 750;
+  transition: 0.18s;
+  user-select: none;
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #7895ff, #5b7cff);
+  color: #081126;
+}
+
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.btn-secondary {
+  background: #1b2943;
+  color: #e9efff;
+  border: 1px solid #304362;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #243550;
+}
+
+.btn-danger {
+  background: #482331;
+  color: #ffdbe0;
+  border: 1px solid #743445;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #5a2d3f;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.full {
+  width: 100%;
+}
+
+.notice {
+  padding: 12px 14px;
+  border: 1px solid #40517a;
+  background: #172541;
+  border-radius: 12px;
+  color: #c7d6f4;
+  font-size: 13px;
+  margin-top: 18px;
+}
+
+.notice code {
+  background: #0a1223;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  min-height: 100vh;
+}
+
+.sidebar {
+  padding: 24px 16px;
+  border-right: 1px solid var(--line);
+  background: #0b1324;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  overflow-y: auto;
+  max-height: 100vh;
+  padding-top: calc(24px + var(--safe-top));
+  padding-bottom: calc(24px + var(--safe-bottom));
+}
+
+.side-label {
+  color: #7083a4;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+  padding: 0 12px;
+}
+
+.nav {
+  display: grid;
+  gap: 6px;
+}
+
+.nav button {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  text-align: left;
+  background: transparent;
+  color: #9eb0ce;
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: 650;
+  transition: 0.2s;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.nav button:active,
+.nav button.active,
+.nav button:hover {
+  background: #1a2946;
+  color: white;
+}
+
+.nav .ico {
+  width: 22px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.sidebar-bottom {
+  margin-top: auto;
+}
+
+.main {
+  min-width: 0;
+  padding: 28px clamp(16px, 3vw, 42px) calc(50px + var(--safe-bottom)) clamp(16px, 3vw, 42px);
+  overflow-y: auto;
+  max-height: 100vh;
+  padding-top: calc(28px + var(--safe-top));
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.topbar h1 {
+  font-size: clamp(24px, 3vw, 34px);
+  margin: 0;
+  letter-spacing: -1px;
+}
+
+.top-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 13px;
+  background: #25385d;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  color: #b9caff;
+  flex-shrink: 0;
+}
+
+.welcome {
+  padding: clamp(20px, 4vw, 25px);
+  border-radius: 20px;
+  background: linear-gradient(115deg, #1e3261, #17243e 68%, #173c4b);
+  border: 1px solid #344d78;
+  margin-bottom: 22px;
+  position: relative;
+  overflow: hidden;
+}
+
+.welcome:after {
+  content: "";
+  position: absolute;
+  width: 210px;
+  height: 210px;
+  border: 35px solid rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+  right: -40px;
+  top: -100px;
+  pointer-events: none;
+}
+
+.welcome h2 {
+  font-size: clamp(20px, 4vw, 24px);
+  margin: 0 0 6px;
+  position: relative;
+  z-index: 1;
+}
+
+.welcome p {
+  position: relative;
+  z-index: 1;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+  margin-bottom: 25px;
+}
+
+.stat,
+.card {
+  background: linear-gradient(145deg, #121d32, #10192b);
+  border: 1px solid var(--line);
+  border-radius: 17px;
+  padding: 18px;
+  transition: 0.2s;
+}
+
+.stat:hover {
+  border-color: var(--blue);
+  transform: translateY(-2px);
+}
+
+.stat .num {
+  font-size: clamp(24px, 5vw, 27px);
+  font-weight: 850;
+  letter-spacing: -1px;
+}
+
+.stat .label {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 24px 0 14px;
+  flex-wrap: wrap;
+}
+
+.section-head h2 {
+  font-size: 19px;
+  margin: 0;
+}
+
+.course-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 15px;
+}
+
+.course {
+  padding: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #121d32, #10192b);
+  border: 1px solid var(--line);
+  transition: 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.course:hover {
+  border-color: var(--blue);
+  transform: translateY(-2px);
+}
+
+.course-art {
+  height: 112px;
+  padding: 16px;
+  display: flex;
+  align-items: flex-end;
+  background: linear-gradient(135deg, #273e77, #19264a);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #d7e2ff;
+  flex-shrink: 0;
+}
+
+.course:nth-child(3n+2) .course-art {
+  background: linear-gradient(135deg, #185d65, #172d4d);
+}
+
+.course:nth-child(3n) .course-art {
+  background: linear-gradient(135deg, #61416f, #2a274e);
+}
+
+.course-body {
+  padding: 15px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.course-body h3 {
+  margin: 0 0 5px;
+  font-size: 16px;
+}
+
+.course-meta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: auto;
+  padding-bottom: 14px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pill {
+  display: inline-flex;
+  padding: 4px 8px;
+  border-radius: 20px;
+  background: #1e304f;
+  color: #c4d4f5;
+  font-size: 11px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.toolbar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.toolbar input,
+.toolbar select {
+  background: #101a2e;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: white;
+  padding: 10px 12px;
+  min-height: 44px;
+  transition: 0.2s;
+  font-size: 16px;
+}
+
+.toolbar input {
+  flex: 1;
+  min-width: min(100%, 180px);
+}
+
+.toolbar input:focus,
+.toolbar select:focus {
+  border-color: var(--blue);
+}
+
+.lesson-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(240px, 0.8fr);
+  gap: 18px;
+}
+
+.video-frame {
+  aspect-ratio: 16 / 9;
+  background: #050914;
+  border-radius: 15px;
+  overflow: hidden;
+  border: 1px solid #2a3b58;
+  display: grid;
+  place-items: center;
+  position: relative;
+  width: 100%;
+}
+
+.video-frame iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.custom-player-shell {
+  display: flex;
+  flex-direction: column;
+}
+
+.custom-player-shell:fullscreen {
+  background: #050914;
+  padding: 12px;
+}
+
+.custom-player-shell:fullscreen .video-frame {
+  width: 100%;
+  height: auto;
+  max-height: calc(100vh - 90px);
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+}
+
+.custom-player-shell:fullscreen .custom-player-controls {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.custom-player-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: #0b1324;
+  border: 1px solid #2a3b58;
+  border-top: 0;
+  border-radius: 0 0 12px 12px;
+  padding: 10px 12px;
+  min-height: 44px;
+}
+
+.custom-player-controls button {
+  background: #1b2943;
+  color: #e9efff;
+  border: 1px solid #304362;
+  border-radius: 8px;
+  padding: 7px 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  min-height: 32px;
+}
+
+.custom-player-controls input[type="range"] {
+  accent-color: #7895ff;
+  min-width: 65px;
+  flex: 1;
+  min-height: 6px;
+  cursor: pointer;
+}
+
+.custom-player-controls .time {
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  color: #c7d6f4;
+  white-space: nowrap;
+}
+
+.video-frame:has(+ .custom-player-controls) {
+  border-radius: 15px 15px 0 0;
+}
+
+.video-placeholder {
+  text-align: center;
+  padding: 20px;
+  max-width: 440px;
+}
+
+.video-placeholder .play {
+  font-size: 44px;
+  color: var(--blue);
+}
+
+.video-placeholder h3 {
+  margin: 6px 0;
+}
+
+.lesson-list {
+  display: grid;
+  gap: 9px;
+}
+
+.lesson-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 12px;
+  background: #111c30;
+  border: 1px solid var(--line);
+  color: #eaf0ff;
+  text-align: left;
+  width: 100%;
+  transition: 0.2s;
+  cursor: pointer;
+  user-select: none;
+  min-height: 44px;
+}
+
+.lesson-item:active,
+.lesson-item:hover {
+  background: #1a2947;
+}
+
+.lesson-item.active {
+  border-color: var(--blue);
+  background: #1a2947;
+}
+
+.lesson-item .lesson-num {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: #25385d;
+  flex-shrink: 0;
+  font-weight: 600;
+}
+
+.lesson-item small {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.resource-list {
+  display: grid;
+  gap: 10px;
+}
+
+.resource {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px;
+  border-radius: 12px;
+  background: #111c30;
+  border: 1px solid var(--line);
+  flex-wrap: wrap;
+  min-height: 44px;
+}
+
+.resource .fileico {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.resource .resinfo {
+  min-width: 0;
+  flex: 1;
+}
+
+.resource .resinfo strong {
+  display: block;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.empty {
+  padding: 30px;
+  text-align: center;
+  border: 1px dashed #354663;
+  border-radius: 15px;
+  color: var(--muted);
+}
+
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 620px;
+}
+
+.table th,
+.table td {
+  padding: 13px 15px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+
+.table th {
+  font-size: 11px;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  color: #91a5c6;
+  background: #111b2f;
+  font-weight: 700;
+}
+
+.table td {
+  font-size: 13px;
+}
+
+.table tr:last-child td {
+  border-bottom: 0;
+}
+
+.actions {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 7, 18, 0.79);
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  z-index: 100;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.modal {
+  width: min(100%, 600px);
+  max-height: 90vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #111b2f;
+  border: 1px solid #344866;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.modal-head h2 {
+  margin: 0;
+  font-size: clamp(18px, 4vw, 22px);
+}
+
+.modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 14px;
+}
+
+.toast {
+  position: fixed;
+  right: 20px;
+  bottom: calc(20px + var(--safe-bottom));
+  z-index: 200;
+  background: #183d3a;
+  border: 1px solid #2b746a;
+  color: #d5fff6;
+  padding: 13px 17px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.mobile-menu {
+  display: none;
+}
+
+.student-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.footer-note {
+  margin-top: 30px;
+  color: #7083a4;
+  font-size: 11px;
+  text-align: center;
+  padding-bottom: 20px;
+}
+
+.content-type-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+  margin: 18px 0;
+}
+
+.content-type-card {
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: linear-gradient(145deg, #17243d, #10182b);
+  box-shadow: var(--shadow-sm);
+  transition: 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-type-card:hover {
+  border-color: var(--blue);
+  transform: translateY(-2px);
+}
+
+.content-type-card h3 {
+  margin: 8px 0 4px;
+  font-size: 16px;
+}
+
+.content-type-card .type-icon {
+  font-size: 27px;
+  margin-bottom: 8px;
+}
+
+.permission-btn {
+  font-size: 11px !important;
+  padding: 6px 8px !important;
+}
+
+@media (max-width: 1200px) {
+  .course-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+  .lesson-layout {
+    grid-template-columns: 1fr;
+  }
+  .lesson-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .course-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .lesson-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    display: none;
+    position: fixed;
+    z-index: 90;
+    inset: 0 auto 0 0;
+    width: 260px;
+    height: 100vh;
+    border-right: 1px solid var(--line);
+    border-radius: 0;
+    box-shadow: var(--shadow);
+    padding-top: var(--safe-top);
+    padding-bottom: var(--safe-bottom);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .sidebar.open {
+    display: flex;
+  }
+
+  .mobile-menu {
+    display: inline-flex;
+    margin-right: auto;
+  }
+
+  .main {
+    padding: 18px 14px 35px;
+    padding-top: calc(18px + var(--safe-top));
+    padding-bottom: calc(35px + var(--safe-bottom));
+  }
+
+  .topbar {
+    margin-bottom: 20px;
+  }
+
+  .topbar h1 {
+    font-size: clamp(20px, 5vw, 24px);
+  }
+
+  .stats {
+    gap: 8px;
+    grid-template-columns: 1fr 1fr;
+    margin-bottom: 20px;
+  }
+
+  .stat {
+    padding: 12px;
+  }
+
+  .stat .num {
+    font-size: 22px;
+  }
+
+  .course-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .course-art {
+    height: 90px;
+  }
+
+  .lesson-layout {
+    gap: 12px;
+  }
+
+  .modal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .login-card {
+    padding: 24px 20px;
+  }
+
+  .welcome {
+    padding: 20px;
+    margin-bottom: 18px;
+  }
+
+  .toolbar {
+    gap: 8px;
+  }
+
+  .toolbar input {
+    min-width: auto;
+    flex: 1;
+  }
+
+  .section-head {
+    margin: 20px 0 12px;
+  }
+
+  .section-head h2 {
+    font-size: 17px;
+  }
+
+  .custom-player-controls {
+    gap: 8px;
+    padding: 8px 10px;
+  }
+
+  .custom-player-controls button {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+
+  .custom-player-controls .time {
+    font-size: 11px;
+  }
+
+  .custom-player-controls input[type="range"] {
+    min-width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 15px;
+  }
+
+  .brand {
+    font-size: 16px;
+    gap: 8px;
+  }
+
+  .brandmark {
+    width: 32px;
+    height: 32px;
+  }
+
+  .login-wrap {
+    padding: max(16px, var(--safe-top)) 16px max(16px, var(--safe-bottom)) 16px;
+  }
+
+  .login-card {
+    padding: 20px;
+  }
+
+  .login-card h1 {
+    font-size: 22px;
+    margin: 16px 0 6px;
+  }
+
+  .main {
+    padding: 14px 12px 30px;
+    padding-top: calc(14px + var(--safe-top));
+    padding-bottom: calc(30px + var(--safe-bottom));
+  }
+
+  .topbar {
+    margin-bottom: 16px;
+    gap: 8px;
+  }
+
+  .topbar h1 {
+    font-size: 18px;
+  }
+
+  .top-right {
+    gap: 8px;
+  }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 13px;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .stat {
+    padding: 14px;
+  }
+
+  .stat .num {
+    font-size: 20px;
+  }
+
+  .course-grid {
+    gap: 10px;
+  }
+
+  .course-art {
+    height: 80px;
+    font-size: 11px;
+    padding: 12px;
+  }
+
+  .course-body {
+    padding: 12px;
+  }
+
+  .course-body h3 {
+    font-size: 14px;
+    margin: 0 0 4px;
+  }
+
+  .section-head {
+    margin: 16px 0 10px;
+  }
+
+  .section-head h2 {
+    font-size: 15px;
+  }
+
+  .welcome {
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+
+  .welcome h2 {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  .welcome:after {
+    display: none;
+  }
+
+  .pill {
+    padding: 3px 6px;
+    font-size: 10px;
+  }
+
+  .toolbar {
+    gap: 6px;
+    margin-bottom: 12px;
+    flex-direction: column;
+  }
+
+  .toolbar input,
+  .toolbar select {
+    width: 100%;
+    min-height: 40px;
+  }
+
+  .btn {
+    padding: 9px 12px;
+    font-size: 14px;
+    min-height: 40px;
+  }
+
+  .field {
+    margin: 12px 0;
+  }
+
+  .field input,
+  .field select,
+  .field textarea {
+    padding: 10px 12px;
+    font-size: 16px;
+    min-height: 40px;
+  }
+
+  .lesson-list {
+    gap: 8px;
+  }
+
+  .lesson-item {
+    padding: 10px;
+    min-height: 44px;
+  }
+
+  .lesson-item .lesson-num {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+
+  .resource-list {
+    gap: 8px;
+  }
+
+  .resource {
+    padding: 10px;
+    gap: 10px;
+    min-height: 40px;
+  }
+
+  .table-wrap {
+    border-radius: 10px;
+  }
+
+  .table th,
+  .table td {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+
+  .modal {
+    padding: 20px;
+  }
+
+  .modal-head {
+    margin-bottom: 16px;
+  }
+
+  .modal-head h2 {
+    font-size: 18px;
+  }
+
+  .notice {
+    padding: 10px 12px;
+    font-size: 12px;
+    margin-top: 12px;
+  }
+
+  .footer-note {
+    margin-top: 20px;
+    font-size: 10px;
+  }
+
+  .row {
+    gap: 8px;
+  }
+
+  .actions {
+    gap: 6px;
+  }
+
+  .empty {
+    padding: 20px;
+    border-radius: 10px;
+    font-size: 13px;
+  }
+
+  .video-placeholder {
+    padding: 16px;
+  }
+
+  .video-placeholder .play {
+    font-size: 36px;
+  }
+
+  .video-placeholder h3 {
+    margin: 4px 0;
+    font-size: 14px;
+  }
+
+  .content-type-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin: 12px 0;
+  }
+
+  .content-type-card {
+    padding: 16px;
+  }
+
+  .sidebar {
+    width: 100%;
+    max-width: none;
+  }
+
+  .modal-backdrop {
+    padding: 12px;
+  }
+
+  .modal {
+    max-height: calc(100vh - 24px);
+    border-radius: 16px;
+  }
+}
+
+@supports (padding: max(0px)) {
+  body {
+    padding-left: max(0px, var(--safe-left));
+    padding-right: max(0px, var(--safe-right));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b1020;
+  }
+}
+
+input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--blue);
+}
+
+input[type="checkbox"]:checked {
+  accent-color: var(--cyan);
+}
+
+.checkbox-group {
+  display: grid;
+  gap: 12px;
+}
+
+.checkbox-item {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  border-radius: 10px;
+  background: #0a1223;
+  border: 1px solid #2a3b58;
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+.checkbox-item:hover {
+  border-color: var(--blue);
+  background: #121f35;
+}
+
+.checkbox-item input[type="checkbox"] {
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.checkbox-item label {
+  flex: 1;
+  cursor: pointer;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.checkbox-item strong {
+  display: block;
+  color: #e9efff;
+}
+
+.checkbox-item .muted {
+  font-size: 12px;
+  color: #9aabc7;
+}
 </style>
 </head>
 <body>
@@ -20,41 +1416,47 @@
     <div class="brand"><div class="brandmark">C</div><span>Classroom<span style="color:var(--cyan)">.</span></span></div>
     <h1>Your class.<br>All in one place.</h1>
     <p class="muted">Sign in to access your lessons, notes and papers.</p>
-    <form id="loginForm">
-      <div class="field"><label for="role">Login as</label><select id="role"><option value="student">Student</option><option value="admin">Admin</option></select></div>
-      <div class="field"><label for="username">Username</label><input id="username" autocomplete="username" placeholder="Enter username" required></div>
+    <form id="loginForm" novalidate>
+      <div class="field"><label for="role">Login as</label><select id="role" required><option value="student">Student</option><option value="admin">Admin</option></select></div>
+      <div class="field"><label for="username">Username</label><input id="username" type="text" autocomplete="username" placeholder="Enter username" required></div>
       <div class="field"><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" placeholder="Enter password" required></div>
       <button class="btn btn-primary full" type="submit">Sign in <span>→</span></button>
-      <p id="loginError" class="small" style="color:var(--danger);margin-bottom:0"></p>
+      <p id="loginError" class="small" style="color:var(--danger);margin:12px 0 0;display:none"></p>
     </form>
-    <div class="notice"><strong>Demo access</strong><br>Admin: <code>admin</code> / <code>class123</code><br>Student: <code>student</code> / <code>learn123</code><br><br>This HTML-only demo stores data in this browser. Do not use real student information or passwords until a secure backend is connected.</div>
+    <div class="notice"><strong>Demo access</strong><br>Admin: <code>admin</code> / <code>class123</code><br>Student: <code>student</code> / <code>learn123</code><br><br>This HTML-only demo stores data in browser. Do not use real student info or passwords until a secure backend is connected.</div>
   </div>
 </div>
 
 <div id="appScreen" class="app hidden">
-  <aside id="sidebar" class="sidebar">
+  <aside id="sidebar" class="sidebar" role="navigation">
     <div class="brand"><div class="brandmark">C</div><span>Classroom<span style="color:var(--cyan)">.</span></span></div>
-    <div><div class="side-label">LEARNING SPACE</div><nav id="nav" class="nav"></nav></div>
+    <div><div class="side-label">LEARNING SPACE</div><nav id="nav" class="nav" aria-label="Main navigation"></nav></div>
     <div class="sidebar-bottom">
       <div class="student-chip"><div class="avatar" id="sideAvatar">S</div><div><strong id="sideName">Student</strong><div class="small muted" id="sideRole">Student account</div></div></div>
       <button id="logoutBtn" class="btn btn-secondary full" style="margin-top:15px">↪ Sign out</button>
     </div>
   </aside>
-  <main class="main">
-    <header class="topbar"><div style="display:flex;align-items:center;gap:12px"><button id="menuBtn" class="btn btn-secondary mobile-menu" aria-label="Open menu">☰</button><div><h1 id="pageTitle">Overview</h1><div class="muted small" id="pageSub">Your learning space</div></div></div><div class="top-right"><span class="pill" id="rolePill">STUDENT</span><div class="avatar" id="topAvatar">S</div></div></header>
+  <main class="main" role="main">
+    <header class="topbar"><div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0"><button id="menuBtn" class="btn btn-secondary mobile-menu" aria-label="Open menu">☰</button><div style="min-width:0;flex:1"><h1 id="pageTitle">Overview</h1><div class="muted small" id="pageSub">Your learning space</div></div></div><div class="top-right"><span class="pill" id="rolePill">STUDENT</span><div class="avatar" id="topAvatar">S</div></div></header>
     <div id="pageContent"></div>
     <div class="footer-note">CLASSROOM • Private learning portal prototype</div>
   </main>
 </div>
 <div id="modalRoot"></div><div id="toastRoot"></div>
+
 <script>
+'use strict';
+
 const STORE='classroom_demo_v1';
 const seed={
- users:[{id:'u-admin',name:'Class Admin',username:'admin',password:'class123',role:'admin'},{id:'u-student',name:'Demo Student',username:'student',password:'learn123',role:'student'}],
+ users:[
+  {id:'u-admin',name:'Class Admin',username:'admin',password:'class123',role:'admin'},
+  {id:'u-student',name:'Demo Student',username:'student',password:'learn123',role:'student'}
+ ],
  courses:[
-  {id:'c-bs',title:'Business Studies',subject:'BUSINESS STUDIES',description:'Lessons, revision and papers',color:'blue'},
-  {id:'c-acc',title:'Accounting',subject:'ACCOUNTING',description:'Accounting lessons and practice',color:'green'},
-  {id:'c-econ',title:'Economics',subject:'ECONOMICS',description:'Theory, notes and past papers',color:'purple'}
+  {id:'c-bs',title:'Business Studies',subject:'BUSINESS STUDIES',description:'Lessons, revision and papers'},
+  {id:'c-acc',title:'Accounting',subject:'ACCOUNTING',description:'Accounting lessons and practice'},
+  {id:'c-econ',title:'Economics',subject:'ECONOMICS',description:'Theory, notes and past papers'}
  ],
  lessons:[
   {id:'l1',courseId:'c-bs',title:'Introduction to Business',videoId:'',description:'Add your YouTube video ID from Admin → Lessons.'},
@@ -62,155 +1464,646 @@ const seed={
   {id:'l3',courseId:'c-acc',title:'Introduction to Accounting',videoId:'',description:'Add your YouTube video ID from Admin → Lessons.'},
   {id:'l4',courseId:'c-econ',title:'Basic Economic Concepts',videoId:'',description:'Add your YouTube video ID from Admin → Lessons.'}
  ],
- papers:[],studentCourseAccess:{'u-student':['c-bs','c-acc','c-econ']}
+ papers:[],
+ studentCourseAccess:{'u-student':['c-bs','c-acc','c-econ']},
+ extras:[]
 };
+
 let db,session=null,activePage='overview',activeCourse=null,activeLesson=null;
 let memoryOnly=false;
+let ytPlayer=null,ytTick=null;
+
 function loadDB(){
  try {
    const raw=window.localStorage ? localStorage.getItem(STORE) : null;
-   if(raw){db=JSON.parse(raw);if(!db||!Array.isArray(db.users)||!Array.isArray(db.courses)||!Array.isArray(db.lessons)||!Array.isArray(db.papers))throw new Error('Invalid saved data');if(!db.studentCourseAccess||typeof db.studentCourseAccess!=='object')db.studentCourseAccess={};if(!Array.isArray(db.extras))db.extras=[];db.users=db.users.filter(u=>u&&typeof u==='object'&&u.id&&u.username&&u.role);db.courses=db.courses.filter(c=>c&&typeof c==='object'&&c.id&&c.title);db.lessons=db.lessons.filter(l=>l&&typeof l==='object'&&l.id&&l.courseId&&l.title);db.papers=db.papers.filter(p=>p&&typeof p==='object'&&p.id&&p.title);db.lessons.forEach(l=>{if(!Array.isArray(l.allowedStudentIds))l.allowedStudentIds=null});}
-   else {db=JSON.parse(JSON.stringify(seed));saveDB();}
+   if(raw){
+     db=JSON.parse(raw);
+     if(!db||!Array.isArray(db.users)||!Array.isArray(db.courses)||!Array.isArray(db.lessons)||!Array.isArray(db.papers))throw new Error('Invalid saved data');
+     if(!db.studentCourseAccess||typeof db.studentCourseAccess!=='object')db.studentCourseAccess={};
+     if(!Array.isArray(db.extras))db.extras=[];
+     db.users=db.users.filter(u=>u&&typeof u==='object'&&u.id&&u.username&&u.role);
+     db.courses=db.courses.filter(c=>c&&typeof c==='object'&&c.id&&c.title);
+     db.lessons=db.lessons.filter(l=>l&&typeof l==='object'&&l.id&&l.courseId&&l.title);
+     db.papers=db.papers.filter(p=>p&&typeof p==='object'&&p.id&&p.title);
+     db.lessons.forEach(l=>{if(!Array.isArray(l.allowedStudentIds))l.allowedStudentIds=null});
+   }else {
+     db=JSON.parse(JSON.stringify(seed));
+     saveDB();
+   }
  } catch(e) {
+   console.error('DB load error:',e);
    memoryOnly=true;
    db=JSON.parse(JSON.stringify(seed));
  }
 }
-function saveDB(){
- try {if(!memoryOnly && window.localStorage){localStorage.setItem(STORE,JSON.stringify(db));return true;}return false;}
- catch(e){memoryOnly=true;return false;}
-}
-const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function id(prefix){return prefix+'-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7)}
-function courseName(cid){return db.courses.find(c=>c.id===cid)?.title||'Unknown subject'}
-function isAdmin(){return session?.role==='admin'}
-function allowedCourses(){return isAdmin()?db.courses:db.courses.filter(c=>(db.studentCourseAccess[session.id]||[]).includes(c.id))}
-function canSeeLesson(l){return isAdmin()||(allowedCourses().some(c=>c.id===l.courseId)&&(l.allowedStudentIds===null||l.allowedStudentIds===undefined||l.allowedStudentIds.includes(session.id)))}
-function toast(msg){$('#toastRoot').innerHTML=`<div class="toast">${esc(msg)}</div>`;setTimeout(()=>$('#toastRoot').innerHTML='',2600)}
-function showLogin(){session=null;$('#appScreen').classList.add('hidden');$('#loginScreen').classList.remove('hidden');$('#password').value='';$('#loginError').textContent=''}
-function enterApp(user){session=user;$('#loginScreen').classList.add('hidden');$('#appScreen').classList.remove('hidden');$('#sideName').textContent=user.name;$('#sideRole').textContent=user.role==='admin'?'Administrator':'Student account';$('#sideAvatar').textContent=user.name[0].toUpperCase();$('#topAvatar').textContent=user.name[0].toUpperCase();$('#rolePill').textContent=user.role.toUpperCase();activePage='overview';renderNav();renderPage()}
-function renderNav(){const items=isAdmin()?[['overview','▦','Overview'],['courses','▣','Subjects & lessons'],['papers','▤','PDF papers'],['students','♙','Students'],['extras','✦','Exams & programs']]:[['overview','▦','Overview'],['courses','▣','My subjects'],['papers','▤','Notes & papers'],['extras','✦','Exams & programs']];$('#nav').innerHTML=items.map(([key,ico,label])=>`<button class="${activePage===key?'active':''}" data-page="${key}"><span class="ico">${ico}</span>${label}</button>`).join('');$$('[data-page]').forEach(b=>b.onclick=()=>{activePage=b.dataset.page;$('#sidebar').classList.remove('open');renderNav();renderPage()})}
-function setTitle(t,s){$('#pageTitle').textContent=t;$('#pageSub').textContent=s||''}
-function renderPage(){if(activePage==='overview')renderOverview();else if(activePage==='courses')renderCourses();else if(activePage==='papers')renderPapers();else if(activePage==='students'&&isAdmin())renderStudents();else if(activePage==='extras')renderExtras();else{activePage='overview';renderOverview()}}
-function renderOverview(){setTitle(isAdmin()?'Admin overview':'Welcome back',isAdmin()?'Manage your learning platform':'Pick up where you left off');const cs=allowedCourses(),ls=db.lessons.filter(canSeeLesson),ps=db.papers.filter(p=>isAdmin()||!p.courseId||cs.some(c=>c.id===p.courseId));$('#pageContent').innerHTML=`<section class="welcome"><div class="pill">${isAdmin()?'ADMIN WORKSPACE':'YOUR LEARNING SPACE'}</div><h2>${isAdmin()?'Everything for your classes, in one place.':'Keep learning. One lesson at a time.'}</h2><p class="muted" style="max-width:560px;margin-bottom:0">${isAdmin()?'Add subjects, embed lessons, upload PDFs and manage student access.':'Your class videos and downloadable learning resources are organized by subject.'}</p></section><div class="stats"><div class="stat"><div class="num">${cs.length}</div><div class="label">${isAdmin()?'Subjects':'Available subjects'}</div></div><div class="stat"><div class="num">${ls.length}</div><div class="label">Video lessons</div></div><div class="stat"><div class="num">${ps.length}</div><div class="label">PDF resources</div></div></div><div class="section-head"><h2>${isAdmin()?'Manage subjects':'Continue learning'}</h2><button class="btn btn-secondary" id="goCourses">View all →</button></div><div class="course-grid">${cs.slice(0,3).map(courseCard).join('')||'<div class="empty">No subjects available yet.</div>'}</div>${isAdmin()?`<div class="section-head"><h2>Quick actions</h2></div><div class="toolbar"><button class="btn btn-primary" id="quickCourse">＋ Add subject</button><button class="btn btn-secondary" id="quickLesson">＋ Add lesson</button><button class="btn btn-secondary" id="quickPaper">＋ Upload PDF</button><button class="btn btn-secondary" id="quickStudent">＋ Add student</button></div>`:''}`;
-$('#goCourses').onclick=()=>{activePage='courses';renderNav();renderPage()};$$('[data-open-course]').forEach(b=>b.onclick=()=>openCourse(b.dataset.openCourse));
-if(isAdmin()){$('#quickCourse').onclick=()=>courseModal();$('#quickLesson').onclick=()=>lessonModal();$('#quickPaper').onclick=()=>paperModal();$('#quickStudent').onclick=()=>studentModal()}
-}
-function courseCard(c){const count=db.lessons.filter(l=>l.courseId===c.id).length;return `<article class="card course"><div class="course-art">${esc(c.subject||'SUBJECT')}</div><div class="course-body"><h3>${esc(c.title)}</h3><div class="course-meta">${count} lesson${count===1?'':'s'} · ${esc(c.description||'Course materials')}</div><div class="row"><span class="pill">COURSE</span><button class="btn btn-secondary" data-open-course="${c.id}">Open →</button></div></div></article>`}
-function renderCourses(){setTitle(isAdmin()?'Subjects & lessons':'My subjects',isAdmin()?'Create subjects and organize video lessons':'Choose a subject to view lessons');const cs=allowedCourses();$('#pageContent').innerHTML=`<div class="toolbar"><input id="courseSearch" placeholder="Search subjects...">${isAdmin()?'<button class="btn btn-primary" id="addCourse">＋ Add subject</button><button class="btn btn-secondary" id="addLesson">＋ Add lesson</button>':''}</div><div class="course-grid" id="courseGrid">${cs.map(courseCard).join('')||'<div class="empty">No subjects found. Ask your class admin for access.</div>'}</div><div id="courseDetail"></div>`;
-$('#courseSearch').oninput=()=>{$('#courseGrid').innerHTML=cs.filter(c=>c.title.toLowerCase().includes($('#courseSearch').value.toLowerCase())).map(courseCard).join('')||'<div class="empty">No matching subjects.</div>';wireCourseButtons()};
-if(isAdmin()){$('#addCourse').onclick=()=>courseModal();$('#addLesson').onclick=()=>lessonModal()}wireCourseButtons()}
-function wireCourseButtons(){$$('[data-open-course]').forEach(b=>b.onclick=()=>openCourse(b.dataset.openCourse))}
-function openCourse(cid){const c=db.courses.find(x=>x.id===cid);if(!c)return;activePage='courses';renderNav();if(!$('#courseDetail'))renderPage();activeCourse=cid;const lessons=db.lessons.filter(l=>l.courseId===cid);activeLesson=lessons[0]?.id||null;renderCourseDetail();const detail=$('#courseDetail');if(detail)detail.scrollIntoView({behavior:'smooth',block:'start'})}
 
-let ytPlayer=null,ytReady=false,ytTick=null;
-window.onYouTubeIframeAPIReady=function(){ytReady=true;};
-(function loadYouTubeAPI(){if(!document.querySelector('script[data-youtube-iframe-api]')){const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';s.dataset.youtubeIframeApi='1';document.head.appendChild(s);}})();
-function formatPlayerTime(seconds){seconds=Math.max(0,Math.floor(Number(seconds)||0));return Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0')}
+function saveDB(){
+ try {
+   if(!memoryOnly && window.localStorage){
+     localStorage.setItem(STORE,JSON.stringify(db));
+     return true;
+   }
+   return false;
+ } catch(e){
+   console.error('DB save error:',e);
+   memoryOnly=true;
+   return false;
+ }
+}
+
+const $=s=>document.querySelector(s);
+const $$=s=>[...document.querySelectorAll(s)];
+
+function esc(s=''){
+  return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))
+}
+
+function id(prefix){
+  return prefix+'-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7)
+}
+
+function courseName(cid){
+  return db.courses.find(c=>c.id===cid)?.title||'Unknown subject'
+}
+
+function isAdmin(){
+  return session?.role==='admin'
+}
+
+function allowedCourses(){
+  return isAdmin()?db.courses:db.courses.filter(c=>(db.studentCourseAccess[session.id]||[]).includes(c.id))
+}
+
+function canSeeLesson(l){
+  return isAdmin()||(allowedCourses().some(c=>c.id===l.courseId)&&(l.allowedStudentIds===null||l.allowedStudentIds===undefined||l.allowedStudentIds.includes(session.id)))
+}
+
+function toast(msg){
+  const root=$('#toastRoot');
+  if(!root)return;
+  root.innerHTML=`<div class="toast">${esc(msg)}</div>`;
+  setTimeout(()=>{if(root)root.innerHTML=''},3000);
+}
+
+function showLogin(){
+  session=null;
+  $('#appScreen').classList.add('hidden');
+  $('#loginScreen').classList.remove('hidden');
+  $('#password').value='';
+  $('#loginError').textContent='';
+  $('#loginError').style.display='none';
+}
+
+function enterApp(user){
+  session=user;
+  $('#loginScreen').classList.add('hidden');
+  $('#appScreen').classList.remove('hidden');
+  $('#sideName').textContent=user.name;
+  $('#sideRole').textContent=user.role==='admin'?'Administrator':'Student account';
+  $('#sideAvatar').textContent=user.name[0].toUpperCase();
+  $('#topAvatar').textContent=user.name[0].toUpperCase();
+  $('#rolePill').textContent=user.role.toUpperCase();
+  activePage='overview';
+  renderNav();
+  renderPage();
+}
+
+function renderNav(){
+  const items=isAdmin()?
+    [['overview','▦','Overview'],['courses','▣','Subjects & lessons'],['papers','▤','PDF papers'],['students','♙','Students'],['extras','✦','Exams & programs']]:
+    [['overview','▦','Overview'],['courses','▣','My subjects'],['papers','▤','Notes & papers'],['extras','✦','Exams & programs']];
+
+  $('#nav').innerHTML=items.map(([key,ico,label])=>`<button class="${activePage===key?'active':''}" data-page="${key}"><span class="ico">${ico}</span>${label}</button>`).join('');
+
+  $$('[data-page]').forEach(b=>b.onclick=()=>{
+    activePage=b.dataset.page;
+    $('#sidebar').classList.remove('open');
+    renderNav();
+    renderPage();
+  });
+}
+
+function setTitle(t,s){
+  $('#pageTitle').textContent=t;
+  $('#pageSub').textContent=s||'';
+}
+
+function renderPage(){
+  if(activePage==='overview')renderOverview();
+  else if(activePage==='courses')renderCourses();
+  else if(activePage==='papers')renderPapers();
+  else if(activePage==='students'&&isAdmin())renderStudents();
+  else if(activePage==='extras')renderExtras();
+  else{activePage='overview';renderOverview()}
+}
+
+function renderOverview(){
+  setTitle(isAdmin()?'Admin overview':'Welcome back',isAdmin()?'Manage your learning platform':'Pick up where you left off');
+  const cs=allowedCourses(),ls=db.lessons.filter(canSeeLesson),ps=db.papers.filter(p=>isAdmin()||!p.courseId||cs.some(c=>c.id===p.courseId));
+
+  $('#pageContent').innerHTML=`<section class="welcome"><div class="pill">${isAdmin()?'ADMIN WORKSPACE':'YOUR LEARNING SPACE'}</div><h2>${isAdmin()?'Everything for your classes, in one place.':'Keep learning. One lesson at a time.'}</h2><p class="muted" style="max-width:560px;margin-bottom:0">${isAdmin()?'Add subjects, embed lessons, upload PDFs and manage student access.':'Your class videos and downloadable learning resources are organized by subject.'}</p></section><div class="stats"><div class="stat"><div class="num">${cs.length}</div><div class="label">${isAdmin()?'Subjects':'Available subjects'}</div></div><div class="stat"><div class="num">${ls.length}</div><div class="label">Video lessons</div></div><div class="stat"><div class="num">${ps.length}</div><div class="label">PDF resources</div></div></div><div class="section-head"><h2>${isAdmin()?'Manage subjects':'Continue learning'}</h2><button class="btn btn-secondary" id="goCourses">View all →</button></div><div class="course-grid">${cs.slice(0,3).map(courseCard).join('')||'<div class="empty">No subjects available yet.</div>'}</div>${isAdmin()?`<div class="section-head"><h2>Quick actions</h2></div><div class="toolbar"><button class="btn btn-primary" id="quickCourse">＋ Add subject</button><button class="btn btn-secondary" id="quickLesson">＋ Add lesson</button><button class="btn btn-secondary" id="quickPaper">＋ Upload PDF</button><button class="btn btn-secondary" id="quickStudent">＋ Add student</button></div>`:''}`;;
+
+  $('#goCourses').onclick=()=>{activePage='courses';renderNav();renderPage()};
+  $$('[data-open-course]').forEach(b=>b.onclick=()=>openCourse(b.dataset.openCourse));
+
+  if(isAdmin()){
+    $('#quickCourse').onclick=()=>courseModal();
+    $('#quickLesson').onclick=()=>lessonModal();
+    $('#quickPaper').onclick=()=>paperModal();
+    $('#quickStudent').onclick=()=>studentModal();
+  }
+}
+
+function courseCard(c){
+  const count=db.lessons.filter(l=>l.courseId===c.id).length;
+  return `<article class="card course"><div class="course-art">${esc(c.subject||'SUBJECT')}</div><div class="course-body"><h3>${esc(c.title)}</h3><div class="course-meta">${count} lesson${count===1?'':'s'} · ${esc(c.description||'Course materials')}</div><div class="row"><span class="pill">COURSE</span><button class="btn btn-secondary" data-open-course="${c.id}">Open →</button></div></div></article>`
+}
+
+function renderCourses(){
+  setTitle(isAdmin()?'Subjects & lessons':'My subjects',isAdmin()?'Create subjects and organize video lessons':'Choose a subject to view lessons');
+  const cs=allowedCourses();
+  $('#pageContent').innerHTML=`<div class="toolbar"><input id="courseSearch" placeholder="Search subjects...">${isAdmin()?'<button class="btn btn-primary" id="addCourse">＋ Add subject</button><button class="btn btn-secondary" id="addLesson">＋ Add lesson</button>':''}</div><div class="course-grid" id="courseGrid">${cs.map(courseCard).join('')||'<div class="empty">No subjects found. Ask your class admin for access.</div>'}</div><div id="courseDetail"></div>`;
+
+  $('#courseSearch').oninput=()=>{
+    $('#courseGrid').innerHTML=cs.filter(c=>c.title.toLowerCase().includes($('#courseSearch').value.toLowerCase())).map(courseCard).join('')||'<div class="empty">No matching subjects.</div>';
+    wireCourseButtons();
+  };
+
+  if(isAdmin()){
+    $('#addCourse').onclick=()=>courseModal();
+    $('#addLesson').onclick=()=>lessonModal();
+  }
+  wireCourseButtons();
+}
+
+function wireCourseButtons(){
+  $$('[data-open-course]').forEach(b=>b.onclick=()=>openCourse(b.dataset.openCourse))
+}
+
+function openCourse(cid){
+  const c=db.courses.find(x=>x.id===cid);
+  if(!c)return;
+  activePage='courses';
+  renderNav();
+  if(!$('#courseDetail'))renderPage();
+  activeCourse=cid;
+  const lessons=db.lessons.filter(l=>l.courseId===cid);
+  activeLesson=lessons[0]?.id||null;
+  renderCourseDetail();
+  const detail=$('#courseDetail');
+  if(detail)setTimeout(()=>detail.scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+
+window.onYouTubeIframeAPIReady=function(){};
+(function loadYouTubeAPI(){
+  if(!document.querySelector('script[data-youtube-iframe-api]')){
+    const s=document.createElement('script');
+    s.src='https://www.youtube.com/iframe_api';
+    s.dataset.youtubeIframeApi='1';
+    s.async=true;
+    document.head.appendChild(s);
+  }
+})();
+
+function formatPlayerTime(seconds){
+  seconds=Math.max(0,Math.floor(Number(seconds)||0));
+  return Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0');
+}
+
 function initCustomYTPlayer(videoId){
- const frame=$('#ytCustomFrame');if(!frame)return;
- const start=()=>{if(!window.YT||!YT.Player){setTimeout(start,250);return}
-   try{if(ytPlayer&&typeof ytPlayer.destroy==='function')ytPlayer.destroy()}catch(_){}
-   ytPlayer=new YT.Player('ytCustomFrame',{videoId,playerVars:{controls:0,disablekb:1,fs:0,rel:0,playsinline:1,iv_load_policy:3,modestbranding:1,enablejsapi:1},events:{
-    onReady:()=>{const play=$('#ytPlayPause');if(play)play.textContent='▶ Play';const vol=$('#ytVolume');if(vol){vol.value=100;ytPlayer.setVolume(100)}},
-    onStateChange:e=>{const b=$('#ytPlayPause');if(b)b.textContent=e.data===1?'❚❚ Pause':'▶ Play'},
-    onError:()=>{const t=$('#ytPlayerStatus');if(t)t.textContent='This video cannot be embedded. Ask the admin to use an embeddable video.'}
-   }});
- };start();
- if(ytTick)clearInterval(ytTick);
- ytTick=setInterval(()=>{if(!ytPlayer||typeof ytPlayer.getCurrentTime!=='function')return;try{const cur=ytPlayer.getCurrentTime()||0,dur=ytPlayer.getDuration()||0,bar=$('#ytSeek'),time=$('#ytTime');if(bar&&dur){bar.max=dur;bar.value=cur}if(time)time.textContent=formatPlayerTime(cur)+' / '+formatPlayerTime(dur)}catch(_){}},500);
+  const frame=$('#ytCustomFrame');
+  if(!frame)return;
+
+  const start=()=>{
+    if(!window.YT||!YT.Player){setTimeout(start,250);return}
+    try{if(ytPlayer&&typeof ytPlayer.destroy==='function')ytPlayer.destroy()}catch(_){}
+
+    ytPlayer=new YT.Player('ytCustomFrame',{
+      videoId,
+      playerVars:{controls:0,disablekb:1,fs:0,rel:0,playsinline:1,iv_load_policy:3,modestbranding:1,enablejsapi:1},
+      events:{
+        onReady:()=>{
+          const play=$('#ytPlayPause');
+          if(play)play.textContent='▶ Play';
+          const vol=$('#ytVolume');
+          if(vol){vol.value=100;ytPlayer.setVolume(100)}
+        },
+        onStateChange:e=>{
+          const b=$('#ytPlayPause');
+          if(b)b.textContent=e.data===1?'❚❚ Pause':'▶ Play';
+        },
+        onError:()=>{
+          const t=$('#ytPlayerStatus');
+          if(t)t.textContent='This video cannot be embedded. Ask the admin to use an embeddable video.';
+        }
+      }
+    });
+  };
+  start();
+
+  if(ytTick)clearInterval(ytTick);
+  ytTick=setInterval(()=>{
+    if(!ytPlayer||typeof ytPlayer.getCurrentTime!=='function')return;
+    try{
+      const cur=ytPlayer.getCurrentTime()||0,dur=ytPlayer.getDuration()||0,bar=$('#ytSeek'),time=$('#ytTime');
+      if(bar&&dur){bar.max=dur;bar.value=cur}
+      if(time)time.textContent=formatPlayerTime(cur)+' / '+formatPlayerTime(dur);
+    }catch(_){}
+  },500);
 }
-function renderCourseDetail(){const c=db.courses.find(x=>x.id===activeCourse);if(!c)return;const lessons=db.lessons.filter(l=>l.courseId===c.id&&canSeeLesson(l));if(activeLesson&&!lessons.some(l=>l.id===activeLesson))activeLesson=lessons[0]?.id||null;const l=lessons.find(x=>x.id===activeLesson);const video=(l?.videoId&&/^[A-Za-z0-9_-]{11}$/.test(l.videoId))?`https://www.youtube-nocookie.com/embed/${l.videoId}?enablejsapi=1&controls=0&disablekb=1&fs=0&rel=0&playsinline=1&iv_load_policy=3&modestbranding=1`:'';
-const papers=db.papers.filter(p=>p.courseId===c.id);const host=$('#courseDetail');host.innerHTML=`<div class="section-head"><h2>${esc(c.title)} <span class="muted">/ Lessons</span></h2>${isAdmin()?`<button class="btn btn-secondary" id="editCourse">Edit subject</button>`:''}</div><div class="lesson-layout"><div><div class="custom-player-shell"><div class="video-frame">${video?`<iframe id="ytCustomFrame" src="${video}" title="${esc(l.title)}" allow="autoplay; encrypted-media" referrerpolicy="strict-origin-when-cross-origin" tabindex="-1"></iframe>`:`<div class="video-placeholder"><div class="play">▶</div><h3>${l?esc(l.title):'No lessons yet'}</h3><p class="muted">${l?'The admin needs to add a valid YouTube video ID for this lesson.':'Lessons will appear here once added by the admin.'}</p></div>`}</div>${video?`<div class="custom-player-controls"><button type="button" id="ytPlayPause">▶ Play</button><button type="button" id="ytBack">↶ 10s</button><button type="button" id="ytForward">10s ↷</button><span class="time" id="ytTime">0:00 / 0:00</span><input id="ytSeek" type="range" min="0" max="100" value="0" aria-label="Seek video"><label class="time">🔊 <input id="ytVolume" type="range" min="0" max="100" value="100" aria-label="Volume" style="width:90px;min-width:70px;vertical-align:middle"></label><button type="button" id="ytFullscreen" aria-label="Toggle fullscreen">⛶ Fullscreen</button></div></div><p class="small muted" id="ytPlayerStatus" style="margin:7px 0">Use these controls to play, pause, seek and adjust volume.</p>`:''}<p class="small muted" style="margin:8px 0">For reliable playback, use an HTTPS-hosted site. Some videos disable embedding or require sign-in. YouTube still controls playback availability and may display its own branding or notices.</p><h2 style="font-size:21px;margin:18px 0 5px">${l?esc(l.title):'Select a lesson'}</h2><p class="muted">${esc(l?.description||'Choose a lesson from the list to start learning.')}</p><div class="section-head"><h2>Lesson resources</h2></div><div class="resource-list">${papers.map(p=>resourceCard(p)).join('')||'<div class="empty">No PDFs attached to this subject yet.</div>'}</div></div><div><div class="section-head" style="margin-top:0"><h2>Course lessons</h2>${isAdmin()?'<button class="btn btn-secondary" id="addCourseLesson">＋</button>':''}</div><div class="lesson-list">${lessons.map((x,i)=>`<button class="lesson-item ${x.id===activeLesson?'active':''}" data-lesson="${x.id}"><span class="lesson-num">${String(i+1).padStart(2,'0')}</span><span><strong>${esc(x.title)}</strong><small>${x.videoId?'Video lesson':'Video not added'}</small></span></button>`).join('')||'<div class="empty">No lessons added yet.</div>'}</div>${isAdmin()?`<div class="section-head"><h2>Admin tools</h2></div><div class="resource-list">${lessons.map(x=>`<div class="resource"><div class="resinfo"><strong>${esc(x.title)}</strong><div class="small muted">${x.videoId?'YouTube ID set':'No video ID'}</div></div><button class="btn btn-secondary" data-edit-lesson="${x.id}">Edit</button><button class="btn btn-secondary permission-btn" data-permission-lesson="${x.id}">Access</button><button class="btn btn-danger" data-delete-lesson="${x.id}">×</button></div>`).join('')}</div>`:''}</div></div>`;
-if(video){initCustomYTPlayer(l.videoId);const bind=(id,fn)=>{const el=$('#'+id);if(el)el.addEventListener('click',fn)};bind('ytPlayPause',()=>{if(!ytPlayer)return;try{if(ytPlayer.getPlayerState()===1)ytPlayer.pauseVideo();else ytPlayer.playVideo()}catch(_){}});bind('ytBack',()=>{if(ytPlayer)ytPlayer.seekTo(Math.max(0,ytPlayer.getCurrentTime()-10),true)});bind('ytForward',()=>{if(ytPlayer)ytPlayer.seekTo(Math.min(ytPlayer.getDuration(),ytPlayer.getCurrentTime()+10),true)});const seek=$('#ytSeek');if(seek)seek.addEventListener('change',()=>{if(ytPlayer)ytPlayer.seekTo(Number(seek.value),true)});const vol=$('#ytVolume');if(vol)vol.addEventListener('input',()=>{if(ytPlayer)ytPlayer.setVolume(Number(vol.value))});bind('ytFullscreen',()=>{const shell=document.querySelector('.custom-player-shell');if(!shell)return;if(document.fullscreenElement){document.exitFullscreen?.()}else{shell.requestFullscreen?.().catch(()=>{const t=$('#ytPlayerStatus');if(t)t.textContent='Fullscreen is not supported by this browser.'})}});}
-$$('[data-lesson]').forEach(b=>b.onclick=()=>{activeLesson=b.dataset.lesson;renderCourseDetail()});
-if(isAdmin()){$('#editCourse').onclick=()=>courseModal(c);$('#addCourseLesson').onclick=()=>lessonModal(c.id);$$('[data-edit-lesson]').forEach(b=>b.onclick=()=>lessonModal(null,db.lessons.find(x=>x.id===b.dataset.editLesson)));$$('[data-permission-lesson]').forEach(b=>b.onclick=()=>lessonPermissionModal(db.lessons.find(x=>x.id===b.dataset.permissionLesson)));$$('[data-delete-lesson]').forEach(b=>b.onclick=()=>{if(confirm('Delete this lesson?')){db.lessons=db.lessons.filter(x=>x.id!==b.dataset.deleteLesson);saveDB();renderCourseDetail();toast('Lesson deleted')}})}
+
+function renderCourseDetail(){
+  const c=db.courses.find(x=>x.id===activeCourse);
+  if(!c)return;
+
+  const lessons=db.lessons.filter(l=>l.courseId===c.id&&canSeeLesson(l));
+  if(activeLesson&&!lessons.some(l=>l.id===activeLesson))activeLesson=lessons[0]?.id||null;
+
+  const l=lessons.find(x=>x.id===activeLesson);
+  const video=(l?.videoId&&/^[A-Za-z0-9_-]{11}$/.test(l.videoId))?`https://www.youtube-nocookie.com/embed/${l.videoId}?enablejsapi=1&controls=0&disablekb=1&fs=0&rel=0&playsinline=1&iv_load_policy=3&modestbranding=1`:'';
+  const papers=db.papers.filter(p=>p.courseId===c.id);
+
+  const host=$('#courseDetail');
+  host.innerHTML=`<div class="section-head"><h2>${esc(c.title)} <span class="muted">/ Lessons</span></h2>${isAdmin()?`<button class="btn btn-secondary" id="editCourse">Edit subject</button>`:''}</div><div class="lesson-layout"><div><div class="custom-player-shell"><div class="video-frame">${video?`<iframe id="ytCustomFrame" src="${video}" title="${esc(l?.title||'Video')}" allow="autoplay; encrypted-media" referrerpolicy="strict-origin-when-cross-origin" tabindex="-1"></iframe>`:`<div class="video-placeholder"><div class="play">▶</div><h3>${l?esc(l.title):'No lessons yet'}</h3><p class="muted">${l?'The admin needs to add a valid YouTube video ID for this lesson.':'Lessons will appear here once added by the admin.'}</p></div>`}</div>${video?`<div class="custom-player-controls"><button type="button" id="ytPlayPause">▶ Play</button><button type="button" id="ytBack">↶ 10s</button><button type="button" id="ytForward">10s ↷</button><span class="time" id="ytTime">0:00 / 0:00</span><input id="ytSeek" type="range" min="0" max="100" value="0" aria-label="Seek video"><label class="time">🔊 <input id="ytVolume" type="range" min="0" max="100" value="100" aria-label="Volume" style="width:90px;min-width:70px;vertical-align:middle"></label><button type="button" id="ytFullscreen" aria-label="Toggle fullscreen">⛶ Fullscreen</button></div></div><p class="small muted" id="ytPlayerStatus" style="margin:7px 0">Use these controls to play, pause, seek and adjust volume.</p>`:''}<p class="small muted" style="margin:8px 0">For reliable playback, use an HTTPS-hosted site. Some videos disable embedding or require sign-in. YouTube still controls playback availability.</p><h2 style="font-size:21px;margin:18px 0 5px">${l?esc(l.title):'Select a lesson'}</h2><p class="muted">${esc(l?.description||'Choose a lesson from the list to start learning.')}</p><div class="section-head"><h2>Lesson resources</h2></div><div class="resource-list">${papers.map(p=>resourceCard(p)).join('')||'<div class="empty">No PDFs attached to this subject yet.</div>'}</div></div><div><div class="section-head" style="margin-top:0"><h2>Course lessons</h2>${isAdmin()?'<button class="btn btn-secondary" id="addCourseLesson">＋</button>':''}</div><div class="lesson-list">${lessons.map((x,i)=>`<button class="lesson-item ${x.id===activeLesson?'active':''}" data-lesson="${x.id}"><span class="lesson-num">${String(i+1).padStart(2,'0')}</span><span><strong>${esc(x.title)}</strong><small>${x.videoId?'Video lesson':'Video not added'}</small></span></button>`).join('')||'<div class="empty">No lessons added yet.</div>'}</div>${isAdmin()?`<div class="section-head"><h2>Admin tools</h2></div><div class="resource-list">${lessons.map(x=>`<div class="resource"><div class="resinfo"><strong>${esc(x.title)}</strong><div class="small muted">${x.videoId?'YouTube ID set':'No video ID'}</div></div><button class="btn btn-secondary" data-edit-lesson="${x.id}">Edit</button><button class="btn btn-secondary permission-btn" data-permission-lesson="${x.id}">Access</button><button class="btn btn-danger" data-delete-lesson="${x.id}">×</button></div>`).join('')}</div>`:''}</div></div>`;
+
+  if(video){
+    initCustomYTPlayer(l.videoId);
+    const bind=(id,fn)=>{const el=$('#'+id);if(el)el.addEventListener('click',fn)};
+
+    bind('ytPlayPause',()=>{
+      if(!ytPlayer)return;
+      try{if(ytPlayer.getPlayerState()===1)ytPlayer.pauseVideo();else ytPlayer.playVideo()}catch(_){}
+    });
+
+    bind('ytBack',()=>{if(ytPlayer)ytPlayer.seekTo(Math.max(0,ytPlayer.getCurrentTime()-10),true)});
+    bind('ytForward',()=>{if(ytPlayer)ytPlayer.seekTo(Math.min(ytPlayer.getDuration(),ytPlayer.getCurrentTime()+10),true)});
+
+    const seek=$('#ytSeek');
+    if(seek)seek.addEventListener('change',()=>{if(ytPlayer)ytPlayer.seekTo(Number(seek.value),true)});
+
+    const vol=$('#ytVolume');
+    if(vol)vol.addEventListener('input',()=>{if(ytPlayer)ytPlayer.setVolume(Number(vol.value))});
+
+    bind('ytFullscreen',()=>{
+      const shell=document.querySelector('.custom-player-shell');
+      if(!shell)return;
+      if(document.fullscreenElement){
+        document.exitFullscreen?.();
+      }else{
+        shell.requestFullscreen?.().catch(()=>{
+          const t=$('#ytPlayerStatus');
+          if(t)t.textContent='Fullscreen is not supported by this browser.';
+        });
+      }
+    });
+  }
+
+  $$('[data-lesson]').forEach(b=>b.onclick=()=>{activeLesson=b.dataset.lesson;renderCourseDetail()});
+
+  if(isAdmin()){
+    $('#editCourse').onclick=()=>courseModal(c);
+    $('#addCourseLesson').onclick=()=>lessonModal(c.id);
+    $$('[data-edit-lesson]').forEach(b=>b.onclick=()=>lessonModal(null,db.lessons.find(x=>x.id===b.dataset.editLesson)));
+    $$('[data-permission-lesson]').forEach(b=>b.onclick=()=>lessonPermissionModal(db.lessons.find(x=>x.id===b.dataset.permissionLesson)));
+    $$('[data-delete-lesson]').forEach(b=>b.onclick=()=>{
+      if(confirm('Delete this lesson?')){
+        db.lessons=db.lessons.filter(x=>x.id!==b.dataset.deleteLesson);
+        saveDB();
+        renderCourseDetail();
+        toast('Lesson deleted');
+      }
+    });
+  }
 }
-function resourceCard(p){return `<div class="resource"><div class="fileico">📄</div><div class="resinfo"><strong>${esc(p.title)}</strong><div class="small muted">${esc(courseName(p.courseId))} · ${p.dataUrl?'PDF document':'File unavailable'}</div></div>${p.dataUrl?`<a class="btn btn-secondary" href="${p.dataUrl}" download="${esc(p.fileName||p.title+'.pdf')}">Download</a>`:'<span class="small muted">No file</span>'}${isAdmin()?`<button class="btn btn-danger" data-delete-paper="${p.id}">×</button>`:''}</div>`}
-function renderPapers(){setTitle(isAdmin()?'PDF papers':'Notes & papers',isAdmin()?'Upload and organize downloadable course files':'Download PDFs shared for your subjects');const cs=allowedCourses();const ps=db.papers.filter(p=>isAdmin()||!p.courseId||cs.some(c=>c.id===p.courseId));$('#pageContent').innerHTML=`<div class="toolbar"><input id="paperSearch" placeholder="Search PDF resources..."><select id="paperFilter"><option value="">All subjects</option>${cs.map(c=>`<option value="${c.id}">${esc(c.title)}</option>`).join('')}</select>${isAdmin()?'<button class="btn btn-primary" id="uploadPaper">＋ Upload PDF</button>':''}</div><div class="resource-list" id="paperList">${ps.map(resourceCard).join('')||'<div class="empty">No PDFs available yet.</div>'}</div>`;
-const filter=()=>{const q=$('#paperSearch').value.toLowerCase(),cid=$('#paperFilter').value;const rows=ps.filter(p=>p.title.toLowerCase().includes(q)&&(!cid||p.courseId===cid));$('#paperList').innerHTML=rows.map(resourceCard).join('')||'<div class="empty">No matching resources.</div>';wirePaperDeletes()};$('#paperSearch').oninput=filter;$('#paperFilter').onchange=filter;if(isAdmin())$('#uploadPaper').onclick=()=>paperModal();wirePaperDeletes()}
-function wirePaperDeletes(){$$('[data-delete-paper]').forEach(b=>b.onclick=()=>{if(confirm('Delete this PDF?')){db.papers=db.papers.filter(p=>p.id!==b.dataset.deletePaper);saveDB();renderPage();toast('PDF deleted')}})}
-function renderStudents(){setTitle('Students','Create student logins and assign subject access');const students=db.users.filter(u=>u.role==='student');$('#pageContent').innerHTML=`<div class="toolbar"><input id="studentSearch" placeholder="Search students..."><button class="btn btn-primary" id="addStudent">＋ Add student</button></div><div class="table-wrap"><table class="table"><thead><tr><th>Student</th><th>Username</th><th>Subject access</th><th>Actions</th></tr></thead><tbody id="studentRows">${students.map(studentRow).join('')||'<tr><td colspan="4">No students yet.</td></tr>'}</tbody></table></div>`;
-$('#addStudent').onclick=()=>studentModal();$('#studentSearch').oninput=()=>{$('#studentRows').innerHTML=students.filter(u=>(u.name+' '+u.username).toLowerCase().includes($('#studentSearch').value.toLowerCase())).map(studentRow).join('')||'<tr><td colspan="4">No matching students.</td></tr>';wireStudentButtons()};wireStudentButtons()}
-function studentRow(u){const access=db.studentCourseAccess[u.id]||[];return `<tr><td><strong>${esc(u.name)}</strong></td><td>${esc(u.username)}</td><td>${access.length} subject(s)</td><td><div class="actions"><button class="btn btn-secondary" data-edit-student="${u.id}">Edit / access</button><button class="btn btn-danger" data-delete-student="${u.id}">Remove</button></div></td></tr>`}
-function wireStudentButtons(){$$('[data-edit-student]').forEach(b=>b.onclick=()=>studentModal(db.users.find(u=>u.id===b.dataset.editStudent)));$$('[data-delete-student]').forEach(b=>b.onclick=()=>{const u=db.users.find(x=>x.id===b.dataset.deleteStudent);if(!u)return;if(confirm(`Remove student ${u.name}?`)){db.users=db.users.filter(x=>x.id!==u.id);delete db.studentCourseAccess[u.id];saveDB();renderStudents();toast('Student removed')}})}
+
+function resourceCard(p){
+  return `<div class="resource"><div class="fileico">📄</div><div class="resinfo"><strong>${esc(p.title)}</strong><div class="small muted">${esc(courseName(p.courseId))} · ${p.dataUrl?'PDF document':'File unavailable'}</div></div>${p.dataUrl?`<a class="btn btn-secondary" href="${p.dataUrl}" download="${esc(p.fileName||p.title+'.pdf')}">Download</a>`:'<span class="small muted">No file</span>'}${isAdmin()?`<button class="btn btn-danger" data-delete-paper="${p.id}">×</button>`:''}</div>`
+}
+
+function renderPapers(){
+  setTitle(isAdmin()?'PDF papers':'Notes & papers',isAdmin()?'Upload and organize downloadable course files':'Download PDFs shared for your subjects');
+  const cs=allowedCourses();
+  const ps=db.papers.filter(p=>isAdmin()||!p.courseId||cs.some(c=>c.id===p.courseId));
+
+  $('#pageContent').innerHTML=`<div class="toolbar"><input id="paperSearch" placeholder="Search PDF resources..."><select id="paperFilter"><option value="">All subjects</option>${cs.map(c=>`<option value="${c.id}">${esc(c.title)}</option>`).join('')}</select>${isAdmin()?'<button class="btn btn-primary" id="uploadPaper">＋ Upload PDF</button>':''}</div><div class="resource-list" id="paperList">${ps.map(resourceCard).join('')||'<div class="empty">No PDFs available yet.</div>'}</div>`;
+
+  const filter=()=>{
+    const q=$('#paperSearch').value.toLowerCase(),cid=$('#paperFilter').value;
+    const rows=ps.filter(p=>p.title.toLowerCase().includes(q)&&(!cid||p.courseId===cid));
+    $('#paperList').innerHTML=rows.map(resourceCard).join('')||'<div class="empty">No matching resources.</div>';
+    wirePaperDeletes();
+  };
+
+  $('#paperSearch').oninput=filter;
+  $('#paperFilter').onchange=filter;
+  if(isAdmin())$('#uploadPaper').onclick=()=>paperModal();
+  wirePaperDeletes();
+}
+
+function wirePaperDeletes(){
+  $$('[data-delete-paper]').forEach(b=>b.onclick=()=>{
+    if(confirm('Delete this PDF?')){
+      db.papers=db.papers.filter(p=>p.id!==b.dataset.deletePaper);
+      saveDB();
+      renderPage();
+      toast('PDF deleted');
+    }
+  });
+}
+
+function renderStudents(){
+  setTitle('Students','Create student logins and assign subject access');
+  const students=db.users.filter(u=>u.role==='student');
+  $('#pageContent').innerHTML=`<div class="toolbar"><input id="studentSearch" placeholder="Search students..."><button class="btn btn-primary" id="addStudent">＋ Add student</button></div><div class="table-wrap"><table class="table"><thead><tr><th>Student</th><th>Username</th><th>Subject access</th><th>Actions</th></tr></thead><tbody id="studentRows">${students.map(studentRow).join('')||'<tr><td colspan="4">No students yet.</td></tr>'}</tbody></table></div>`;
+
+  $('#addStudent').onclick=()=>studentModal();
+  $('#studentSearch').oninput=()=>{
+    $('#studentRows').innerHTML=students.filter(u=>(u.name+' '+u.username).toLowerCase().includes($('#studentSearch').value.toLowerCase())).map(studentRow).join('')||'<tr><td colspan="4">No matching students.</td></tr>';
+    wireStudentButtons();
+  };
+  wireStudentButtons();
+}
+
+function studentRow(u){
+  const access=db.studentCourseAccess[u.id]||[];
+  return `<tr><td><strong>${esc(u.name)}</strong></td><td>${esc(u.username)}</td><td>${access.length} subject(s)</td><td><div class="actions"><button class="btn btn-secondary" data-edit-student="${u.id}">Edit / access</button><button class="btn btn-danger" data-delete-student="${u.id}">Remove</button></div></td></tr>`
+}
+
+function wireStudentButtons(){
+  $$('[data-edit-student]').forEach(b=>b.onclick=()=>studentModal(db.users.find(u=>u.id===b.dataset.editStudent)));
+  $$('[data-delete-student]').forEach(b=>b.onclick=()=>{
+    const u=db.users.find(x=>x.id===b.dataset.deleteStudent);
+    if(!u)return;
+    if(confirm(`Remove student ${u.name}?`)){
+      db.users=db.users.filter(x=>x.id!==u.id);
+      delete db.studentCourseAccess[u.id];
+      saveDB();
+      renderStudents();
+      toast('Student removed');
+    }
+  });
+}
 
 function renderExtras(){
- setTitle('Exams & programs','Keep exams, revision programs and special learning events organized.');
- const items=(db.extras||[]).filter(x=>isAdmin()||x.published!==false);
- $('#pageContent').innerHTML=`<div class="toolbar"><input id="extraSearch" placeholder="Search exams and programs...">${isAdmin()?'<button class="btn btn-primary" id="addExtra">＋ Add exam / program</button>':''}</div><div class="content-type-grid">${items.map(x=>`<article class="content-type-card"><div class="type-icon">${x.type==='Exam'?'📝':x.type==='Program'?'🚀':'📚'}</div><span class="pill">${esc(x.type||'Program')}</span><h3>${esc(x.title)}</h3><p class="muted">${esc(x.description||'')}</p><div class="small muted">${esc(x.date||'Date not set')} · ${x.published===false?'Draft':'Published'}</div>${isAdmin()?`<div class="row" style="margin-top:14px"><button class="btn btn-secondary" data-edit-extra="${x.id}">Edit</button><button class="btn btn-danger" data-delete-extra="${x.id}">Remove</button></div>`:''}</article>`).join('')||'<div class="empty">No exams or programs added yet.</div>'}</div>`;
- if(isAdmin()){$('#addExtra').onclick=()=>extraModal();$$('[data-edit-extra]').forEach(b=>b.onclick=()=>extraModal(db.extras.find(x=>x.id===b.dataset.editExtra)));$$('[data-delete-extra]').forEach(b=>b.onclick=()=>{if(confirm('Remove this item?')){db.extras=db.extras.filter(x=>x.id!==b.dataset.deleteExtra);saveDB();renderExtras();toast('Item removed')}})}
- $('#extraSearch').oninput=()=>{$$('.content-type-card').forEach(c=>c.classList.toggle('hidden',!c.innerText.toLowerCase().includes($('#extraSearch').value.toLowerCase())))};
+  setTitle('Exams & programs','Keep exams, revision programs and special learning events organized.');
+  const items=(db.extras||[]).filter(x=>isAdmin()||x.published!==false);
+
+  $('#pageContent').innerHTML=`<div class="toolbar"><input id="extraSearch" placeholder="Search exams and programs...">${isAdmin()?'<button class="btn btn-primary" id="addExtra">＋ Add exam / program</button>':''}</div><div class="content-type-grid">${items.map(x=>`<article class="content-type-card"><div class="type-icon">${x.type==='Exam'?'📝':x.type==='Program'?'🚀':'📚'}</div><span class="pill">${esc(x.type||'Program')}</span><h3>${esc(x.title)}</h3><p class="muted">${esc(x.description||'')}</p><div class="small muted">${esc(x.date||'Date not set')} · ${x.published===false?'Draft':'Published'}</div>${isAdmin()?`<div class="row" style="margin-top:14px"><button class="btn btn-secondary" data-edit-extra="${x.id}">Edit</button><button class="btn btn-danger" data-delete-extra="${x.id}">Remove</button></div>`:''}</article>`).join('')||'<div class="empty">No exams or programs added yet.</div>'}</div>`;
+
+  if(isAdmin()){
+    $('#addExtra').onclick=()=>extraModal();
+    $$('[data-edit-extra]').forEach(b=>b.onclick=()=>extraModal(db.extras.find(x=>x.id===b.dataset.editExtra)));
+    $$('[data-delete-extra]').forEach(b=>b.onclick=()=>{
+      if(confirm('Remove this item?')){
+        db.extras=db.extras.filter(x=>x.id!==b.dataset.deleteExtra);
+        saveDB();
+        renderExtras();
+        toast('Item removed');
+      }
+    });
+  }
+
+  $('#extraSearch').oninput=()=>{
+    $$('.content-type-card').forEach(c=>c.classList.toggle('hidden',!c.innerText.toLowerCase().includes($('#extraSearch').value.toLowerCase())));
+  };
 }
+
 function extraModal(item=null){
- openModal(item?'Edit exam / program':'Add exam / program',`<div class="field"><label>Type</label><select name="type"><option ${item?.type==='Exam'?'selected':''}>Exam</option><option ${item?.type==='Program'?'selected':''}>Program</option><option ${item?.type==='Event'?'selected':''}>Event</option></select></div><div class="field"><label>Title</label><input name="title" required value="${esc(item?.title||'')}" placeholder="e.g. 2027 Target Paper Program"></div><div class="field"><label>Date / schedule</label><input name="date" value="${esc(item?.date||'')}" placeholder="e.g. Every Sunday 8 AM"></div><div class="field"><label>Description</label><textarea name="description" rows="3">${esc(item?.description||'')}</textarea></div><div class="field"><label><input type="checkbox" name="published" ${item?.published===false?'':'checked'}> Publish to students</label></div>`,item?'Save item':'Create item',f=>{const v={type:f.get('type'),title:String(f.get('title')||'').trim(),date:String(f.get('date')||'').trim(),description:String(f.get('description')||'').trim(),published:f.get('published')==='on'};if(!v.title)throw Error('Enter a title.');if(item)Object.assign(item,v);else db.extras.push({id:id('x'),...v});saveDB();closeModal();renderExtras();toast(item?'Item updated':'Item added')});
+  openModal(item?'Edit exam / program':'Add exam / program',`<div class="field"><label>Type</label><select name="type" required><option ${item?.type==='Exam'?'selected':''}>Exam</option><option ${item?.type==='Program'?'selected':''}>Program</option><option ${item?.type==='Event'?'selected':''}>Event</option></select></div><div class="field"><label>Title</label><input name="title" required value="${esc(item?.title||'')}" placeholder="e.g. 2027 Target Paper Program"></div><div class="field"><label>Date / schedule</label><input name="date" value="${esc(item?.date||'')}" placeholder="e.g. Every Sunday 8 AM"></div><div class="field"><label>Description</label><textarea name="description" rows="3">${esc(item?.description||'')}</textarea></div><div class="field"><div class="checkbox-item" style="gap:10px"><input type="checkbox" id="published_item" name="published" ${item?.published===false?'':'checked'}><label for="published_item"><strong>✓ Publish to students</strong></label></div></div>`,item?'Save item':'Create item',f=>{
+    const v={type:f.get('type'),title:String(f.get('title')||'').trim(),date:String(f.get('date')||'').trim(),description:String(f.get('description')||'').trim(),published:f.get('published')==='on'};
+    if(!v.title)throw Error('Enter a title.');
+    if(item)Object.assign(item,v);
+    else db.extras.push({id:id('x'),...v});
+    saveDB();
+    closeModal();
+    renderExtras();
+    toast(item?'Item updated':'Item added');
+  });
 }
+
 function lessonPermissionModal(lesson){
- const students=db.users.filter(u=>u.role!=='admin');const current=Array.isArray(lesson.allowedStudentIds)?lesson.allowedStudentIds:null;
- const checks=students.map(u=>`<label style="display:flex;gap:9px;align-items:center;margin:9px 0;color:#d8e3fa"><input type="checkbox" name="studentIds" value="${u.id}" ${current===null||current.includes(u.id)?'checked':''}> ${esc(u.name)} <span class="muted">(@${esc(u.username)})</span></label>`).join('')||'<p class="muted">No students created yet.</p>';
- openModal('Lesson access permissions',`<p class="muted small">Choose which students can see this lesson. By default, a lesson is available to every student who has access to its subject.</p><div class="field"><label><input type="checkbox" name="allStudents" ${current===null?'checked':''}> Allow all students with subject access</label></div><div class="field"><label>Specific students</label>${checks}</div>`, 'Save permissions',f=>{lesson.allowedStudentIds=f.get('allStudents')==='on'?null:students.filter(u=>f.getAll('studentIds').includes(u.id)).map(u=>u.id);saveDB();closeModal();if(activeCourse)renderCourseDetail();toast('Lesson permissions updated')});
+  const students=db.users.filter(u=>u.role!=='admin');
+  const current=Array.isArray(lesson.allowedStudentIds)?lesson.allowedStudentIds:null;
+  const checks=students.map(u=>`<div class="checkbox-item"><input type="checkbox" id="student_${u.id}" name="studentIds" value="${u.id}" ${current===null||current.includes(u.id)?'checked':''}><label for="student_${u.id}"><strong>✓ ${esc(u.name)}</strong><span class="muted">@${esc(u.username)}</span></label></div>`).join('')||'<p class="muted">No students created yet.</p>';
+
+  openModal('Lesson access permissions',`<p class="muted small">Choose which students can see this lesson. By default, a lesson is available to every student who has access to its subject.</p><div class="field"><div class="checkbox-item" style="gap:10px"><input type="checkbox" id="all_students" name="allStudents" ${current===null?'checked':''}><label for="all_students"><strong>Allow all students with subject access</strong></label></div></div><div class="field"><div style="display:flex;gap:8px;margin-bottom:12px;align-items:center"><label style="margin:0;flex:1">Specific students</label><button type="button" class="btn btn-secondary" id="selectStudentsBtn" style="padding:6px 12px;font-size:11px">✓ All</button><button type="button" class="btn btn-secondary" id="clearStudentsBtn" style="padding:6px 12px;font-size:11px">✕ None</button></div><div class="checkbox-group">${checks}</div></div>`,'Save permissions',f=>{
+    lesson.allowedStudentIds=f.get('allStudents')==='on'?null:students.filter(u=>f.getAll('studentIds').includes(u.id)).map(u=>u.id);
+    saveDB();
+    closeModal();
+    if(activeCourse)renderCourseDetail();
+    toast('Lesson permissions updated');
+  });
+
+  setTimeout(()=>{
+    const selectBtn=$('#selectStudentsBtn');
+    const clearBtn=$('#clearStudentsBtn');
+    if(selectBtn){
+      selectBtn.onclick=()=>{
+        $$('[name="studentIds"]').forEach(cb=>cb.checked=true);
+      };
+    }
+    if(clearBtn){
+      clearBtn.onclick=()=>{
+        $$('[name="studentIds"]').forEach(cb=>cb.checked=false);
+      };
+    }
+  },10);
 }
-function openModal(title,body,submitText,onSubmit){$('#modalRoot').innerHTML=`<div class="modal-backdrop" id="modalBackdrop"><section class="modal"><div class="modal-head"><h2>${title}</h2><button class="btn btn-secondary" id="closeModal">✕</button></div><form id="modalForm">${body}<div class="row" style="margin-top:20px;justify-content:flex-end"><button type="button" class="btn btn-secondary" id="cancelModal">Cancel</button><button class="btn btn-primary" type="submit">${submitText}</button></div></form></section></div>`;$('#closeModal').onclick=closeModal;$('#cancelModal').onclick=closeModal;$('#modalBackdrop').onclick=e=>{if(e.target.id==='modalBackdrop')closeModal()};$('#modalForm').onsubmit=async e=>{e.preventDefault();const btn=$('#modalForm button[type=submit]');btn.disabled=true;try{await onSubmit(new FormData(e.target))}catch(err){alert(err.message||'Could not save.')}finally{btn.disabled=false}}}
-function closeModal(){$('#modalRoot').innerHTML=''}
-function courseModal(c=null){openModal(c?'Edit subject':'Add subject',`<div class="field"><label>Subject name</label><input name="title" required value="${esc(c?.title||'')}" placeholder="e.g. Business Studies"></div><div class="field"><label>Display label</label><input name="subject" value="${esc(c?.subject||'')}" placeholder="e.g. BUSINESS STUDIES"></div><div class="field"><label>Description</label><textarea name="description" rows="3" placeholder="Short description">${esc(c?.description||'')}</textarea></div>`,c?'Save changes':'Create subject',f=>{const title=f.get('title').trim();if(!title)throw Error('Please enter a subject name.');if(c){Object.assign(c,{title,subject:f.get('subject').trim(),description:f.get('description').trim()})}else db.courses.push({id:id('c'),title,subject:f.get('subject').trim()||title.toUpperCase(),description:f.get('description').trim()});saveDB();closeModal();renderPage();toast(c?'Subject updated':'Subject created')})}
+
+function openModal(title,body,submitText,onSubmit){
+  $('#modalRoot').innerHTML=`<div class="modal-backdrop" id="modalBackdrop"><section class="modal"><div class="modal-head"><h2>${title}</h2><button class="btn btn-secondary" id="closeModal">✕</button></div><form id="modalForm">${body}<div class="row" style="margin-top:20px;justify-content:flex-end;gap:10px"><button type="button" class="btn btn-secondary" id="cancelModal">Cancel</button><button class="btn btn-primary" type="submit">${submitText}</button></div></form></section></div>`;
+
+  $('#closeModal').onclick=closeModal;
+  $('#cancelModal').onclick=closeModal;
+  $('#modalBackdrop').onclick=e=>{if(e.target.id==='modalBackdrop')closeModal()};
+
+  $('#modalForm').onsubmit=async e=>{
+    e.preventDefault();
+    const btn=$('#modalForm button[type=submit]');
+    btn.disabled=true;
+    try{
+      await onSubmit(new FormData(e.target));
+    }catch(err){
+      alert(err.message||'Could not save.');
+    }finally{
+      btn.disabled=false;
+    }
+  };
+}
+
+function closeModal(){
+  $('#modalRoot').innerHTML='';
+}
+
+function courseModal(c=null){
+  openModal(c?'Edit subject':'Add subject',`<div class="field"><label>Subject name</label><input name="title" required value="${esc(c?.title||'')}" placeholder="e.g. Business Studies"></div><div class="field"><label>Display label</label><input name="subject" value="${esc(c?.subject||'')}" placeholder="e.g. BUSINESS STUDIES"></div><div class="field"><label>Description</label><textarea name="description" rows="3" placeholder="Short description">${esc(c?.description||'')}</textarea></div>`,c?'Save changes':'Create subject',f=>{
+    const title=f.get('title').trim();
+    if(!title)throw Error('Please enter a subject name.');
+    if(c){
+      Object.assign(c,{title,subject:f.get('subject').trim(),description:f.get('description').trim()});
+    }else{
+      db.courses.push({id:id('c'),title,subject:f.get('subject').trim()||title.toUpperCase(),description:f.get('description').trim()});
+    }
+    saveDB();
+    closeModal();
+    renderPage();
+    toast(c?'Subject updated':'Subject created');
+  });
+}
+
 function normalizeYouTubeId(value){
- const raw=String(value||'').trim();
- if(!raw)return '';
- if(/^[A-Za-z0-9_-]{11}$/.test(raw))return raw;
- try{
-   const u=new URL(raw.startsWith('//')?'https:'+raw:raw);
-   const host=u.hostname.toLowerCase().replace(/^www\./,'').replace(/^m\./,'');
-   let candidate='';
-   if(host==='youtu.be') candidate=u.pathname.split('/').filter(Boolean)[0]||'';
-   else if(host==='youtube.com'||host==='youtube-nocookie.com'){
-     candidate=u.searchParams.get('v')||'';
-     if(!candidate){const parts=u.pathname.split('/').filter(Boolean);if(['embed','shorts','live','v'].includes(parts[0]))candidate=parts[1]||'';}
-   }
-   return /^[A-Za-z0-9_-]{11}$/.test(candidate)?candidate:'';
- }catch(_){return '';}
+  const raw=String(value||'').trim();
+  if(!raw)return '';
+  if(/^[A-Za-z0-9_-]{11}$/.test(raw))return raw;
+  try{
+    const u=new URL(raw.startsWith('//')?'https:'+raw:raw);
+    const host=u.hostname.toLowerCase().replace(/^www\./,'').replace(/^m\./,'');
+    let candidate='';
+    if(host==='youtu.be') candidate=u.pathname.split('/').filter(Boolean)[0]||'';
+    else if(host==='youtube.com'||host==='youtube-nocookie.com'){
+      candidate=u.searchParams.get('v')||'';
+      if(!candidate){const parts=u.pathname.split('/').filter(Boolean);if(['embed','shorts','live','v'].includes(parts[0]))candidate=parts[1]||'';}
+    }
+    return /^[A-Za-z0-9_-]{11}$/.test(candidate)?candidate:'';
+  }catch(_){return '';}
 }
-function lessonModal(defaultCourseId=null,lesson=null){if(!db.courses.length){alert('Add a subject first.');return}const options=db.courses.map(c=>`<option value="${c.id}" ${(lesson?.courseId||defaultCourseId)===c.id?'selected':''}>${esc(c.title)}</option>`).join('');openModal(lesson?'Edit lesson':'Add lesson',`<div class="field"><label>Subject</label><select name="courseId" required>${options}</select></div><div class="field"><label>Lesson title</label><input name="title" required value="${esc(lesson?.title||'')}" placeholder="e.g. Lesson 01 — Introduction"></div><div class="field"><label>YouTube video ID</label><input name="videoId" value="${esc(lesson?.videoId||'')}" placeholder="e.g. dQw4w9WgXcQ"><div class="small muted">Paste only the video ID, not the full URL. Embedded playback works only when YouTube allows embedding and the video's access settings permit the student to watch it.</div></div><div class="field"><label>Lesson description</label><textarea name="description" rows="3">${esc(lesson?.description||'')}</textarea></div>`,lesson?'Save lesson':'Add lesson',f=>{const rawVideo=String(f.get('videoId')||'').trim();const normalizedVideo=normalizeYouTubeId(rawVideo);if(rawVideo&&!normalizedVideo)throw Error('Enter a valid YouTube video ID or URL.');const vals={courseId:f.get('courseId'),title:String(f.get('title')||'').trim(),videoId:normalizedVideo,description:String(f.get('description')||'').trim()};if(!vals.title)throw Error('Enter a lesson title.');if(lesson)Object.assign(lesson,vals);else db.lessons.push({id:id('l'),...vals,allowedStudentIds:null});saveDB();closeModal();if(activeCourse && $('#courseDetail'))renderCourseDetail();else {activeCourse=null;renderPage()}toast(lesson?'Lesson updated':'Lesson added')})}
-function paperModal(){if(!db.courses.length){alert('Add a subject first.');return}openModal('Upload PDF paper',`<div class="field"><label>Paper / document title</label><input name="title" required placeholder="e.g. 2026 Revision Paper 01"></div><div class="field"><label>Subject</label><select name="courseId"><option value="">All students / general</option>${db.courses.map(c=>`<option value="${c.id}">${esc(c.title)}</option>`).join('')}</select></div><div class="field"><label>PDF file</label><input name="file" type="file" accept="application/pdf,.pdf" required><div class="small muted">Demo stores the file in this browser. Small PDFs only; production should use cloud storage.</div></div>`, 'Upload PDF',async f=>{const file=f.get('file');if(!file||file.size===0)throw Error('Choose a PDF file.');if(file.size>1_500_000)throw Error('For this HTML demo, choose a PDF under 1.5 MB. Use cloud storage for larger files.');if(file.type&&file.type!=='application/pdf'&&!file.name.toLowerCase().endsWith('.pdf'))throw Error('Please choose a PDF file.');const dataUrl=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(Error('Could not read file.'));r.readAsDataURL(file)});db.papers.push({id:id('p'),title:f.get('title').trim(),courseId:f.get('courseId'),fileName:file.name,dataUrl});try{saveDB()}catch(e){db.papers.pop();throw Error('Browser storage is full. Connect cloud storage for PDF uploads.')}closeModal();renderPage();toast('PDF uploaded')})}
-function studentModal(u=null){const access=db.studentCourseAccess[u?.id]||[];const checks=db.courses.map(c=>`<label style="display:flex;gap:9px;align-items:center;margin:9px 0;color:#d8e3fa"><input type="checkbox" name="access" value="${c.id}" ${access.includes(c.id)?'checked':''}> ${esc(c.title)}</label>`).join('')||'<p class="muted">Create a subject first.</p>';openModal(u?'Edit student':'Add student',`<div class="field"><label>Student full name</label><input name="name" required value="${esc(u?.name||'')}" placeholder="Student name"></div><div class="field"><label>Username</label><input name="username" required value="${esc(u?.username||'')}" placeholder="Unique username"></div><div class="field"><label>${u?'New password (leave blank to keep current)':'Temporary password'}</label><input name="password" type="password" ${u?'':'required'} minlength="6" placeholder="At least 6 characters"></div><div class="field"><label>Subject access</label>${checks}</div>`,u?'Save student':'Create student',f=>{const name=f.get('name').trim(),username=f.get('username').trim(),password=f.get('password');if(!name||!username)throw Error('Name and username are required.');if(db.users.some(x=>x.username.toLowerCase()===username.toLowerCase()&&x.id!==u?.id))throw Error('That username is already in use.');if(!u&&!password)throw Error('Enter a temporary password.');if(password&&password.length<6)throw Error('Password must be at least 6 characters.');if(u){u.name=name;u.username=username;if(password)u.password=password}else{const nu={id:id('u'),name,username,password,role:'student'};db.users.push(nu);db.studentCourseAccess[nu.id]=[]}db.studentCourseAccess[u?.id||db.users[db.users.length-1].id]=f.getAll('access');saveDB();closeModal();renderPage();toast(u?'Student updated':'Student account created')})}
+
+function lessonModal(defaultCourseId=null,lesson=null){
+  if(!db.courses.length){alert('Add a subject first.');return}
+  const options=db.courses.map(c=>`<option value="${c.id}" ${(lesson?.courseId||defaultCourseId)===c.id?'selected':''}>${esc(c.title)}</option>`).join('');
+
+  openModal(lesson?'Edit lesson':'Add lesson',`<div class="field"><label>Subject</label><select name="courseId" required>${options}</select></div><div class="field"><label>Lesson title</label><input name="title" required value="${esc(lesson?.title||'')}" placeholder="e.g. Lesson 01 — Introduction"></div><div class="field"><label>YouTube video ID</label><input name="videoId" value="${esc(lesson?.videoId||'')}" placeholder="e.g. dQw4w9WgXcQ"><div class="small muted">Paste only the video ID, not the full URL. Embedded playback works only when YouTube allows embedding.</div></div><div class="field"><label>Lesson description</label><textarea name="description" rows="3">${esc(lesson?.description||'')}</textarea></div>`,lesson?'Save lesson':'Add lesson',f=>{
+    const rawVideo=String(f.get('videoId')||'').trim();
+    const normalizedVideo=normalizeYouTubeId(rawVideo);
+    if(rawVideo&&!normalizedVideo)throw Error('Enter a valid YouTube video ID or URL.');
+
+    const vals={courseId:f.get('courseId'),title:String(f.get('title')||'').trim(),videoId:normalizedVideo,description:String(f.get('description')||'').trim()};
+    if(!vals.title)throw Error('Enter a lesson title.');
+
+    if(lesson)Object.assign(lesson,vals);
+    else db.lessons.push({id:id('l'),...vals,allowedStudentIds:null});
+
+    saveDB();
+    closeModal();
+    if(activeCourse && $('#courseDetail'))renderCourseDetail();
+    else {activeCourse=null;renderPage()}
+    toast(lesson?'Lesson updated':'Lesson added');
+  });
+}
+
+function paperModal(){
+  if(!db.courses.length){alert('Add a subject first.');return}
+
+  openModal('Upload PDF paper',`<div class="field"><label>Paper / document title</label><input name="title" required placeholder="e.g. 2026 Revision Paper 01"></div><div class="field"><label>Subject</label><select name="courseId"><option value="">All students / general</option>${db.courses.map(c=>`<option value="${c.id}">${esc(c.title)}</option>`).join('')}</select></div><div class="field"><label>PDF file</label><input name="file" type="file" accept="application/pdf,.pdf" required><div class="small muted">Demo stores file in browser. Small PDFs only; use cloud storage for production.</div></div>`,'Upload PDF',async f=>{
+    const file=f.get('file');
+    if(!file||file.size===0)throw Error('Choose a PDF file.');
+    if(file.size>1_500_000)throw Error('For this HTML demo, choose a PDF under 1.5 MB. Use cloud storage for larger files.');
+    if(file.type&&file.type!=='application/pdf'&&!file.name.toLowerCase().endsWith('.pdf'))throw Error('Please choose a PDF file.');
+
+    const dataUrl=await new Promise((resolve,reject)=>{
+      const r=new FileReader();
+      r.onload=()=>resolve(r.result);
+      r.onerror=()=>reject(Error('Could not read file.'));
+      r.readAsDataURL(file);
+    });
+
+    db.papers.push({id:id('p'),title:f.get('title').trim(),courseId:f.get('courseId'),fileName:file.name,dataUrl});
+    try{saveDB()}catch(e){db.papers.pop();throw Error('Browser storage is full. Connect cloud storage for PDF uploads.')}
+
+    closeModal();
+    renderPage();
+    toast('PDF uploaded');
+  });
+}
+
+function studentModal(u=null){
+  const access=db.studentCourseAccess[u?.id]||[];
+  const checks=db.courses.map(c=>`<div class="checkbox-item"><input type="checkbox" id="access_${c.id}" name="access" value="${c.id}" ${access.includes(c.id)?'checked':''}><label for="access_${c.id}"><strong>✓ ${esc(c.title)}</strong></label></div>`).join('')||'<p class="muted">Create a subject first.</p>';
+
+  openModal(u?'Edit student':'Add student',`<div class="field"><label>Student full name</label><input name="name" required value="${esc(u?.name||'')}" placeholder="Student name"></div><div class="field"><label>Username</label><input name="username" required value="${esc(u?.username||'')}" placeholder="Unique username"></div><div class="field"><label>${u?'New password (leave blank to keep current)':'Temporary password'}</label><input name="password" type="password" ${u?'':'required'} minlength="6" placeholder="At least 6 characters"></div><div class="field"><div style="display:flex;gap:8px;margin-bottom:12px;align-items:center"><label style="margin:0;flex:1">Subject access</label><button type="button" class="btn btn-secondary" id="selectAllBtn" style="padding:6px 12px;font-size:11px">✓ All</button><button type="button" class="btn btn-secondary" id="clearAllBtn" style="padding:6px 12px;font-size:11px">✕ None</button></div><div class="checkbox-group">${checks}</div></div>`,u?'Save student':'Create student',f=>{
+    const name=f.get('name').trim(),username=f.get('username').trim(),password=f.get('password');
+    if(!name||!username)throw Error('Name and username are required.');
+    if(db.users.some(x=>x.username.toLowerCase()===username.toLowerCase()&&x.id!==u?.id))throw Error('That username is already in use.');
+    if(!u&&!password)throw Error('Enter a temporary password.');
+    if(password&&password.length<6)throw Error('Password must be at least 6 characters.');
+
+    if(u){
+      u.name=name;
+      u.username=username;
+      if(password)u.password=password;
+    }else{
+      const nu={id:id('u'),name,username,password,role:'student'};
+      db.users.push(nu);
+      db.studentCourseAccess[nu.id]=[];
+    }
+
+    db.studentCourseAccess[u?.id||db.users[db.users.length-1].id]=f.getAll('access');
+    saveDB();
+    closeModal();
+    renderPage();
+    toast(u?'Student updated':'Student account created');
+  });
+
+  setTimeout(()=>{
+    const selectAllBtn=$('#selectAllBtn');
+    const clearAllBtn=$('#clearAllBtn');
+    if(selectAllBtn){
+      selectAllBtn.onclick=()=>{
+        $$('[name="access"]').forEach(cb=>cb.checked=true);
+      };
+    }
+    if(clearAllBtn){
+      clearAllBtn.onclick=()=>{
+        $$('[name="access"]').forEach(cb=>cb.checked=false);
+      };
+    }
+  },10);
+}
+
 $('#loginForm').addEventListener('submit',function(e){
- e.preventDefault();
- const username=String($('#username').value||'').trim().toLowerCase();
- const password=String($('#password').value||'');
- const role=$('#role').value;
- let user=db.users.find(u=>String(u.username).toLowerCase()===username && u.password===password);
- if(!user){
-   const demo=seed.users.find(u=>u.username.toLowerCase()===username && u.password===password);
-   if(demo){
-     const idx=db.users.findIndex(u=>u.id===demo.id);
-     if(idx>=0) db.users[idx]=JSON.parse(JSON.stringify(demo)); else db.users.push(JSON.parse(JSON.stringify(demo)));
-     if(demo.role==='student' && !db.studentCourseAccess[demo.id]) db.studentCourseAccess[demo.id]=[...seed.studentCourseAccess[demo.id]];
-     saveDB();
-     user=db.users.find(u=>String(u.username).toLowerCase()===username && u.password===password);
-   }
- }
- if(!user){
-   $('#loginError').textContent='Login failed. Try admin / class123 or student / learn123.';
-   return;
- }
- // Role selector is a convenience; the account's saved role is authoritative.
- $('#role').value=user.role;
- $('#loginError').textContent='';
- try {
-   enterApp(user);
-   if($('#appScreen').classList.contains('hidden') || $('#loginScreen').classList.contains('hidden')===false){
-     $('#loginScreen').classList.add('hidden');
-     $('#appScreen').classList.remove('hidden');
-     renderNav();
-     renderPage();
-   }
- } catch(err) {
-   console.error('Dashboard error:',err);
-   $('#loginError').textContent='Login succeeded, but dashboard failed to load. Refresh this file and try again.';
- }
+  e.preventDefault();
+  const username=String($('#username').value||'').trim().toLowerCase();
+  const password=String($('#password').value||'');
+  const errorEl=$('#loginError');
+
+  let user=db.users.find(u=>String(u.username).toLowerCase()===username && u.password===password);
+
+  if(!user){
+    const demo=seed.users.find(u=>u.username.toLowerCase()===username && u.password===password);
+    if(demo){
+      const idx=db.users.findIndex(u=>u.id===demo.id);
+      if(idx>=0) db.users[idx]=JSON.parse(JSON.stringify(demo));
+      else db.users.push(JSON.parse(JSON.stringify(demo)));
+      if(demo.role==='student' && !db.studentCourseAccess[demo.id]) db.studentCourseAccess[demo.id]=[...seed.studentCourseAccess[demo.id]];
+      saveDB();
+      user=db.users.find(u=>String(u.username).toLowerCase()===username && u.password===password);
+    }
+  }
+
+  if(!user){
+    errorEl.textContent='Login failed. Try admin / class123 or student / learn123.';
+    errorEl.style.display='block';
+    return;
+  }
+
+  $('#role').value=user.role;
+  errorEl.textContent='';
+  errorEl.style.display='none';
+
+  try {
+    enterApp(user);
+  } catch(err) {
+    console.error('Dashboard error:',err);
+    errorEl.textContent='Login succeeded, but dashboard failed to load. Refresh this file and try again.';
+    errorEl.style.display='block';
+  }
 });
-$('#logoutBtn').onclick=showLogin;$('#menuBtn').onclick=()=>$('#sidebar').classList.toggle('open');
-loadDB();if(!Array.isArray(db.extras))db.extras=[];
+
+$('#logoutBtn').onclick=showLogin;
+$('#menuBtn').onclick=()=>$('#sidebar').classList.toggle('open');
+
+loadDB();
+
 if(memoryOnly)console.warn('Classroom is running in temporary memory mode. Changes will not persist after refresh; use HTTPS hosting and allow browser storage.');
 </script>
 </body>
