@@ -2142,7 +2142,7 @@ function renderOverview(){
 
 function courseCard(c){
   const count=db.lessons.filter(l=>l.courseId===c.id).length;
-  return `<article class="card course">${c.coverDataUrl?`<img src="${safeImg(c.coverDataUrl)}" alt="${esc(c.title)} cover" style="width:100%;height:150px;object-fit:cover;border-radius:12px 12px 0 0">`:`<div class="course-art">${esc(c.subject||'SUBJECT')}</div>`}<div class="course-body"><h3>${esc(c.title)}</h3><div class="course-meta">${count} lesson${count===1?'':'s'} · ${esc(c.description||'Course materials')}</div><div class="row"><span class="pill">COURSE</span><button class="btn btn-secondary" data-open-course="${c.id}">Open →</button></div></div></article>`
+  return `<article class="card course">${c.coverDataUrl?`<img src="${safeImg(c.coverDataUrl)}" alt="${esc(c.title)} cover" style="width:100%;height:150px;object-fit:cover;border-radius:12px 12px 0 0">`:`<div class="course-art">${esc(c.subject||'SUBJECT')}</div>`}<div class="course-body"><h3>${esc(c.title)}</h3><div class="course-meta">${count} lesson${count===1?'':'s'} · ${esc(c.description||'Course materials')}</div><div class="row"><span class="pill">COURSE</span><span style="display:flex;gap:6px">${canManageCourse(c.id)?`<button class="btn btn-secondary" data-cover-course="${c.id}" title="Change cover photo">🖼 Cover</button>`:''}<button class="btn btn-secondary" data-open-course="${c.id}">Open →</button></span></div></div></article>`
 }
 
 function renderCourses(){
@@ -2196,6 +2196,33 @@ function toggleVideoFullscreen(btn){
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#ytFsBtn');if(b)toggleVideoFullscreen(b)});
 document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement)resetVideoFullscreen()});
 window.addEventListener('resize',updateVideoRotation);
+
+// ===== Subject cover photos =====
+// Any phone photo is accepted; it is scaled down and compressed so it fits in browser storage.
+async function compressImageToDataUrl(file,maxW=1024,maxBytes=350000){
+  const url=URL.createObjectURL(file);
+  try{
+    const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(Error('Could not read this image. Try a JPG or PNG.'));i.src=url});
+    const scale=Math.min(1,maxW/img.naturalWidth);
+    const c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.naturalWidth*scale));c.height=Math.max(1,Math.round(img.naturalHeight*scale));
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    let q=0.85,out=c.toDataURL('image/jpeg',q);
+    while(out.length*0.75>maxBytes&&q>0.4){q-=0.1;out=c.toDataURL('image/jpeg',q)}
+    return out;
+  } finally{URL.revokeObjectURL(url)}
+}
+function coverOnlyModal(c){
+  if(!c||!canManageCourse(c.id))return alert('You cannot change this subject cover.');
+  openModal(`Cover photo — ${esc(c.title)}`,`<div class="field"><label>Choose a photo</label><input name="coverPhoto" type="file" accept="image/*" required></div><p class="small muted">Any phone photo works — it is resized automatically.</p>${c.coverDataUrl&&safeImg(c.coverDataUrl)?`<img src="${safeImg(c.coverDataUrl)}" alt="Current cover" style="width:100%;max-height:160px;object-fit:cover;border-radius:12px;margin-top:8px">`:'<p class="small muted">No cover yet.</p>'}`,'Save cover',async f=>{
+    const file=f.get('coverPhoto');
+    if(!file||!file.size)throw Error('Choose an image first.');
+    if(!file.type.startsWith('image/'))throw Error('Choose an image file.');
+    c.coverDataUrl=await compressImageToDataUrl(file);
+    if(!saveDB())throw Error('Could not save. Browser storage may be full — remove some older covers and try again.');
+    closeModal();renderPage();toast('Cover photo saved');
+  });
+}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-cover-course]');if(b)coverOnlyModal(db.courses.find(x=>x.id===b.dataset.coverCourse))});
 window.onYouTubeIframeAPIReady=function(){};
 document.addEventListener('contextmenu',e=>{if(e.target.closest&&e.target.closest('.yt-guard'))e.preventDefault()});
 (function loadYouTubeAPI(){
@@ -2953,11 +2980,11 @@ function closeModal(){
 
 function courseModal(c=null){
   if(c&&!canManageCourse(c.id)){alert('You can only edit subjects assigned to your account.');return;}
-  openModal(c?'Edit subject':'Add subject',`<input type="hidden" name="level" value="AL"><div class="field"><label>Applicable grades / A/L years (select multiple)</label><div id="courseGradesBox" class="checkbox-group">${gradeChecks('grades',courseGrades(c),courseLevel(c))}</div></div><div class="field"><label>Subject name</label><input name="title" required value="${esc(c?.title||'')}" placeholder="e.g. Business Studies"></div><div class="field"><label>Display label</label><input name="subject" value="${esc(c?.subject||'')}" placeholder="e.g. BUSINESS STUDIES"></div><div class="field"><label>Description</label><textarea name="description" rows="3" placeholder="Short description">${esc(c?.description||'')}</textarea></div><div class="field"><label>Subject cover photo (optional)</label><input name="coverPhoto" type="file" accept="image/*"><div class="small muted">Upload JPG/PNG/WebP image up to 1.5 MB. Leave blank to keep current cover.</div>${c?.coverDataUrl?`<img src="${safeImg(c.coverDataUrl)}" alt="Current cover" style="max-width:100%;height:100px;object-fit:cover;border-radius:8px;margin-top:8px">`:''}</div>`,c?'Save changes':'Create subject',async f=>{
+  openModal(c?'Edit subject':'Add subject',`<input type="hidden" name="level" value="AL"><div class="field"><label>Applicable grades / A/L years (select multiple)</label><div id="courseGradesBox" class="checkbox-group">${gradeChecks('grades',courseGrades(c),courseLevel(c))}</div></div><div class="field"><label>Subject name</label><input name="title" required value="${esc(c?.title||'')}" placeholder="e.g. Business Studies"></div><div class="field"><label>Display label</label><input name="subject" value="${esc(c?.subject||'')}" placeholder="e.g. BUSINESS STUDIES"></div><div class="field"><label>Description</label><textarea name="description" rows="3" placeholder="Short description">${esc(c?.description||'')}</textarea></div><div class="field"><label>Subject cover photo (optional)</label><input name="coverPhoto" type="file" accept="image/*"><div class="small muted">Any phone photo works — it is resized automatically. Leave blank to keep current cover.</div>${c?.coverDataUrl?`<img src="${safeImg(c.coverDataUrl)}" alt="Current cover" style="max-width:100%;height:100px;object-fit:cover;border-radius:8px;margin-top:8px">`:''}</div>`,c?'Save changes':'Create subject',async f=>{
     const title=f.get('title').trim();
     if(!title)throw Error('Please enter a subject name.');
     const coverFile=f.get('coverPhoto');let coverDataUrl=c?.coverDataUrl||'';
-    if(coverFile&&coverFile.size){if(!['image/png','image/jpeg','image/webp'].includes(coverFile.type))throw Error('Choose a PNG, JPG or WebP image.');if(coverFile.size>1500000)throw Error('Choose a cover image under 1.5 MB.');coverDataUrl=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(Error('Could not read image.'));r.readAsDataURL(coverFile)});}
+    if(coverFile&&coverFile.size){if(!coverFile.type.startsWith('image/'))throw Error('Choose an image file.');if(coverFile.size>25000000)throw Error('Choose an image under 25 MB.');coverDataUrl=await compressImageToDataUrl(coverFile);}
     if(c){
       Object.assign(c,{title,subject:f.get('subject').trim(),description:f.get('description').trim(),coverDataUrl,level:String(f.get('level')||'AL'),grades:f.getAll('grades')});
     }else{
