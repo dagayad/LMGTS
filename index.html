@@ -1621,11 +1621,8 @@ html, body { max-width:100%; overflow-x:hidden; }
 }
 
 
-/* YouTube embed guard: transparent click shield + solid corner masks over the copy-link and YouTube logo. */
+/* YouTube embed guard: transparent click shield (no visible masks). */
 .yt-guard{position:absolute;inset:0;z-index:3;background:transparent;pointer-events:auto;cursor:default;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
-.yt-guard::before,.yt-guard::after{content:"";position:absolute;bottom:0;background:#050914;pointer-events:none}
-.yt-guard::before{left:0;width:clamp(96px,24%,190px);height:clamp(40px,16%,72px)}
-.yt-guard::after{right:0;width:clamp(96px,24%,190px);height:clamp(40px,16%,72px)}
 .video-frame{position:relative}
 
 /* Hide YouTube's own chrome (title, share/copy-link, logo) by cropping the embed slightly. Guard layer blocks all taps. */
