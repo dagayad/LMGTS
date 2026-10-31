@@ -339,6 +339,11 @@ input[type="number"] {
   text-align: center;
   flex-shrink: 0;
 }
+.nav-status-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-left:auto;flex:0 0 9px;box-shadow:0 0 7px currentColor}
+.nav-status-dot.green{background:#22c55e;color:#22c55e;animation:navDotPulse 1.8s infinite}
+.nav-status-dot.red{background:#ef4444;color:#ef4444}
+@keyframes navDotPulse{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.55)}50%{box-shadow:0 0 0 5px rgba(34,197,94,0)}}
+.nav-status-dot[aria-label]{cursor:help}
 
 .sidebar-bottom {
   margin-top: auto;
@@ -606,6 +611,11 @@ input[type="number"] {
   height: 100%;
   border: 0;
   display: block;
+  /* Keep the YouTube surface non-interactive: learners use the LMS controls below.
+     This blocks taps on the embedded logo/overlays and accidental outbound navigation. */
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .custom-player-shell {
@@ -1108,6 +1118,32 @@ input[type="number"] {
   }
 }
 
+/* Responsive lesson player and controls for phones, tablets, laptops and desktops. */
+.lesson-layout, .lesson-layout > div, .custom-player-shell { min-width: 0; max-width: 100%; }
+.video-frame { width: 100%; aspect-ratio: 16 / 9; }
+.custom-player-controls { width: 100%; box-sizing: border-box; }
+.custom-player-controls button { touch-action: manipulation; }
+.custom-player-controls input[type="range"] { max-width: 100%; }
+@media (max-width: 1024px) {
+  .lesson-layout { grid-template-columns: minmax(0, 1fr); }
+  .lesson-layout > div:first-child { order: 2; grid-column: 1; }
+  .lesson-layout > div:nth-child(2) { order: 1; grid-column: 1; }
+}
+@media (max-width: 600px) {
+  .custom-player-controls { gap: 6px; padding: 8px; }
+  .custom-player-controls button { min-height: 38px; padding: 7px 9px; font-size: 12px; }
+  .custom-player-controls .time { font-size: 11px; }
+  .custom-player-controls #ytSeek { order: 5; flex-basis: 100%; width: 100%; }
+  .custom-player-controls label { display: inline-flex; align-items: center; gap: 4px; }
+  .custom-player-controls #ytVolume { width: clamp(60px, 22vw, 90px) !important; min-width: 55px; }
+  .custom-player-controls #ytFullscreen { margin-left: auto; }
+  .video-placeholder { padding: 14px; }
+}
+@media (max-width: 360px) {
+  .custom-player-controls button { padding: 6px 7px; font-size: 11px; }
+  .custom-player-controls #ytFullscreen { flex: 1 1 auto; }
+}
+
 @media (max-width: 480px) {
   body {
     font-size: 15px;
@@ -1444,15 +1480,15 @@ input[type="checkbox"]:checked {
 }
 .lesson-item.lesson-locked{opacity:.82;border-style:dashed}.lesson-item.lesson-locked .lesson-num{background:#334155}.lesson-lock{margin-left:auto;font-size:14px;flex-shrink:0}
 
-.calendar-wrap{padding:18px}
+.calendar-wrap{padding:20px;background:linear-gradient(145deg,rgba(35,52,86,.92),rgba(12,20,38,.98));border:1px solid rgba(115,150,255,.22);box-shadow:0 18px 45px rgba(0,0,0,.18)}
 .calendar-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:18px}
 .calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
 .calendar-weekdays{margin-bottom:6px;text-align:center;color:var(--muted);font-size:12px;font-weight:800}
 .calendar-weekdays>div{padding:8px 2px}
-.calendar-day{min-height:112px;min-width:0;background:var(--panel,rgba(255,255,255,.025));border:1px solid var(--border);border-radius:10px;padding:7px;overflow:hidden}
+.calendar-day{min-height:112px;min-width:0;background:linear-gradient(160deg,rgba(255,255,255,.045),rgba(255,255,255,.015));border:1px solid var(--border);border-radius:12px;padding:8px;overflow:hidden;transition:transform .18s,border-color .18s,background .18s}.calendar-today{box-shadow:inset 0 0 0 1px rgba(34,197,94,.5);background:rgba(34,197,94,.07)}.calendar-day:not(.is-empty):hover{transform:translateY(-2px);border-color:rgba(99,130,255,.65);background:rgba(96,126,255,.08)}.calendar-day:has(.calendar-event){border-color:rgba(72,187,120,.38)}
 .calendar-day.is-empty{background:transparent;border-color:transparent}
-.calendar-day-number{font-size:12px;font-weight:800;margin-bottom:6px;color:var(--muted)}
-.calendar-event{display:block;width:100%;text-align:left;white-space:normal;overflow-wrap:anywhere;background:rgba(96,126,255,.15);border:1px solid rgba(96,126,255,.35);border-radius:6px;color:var(--text);padding:5px;margin:3px 0;font-size:11px;cursor:pointer}
+.calendar-day-number{display:flex;align-items:center;justify-content:center;width:25px;height:25px;border-radius:50%;font-size:12px;font-weight:800;margin-bottom:6px;color:var(--muted)}
+.calendar-event{display:block;width:100%;text-align:left;white-space:normal;overflow-wrap:anywhere;background:linear-gradient(110deg,rgba(96,126,255,.2),rgba(56,189,248,.08));border:1px solid rgba(96,126,255,.35);border-radius:8px;color:var(--text);padding:6px;margin:4px 0;font-size:11px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.08);transition:transform .16s}.calendar-event:hover{transform:translateY(-1px)}
 .calendar-event span{display:block;font-size:9px;color:var(--cyan);font-weight:800;text-transform:uppercase;margin-bottom:2px}
 .calendar-upcoming-row{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border)}
 .calendar-upcoming-row:last-child{border-bottom:0}
@@ -1472,6 +1508,117 @@ input[type="checkbox"]:checked {
 .dash-donut-center{z-index:1;text-align:center}.dash-donut-center strong{display:block;font-size:27px;line-height:1.1}.dash-donut-center span{font-size:11px;color:var(--muted)}
 .dash-legend{display:grid;gap:10px;min-width:125px}.dash-legend-item{display:flex;align-items:center;gap:8px;font-size:12px}.dash-dot{width:10px;height:10px;border-radius:3px;display:inline-block;flex:0 0 10px}.dash-dot.done{background:var(--cyan)}.dash-dot.left{background:rgba(120,140,170,.45)}.dash-dot.marks{background:#a78bfa}.dash-bars{display:grid;gap:13px}.dash-bar-row{display:grid;grid-template-columns:minmax(78px,1fr) minmax(90px,2fr) 42px;gap:10px;align-items:center;font-size:12px}.dash-bar-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dash-bar-track{height:10px;background:rgba(120,140,170,.18);border-radius:99px;overflow:hidden}.dash-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--cyan),#818cf8);min-width:0}.dash-bar-value{text-align:right;font-weight:800;font-variant-numeric:tabular-nums}.dash-mini-note{font-size:11px;color:var(--muted);margin-top:13px}.dash-highlight{display:flex;align-items:center;gap:12px;padding:13px 15px;border-radius:14px;background:rgba(99,102,241,.10);border:1px solid rgba(129,140,248,.22);margin-top:14px}.dash-highlight .emoji{font-size:23px}.dash-highlight strong{display:block}.dash-highlight span{font-size:12px;color:var(--muted)}
 @media(max-width:700px){.dash-chart-grid{grid-template-columns:1fr}.dash-chart{padding:14px}.dash-donut{width:124px;height:124px;flex-basis:124px}.dash-bar-row{grid-template-columns:minmax(75px,1fr) minmax(70px,1.3fr) 36px;gap:7px}}
+
+
+.live-reminder{display:inline-flex;align-items:center;gap:6px;background:#0d7a46;color:#fff;border:1px solid #22c875;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:800;letter-spacing:.35px;box-shadow:0 0 0 1px rgba(34,200,117,.12);white-space:nowrap}
+.live-reminder .live-dot{width:7px;height:7px;border-radius:50%;background:#8dffbb;box-shadow:0 0 8px #8dffbb;display:inline-block}
+
+/* Owner-controlled seasonal Christmas theme: decorative, lightweight and responsive */
+body.christmas-theme {
+  background: radial-gradient(circle at 8% 0%, rgba(25,135,84,.18), transparent 30%),
+              radial-gradient(circle at 92% 0%, rgba(190,35,55,.22), transparent 32%), var(--bg);
+}
+body.christmas-theme .card,
+body.christmas-theme .stat,
+body.christmas-theme .welcome,
+body.christmas-theme .course-card,
+body.christmas-theme .modal,
+body.christmas-theme .sidebar {
+  border-color: rgba(212,175,85,.34);
+}
+body.christmas-theme .btn-primary,
+body.christmas-theme .nav-item.active {
+  background: linear-gradient(135deg,#176b45,#218653 58%,#b52b3c);
+  border-color: rgba(239,207,120,.55);
+}
+body.christmas-theme .brand-mark,
+body.christmas-theme .logo-mark { background: linear-gradient(135deg,#b52b3c,#176b45,#d4af55); }
+body.christmas-theme h1, body.christmas-theme h2, body.christmas-theme h3 { text-shadow: 0 0 16px rgba(212,175,85,.10); }
+/* Snow sits BEHIND the content (z-index -1) so it never covers text, buttons or inputs. */
+#christmasFx { position:fixed; inset:0; pointer-events:none; z-index:-1; overflow:hidden; contain:strict; }
+#christmasFx .snowflake { position:absolute; top:-12vh; color:#ffffff; opacity:.7; text-shadow:0 0 6px rgba(255,255,255,.55); user-select:none; animation: christmas-fall linear infinite; line-height:1; }
+/* Festive garland strip along the top edge (decorative only, never blocks clicks). */
+body.christmas-theme::before { content:""; position:fixed; top:0; left:0; right:0; height:8px; z-index:60; pointer-events:none; opacity:.9;
+  background:repeating-linear-gradient(90deg,#e63946 0 16px,#2a9d5c 16px 32px,#f4d77b 32px 48px,transparent 48px 64px); }
+/* Festive hero card on the dashboard. */
+body.christmas-theme .welcome { background:linear-gradient(115deg,#1b5e3b,#14361f 65%,#5c1a24); border-color:rgba(212,175,85,.5); }
+body.christmas-theme .welcome h2::after { content:" 🎄"; }
+#christmasFx .twinkle { position:absolute; width:3px; height:3px; border-radius:50%; background:#f4d77b; opacity:.5; animation: christmas-twinkle 3.2s ease-in-out infinite; }
+@keyframes christmas-fall { to { transform:translate3d(4vw,115vh,0) rotate(260deg); } }
+@keyframes christmas-twinkle { 0%,100%{opacity:.18;transform:scale(.7)} 50%{opacity:.9;transform:scale(1.25)} }
+@media (prefers-reduced-motion: reduce) { #christmasFx .snowflake, #christmasFx .twinkle { animation:none!important; } body.christmas-theme * { scroll-behavior:auto!important; } }
+
+/* ===== Adaptive layout: phone / tablet / laptop / large PC ===== */
+*, *::before, *::after { min-width:0; }
+img, video, iframe, canvas, svg { max-width:100%; height:auto; }
+iframe { height:auto; }
+html, body { max-width:100%; overflow-x:hidden; }
+
+/* Tablet (769px – 1024px): slimmer sidebar, 2–3 column grids */
+@media (min-width:769px) and (max-width:1024px) {
+  .app { grid-template-columns:200px minmax(0,1fr); }
+  .sidebar { padding:18px 10px; gap:18px; }
+  .nav button { padding:10px; font-size:14px; }
+  .side-label { padding:0 6px; }
+  .main { padding:22px 20px 40px; }
+  .topbar h1 { font-size:24px; }
+  .stats { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .course-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .content-type-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .dash-chart-grid { grid-template-columns:1fr; }
+  .calendar-grid { gap:4px; }
+  .calendar-day { min-height:90px; }
+}
+
+/* Large PC (1400px+): centred content with a sensible max width */
+@media (min-width:1400px) {
+  .main { max-width:1400px; width:100%; margin:0 auto; }
+  .course-grid { grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); }
+  .content-type-grid { grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); }
+  .app { grid-template-columns:260px minmax(0,1fr); }
+}
+
+/* Phone & small tablet (up to 768px): drawer menu, single column, touch-friendly */
+@media (max-width:768px) {
+  .sidebar { width:min(84vw,300px); box-shadow:8px 0 30px rgba(0,0,0,.45); }
+  .sidebar.open { display:flex; }
+  .topbar { align-items:flex-start; }
+  .top-right { margin-left:auto; }
+  .stats { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .course-grid, .content-type-grid { grid-template-columns:1fr; }
+  .modal-backdrop { padding:10px; align-items:end; }
+  .modal { width:100%; max-height:92vh; border-radius:18px 18px 14px 14px; padding:20px 16px; }
+  .modal .row { flex-wrap:wrap; }
+  .modal .row > .btn { flex:1 1 auto; }
+  .modal-grid, .row:has(> .field) { grid-template-columns:1fr; }
+  .row:has(> .field) { flex-direction:column; align-items:stretch; }
+  .row:has(> .field) > .field { flex:1 1 auto !important; width:100%; }
+  .table { min-width:560px; }
+  .calendar-wrap { padding:8px; }
+  .calendar-day { min-height:64px; }
+  .btn, .nav button, .lesson-item { min-height:44px; }
+  input, select, textarea { font-size:16px; }   /* stops iOS zoom-on-focus */
+  .toast { left:12px; right:12px; bottom:calc(12px + var(--safe-bottom)); text-align:center; }
+}
+
+/* Small phones (up to 480px): tighter spacing, no decorative clutter */
+@media (max-width:480px) {
+  .main { padding:12px 12px 28px; }
+  .welcome h2 { font-size:18px; }
+  .section-head { flex-direction:column; align-items:flex-start; }
+  .section-head .btn { width:100%; }
+  .toolbar > * { width:100%; }
+  .custom-player-controls label.time { display:none; }
+  .lesson-layout { gap:10px; }
+  .login-card { width:100%; }
+  .welcome:after { display:none; }
+}
+
+/* Landscape phones: keep the video visible without being too tall */
+@media (max-height:500px) and (orientation:landscape) and (max-width:900px) {
+  .video-frame { max-height:70vh; }
+  .sidebar { max-height:100vh; }
+}
 
 </style>
 </head>
@@ -1503,7 +1650,7 @@ input[type="checkbox"]:checked {
         <div class="field"><label for="regUsername">Username</label><input id="regUsername" type="text" placeholder="Unique username" required></div>
         <div class="field"><label for="regPassword">Password</label><input id="regPassword" type="password" minlength="6" placeholder="At least 6 characters" required></div>
         <div class="field"><label for="regPhone">Phone (Optional)</label><input id="regPhone" type="tel" placeholder="+94 123456789"></div>
-        <div class="field"><label for="regInstitution">Institution</label><input id="regInstitution" type="text" placeholder="Your school/university name" required></div>
+        <div class="field"><label for="regInstitution">Institution</label><input id="regInstitution" type="text" placeholder="Your school/university name" required></div><input type="hidden" name="regLevel" id="regLevel" value="AL"><div class="field"><label>A/L year</label><select name="regGrade" id="regGrade"></select></div><div class="field"><label>Subjects applying for</label><div id="regSubjectsBox" class="checkbox-group"></div><p class="small muted">Select the subjects you want to apply for. Admin will review access.</p></div>
         <button class="btn btn-primary full" type="submit">Submit Registration</button>
         <p id="registerError" class="small" style="color:var(--danger);margin:12px 0 0;display:none"></p>
         <p id="registerSuccess" class="small" style="color:var(--cyan);margin:12px 0 0;display:none"></p>
@@ -1613,7 +1760,7 @@ function saveDB(){
  db.fees=Array.isArray(db.fees)?db.fees:[];db.deliveries=Array.isArray(db.deliveries)?db.deliveries:[];db.adminCourseAccess=db.adminCourseAccess&&typeof db.adminCourseAccess==='object'?db.adminCourseAccess:{};db.teacherCourseAccess=db.teacherCourseAccess&&typeof db.teacherCourseAccess==='object'?db.teacherCourseAccess:{};db.messages=Array.isArray(db.messages)?db.messages:[];db.marks=Array.isArray(db.marks)?db.marks:[];db.lessonProgress=db.lessonProgress&&typeof db.lessonProgress==='object'?db.lessonProgress:{};
  try {
    if(!memoryOnly && window.localStorage){
-     localStorage.setItem(STORE,JSON.stringify(db));
+     const raw=JSON.stringify(db);localStorage.setItem(STORE,raw);lastRaw=raw;
      return true;
    }
    return false;
@@ -1622,6 +1769,71 @@ function saveDB(){
    memoryOnly=true;
    return false;
  }
+}
+
+
+// ===== Security & sync helpers (added in audit) =====
+let lastRaw=null;
+const PW_ITER=150000;
+function toHex(bytes){return [...bytes].map(b=>b.toString(16).padStart(2,'0')).join('')}
+function fromHex(h){const out=new Uint8Array(h.length/2);for(let i=0;i<out.length;i++)out[i]=parseInt(h.substr(i*2,2),16);return out}
+async function pbkdf2(pw,salt,iter){const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(String(pw)),'PBKDF2',false,['deriveBits']);const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt,iterations:iter,hash:'SHA-256'},key,256);return new Uint8Array(bits)}
+async function hashPassword(pw){const salt=crypto.getRandomValues(new Uint8Array(16));return `pbkdf2$${PW_ITER}$${toHex(salt)}$${toHex(await pbkdf2(pw,salt,PW_ITER))}`}
+function isHashed(stored){return typeof stored==='string'&&stored.startsWith('pbkdf2$')}
+async function checkPassword(stored,pw){if(typeof stored!=='string')return false;if(!isHashed(stored))return stored===pw;const p=stored.split('$');if(p.length!==4)return false;const h=toHex(await pbkdf2(pw,fromHex(p[2]),Number(p[1])));return h===p[3]}
+// Only allow http(s) links, or PDF data URLs produced by readPdfDataUrl. Anything else (javascript:, html data:) becomes inert.
+function safeUrl(u){const s=String(u||'').trim();if(/^https?:\/\/[^\s"<>]+$/i.test(s))return esc(s);if(/^data:application\/pdf;base64,[A-Za-z0-9+/=]+$/.test(s))return s;return '#'}
+function safeImg(u){const s=String(u||'');return /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(s)?s:''}
+// Verify the real file header (%PDF-) instead of trusting the file extension / MIME type.
+async function readPdfDataUrl(file){const buf=new Uint8Array(await file.arrayBuffer());if(buf.length<5||String.fromCharCode(...buf.subarray(0,5))!=='%PDF-')throw Error('This file is not a valid PDF.');let bin='';for(let i=0;i<buf.length;i+=0x8000)bin+=String.fromCharCode.apply(null,buf.subarray(i,i+0x8000));return 'data:application/pdf;base64,'+btoa(bin)}
+function isTypingInPage(){const a=document.activeElement;if($('#modalRoot')?.innerHTML)return true;return !!a&&['INPUT','TEXTAREA','SELECT'].includes(a.tagName)&&!!$('#pageContent')?.contains(a)}
+// Keep the logged-in user object in sync with the latest saved data (admin changes to grade/subjects/removal).
+function rebindSession(){
+  if(!session)return;
+  const latest=(db.users||[]).find(u=>u.id===session.id);
+  if(!latest){session=null;showLogin();toast('Your account was changed or removed. Please sign in again.');return}
+  session=latest;
+}
+function reloadDbFromStorage(){
+  if(memoryOnly||!window.localStorage)return false;
+  let raw=null;try{raw=localStorage.getItem(STORE)}catch(_){return false}
+  if(!raw||raw===lastRaw)return false;
+  let fresh;try{fresh=JSON.parse(raw)}catch(_){return false}
+  if(!fresh||!Array.isArray(fresh.users))return false;
+  ['studentCourseAccess','teacherCourseAccess','adminCourseAccess','lessonProgress'].forEach(k=>{if(!fresh[k]||typeof fresh[k]!=='object')fresh[k]={}});
+  ['messages','notifications','marks','exams','quizzes','fees','deliveries','calendarEvents','extras','papers','lessons','courses','registrationRequests'].forEach(k=>{if(!Array.isArray(fresh[k]))fresh[k]=[]});
+  db=fresh;lastRaw=raw;if(archiveOLData())saveDB();rebindSession();return true;
+}
+function unreadNotificationCount(){return (db.notifications||[]).filter(n=>n.toId===session?.id&&!n.readAt).length}
+function renderNotifications(){
+  setTitle('Notifications','Schedule changes, exam and quiz updates, class and payment alerts');
+  const mine=(db.notifications||[]).filter(n=>n.toId===session.id).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  const unread=mine.filter(n=>!n.readAt).length;
+  $('#pageContent').innerHTML=`<section class="card" style="padding:18px"><div class="section-head"><h2 style="margin:0">Notifications ${unread?`<span class="pill">${unread} unread</span>`:''}</h2><button class="btn btn-secondary" id="markAllNotif" ${unread?'':'disabled'}>Mark all read</button></div><div style="display:grid;gap:10px;margin-top:12px">${mine.map(n=>`<article class="card" style="padding:14px;${n.readAt?'opacity:.7':'border-color:var(--blue)'}"><div class="row" style="justify-content:space-between;gap:8px"><strong>${esc(n.title)}</strong><span class="small muted">${new Date(n.createdAt||Date.now()).toLocaleString()}</span></div><p class="muted" style="margin:6px 0 8px;white-space:pre-wrap">${esc(n.body||'')}</p>${n.courseId?`<span class="pill">${esc(courseName(n.courseId))}</span>`:''}${n.readAt?'':`<div style="margin-top:8px"><button class="btn btn-secondary" data-read-notif="${esc(n.id)}">Mark read</button></div>`}</article>`).join('')||'<div class="empty">No notifications yet.</div>'}</div></section>`;
+  $('#markAllNotif')?.addEventListener('click',()=>{mine.forEach(n=>{if(!n.readAt)n.readAt=Date.now()});saveDB();renderNav();renderNotifications()});
+  $$('[data-read-notif]').forEach(b=>b.onclick=()=>{const n=db.notifications.find(x=>x.id===b.dataset.readNotif&&x.toId===session.id);if(n){n.readAt=Date.now();saveDB();renderNav();renderNotifications()}});
+}
+
+
+// ===== O/L removed: this system is A/L only. Existing O/L data is moved to db.olArchive (hidden, not deleted). =====
+function archiveOLData(){
+  let changed=false;
+  const isOL=c=>!!c&&courseLevel(c)==='OL';
+  const olIds=new Set((db.courses||[]).filter(isOL).map(c=>c.id));
+  db.olArchive=db.olArchive&&typeof db.olArchive==='object'?db.olArchive:{};
+  const take=(key,pred)=>{const keep=[],moved=[];(Array.isArray(db[key])?db[key]:[]).forEach(x=>(pred(x)?moved:keep).push(x));if(moved.length){changed=true;db[key]=keep;db.olArchive[key]=[...(db.olArchive[key]||[]),...moved];}};
+  if(olIds.size){
+    take('courses',c=>olIds.has(c.id));take('lessons',x=>olIds.has(x.courseId));take('papers',x=>olIds.has(x.courseId));
+    take('exams',x=>olIds.has(x.courseId));take('quizzes',x=>olIds.has(x.courseId));take('specialClasses',x=>olIds.has(x.courseId));
+    take('calendarEvents',x=>olIds.has(x.courseId));take('fees',x=>olIds.has(x.courseId));take('deliveries',x=>olIds.has(x.courseId));
+    take('marks',x=>olIds.has(x.courseId));
+    ['studentCourseAccess','teacherCourseAccess','adminCourseAccess'].forEach(k=>{
+      Object.keys(db[k]||{}).forEach(uid=>{const before=(db[k][uid]||[]).length;db[k][uid]=(db[k][uid]||[]).filter(cid=>!olIds.has(cid));if(db[k][uid].length!==before)changed=true;});
+    });
+  }
+  take('registrationRequests',r=>r.level==='OL');
+  (db.users||[]).forEach(u=>{if(u.level==='OL'){u.level='AL';changed=true}if(u.teachingLevel&&u.teachingLevel!=='AL'){u.teachingLevel='AL';changed=true}});
+  return changed;
 }
 
 const $=s=>document.querySelector(s);
@@ -1645,7 +1857,7 @@ function notifyCourseUsers(courseId,title,body,excludeId=session?.id){
  const recipients=new Set();
  // Notify enrolled students, subject managers, AND every admin/teacher (including Dasun)
  // so important updates are not missed by staff who are currently logged in elsewhere.
- (db.users||[]).forEach(u=>{if(u.id===excludeId)return;const student=(u.role==='student'&&(db.studentCourseAccess?.[u.id]||[]).includes(courseId));const staff=u.role==='teacher'||u.role==='admin';if(student||staff)recipients.add(u.id)});
+ (db.users||[]).forEach(u=>{if(u.id===excludeId)return;const student=(u.role==='student'&&(db.studentCourseAccess?.[u.id]||[]).includes(courseId));const staff=(u.role==='teacher'||u.role==='admin')&&(isOwnerAdminUserId(u.id)||canManageCourseForUser(u.id,courseId));if(student||staff)recipients.add(u.id)});
  recipients.forEach(toId=>db.notifications.push({id:id('notice'),toId,courseId,title,body,createdAt:Date.now(),readAt:null}));
 }
 function notifyStaffUsers(title,body,excludeId=session?.id){
@@ -1653,6 +1865,8 @@ function notifyStaffUsers(title,body,excludeId=session?.id){
  (db.users||[]).filter(u=>(u.role==='admin'||u.role==='teacher')&&u.id!==excludeId).forEach(u=>db.notifications.push({id:id('notice'),toId:u.id,courseId:'',title,body,createdAt:Date.now(),readAt:null}));
 }
 function isOwnerAdminUser(u){return !!u&&(u.isOwner===true||String(u.username||'').toLowerCase()==='dasun');}
+// FIX: canSeeCourse was only defined inside navHasScheduledItem, so Paper Class / Master Blast / Calendar threw ReferenceError.
+function canSeeCourse(courseId){return isOwnerAdmin()||canManageCourse(courseId)||(!isAdmin()&&!isTeacher()&&allowedCourses().some(c=>String(c.id)===String(courseId)));}
 
 function courseName(cid){
   return db.courses.find(c=>c.id===cid)?.title||'Unknown subject'
@@ -1666,16 +1880,17 @@ function isOwnerAdmin(){const storedUser=(db.users||[]).find(u=>u.id===session?.
 function isTeacher(){return session?.role==='teacher'}
 function teacherCourses(){return db.courses.filter(c=>(db.teacherCourseAccess?.[session?.id]||[]).includes(c.id))}
 function adminCourses(){return db.courses.filter(c=>(db.adminCourseAccess?.[session?.id]||[]).includes(c.id))}
-function canManageCourse(cid){return isOwnerAdmin()||(isAdmin()&&adminCourses().some(c=>c.id===cid))||(isTeacher()&&teacherCourses().some(c=>c.id===cid))}
+function canManageCourse(cid){if(isOwnerAdmin())return true;const c=db.courses.find(x=>x.id===cid);if(!c)return false;if(isAdmin())return adminCourses().some(x=>x.id===cid);if(isTeacher()){const t=db.users.find(u=>u.id===session.id)||session;const level=courseLevel(c),grades=courseGrades(c).filter(Boolean);if(t.teachingLevel&&t.teachingLevel!=='both'&&t.teachingLevel!==level)return false;if(Array.isArray(t.teachingGrades)&&t.teachingGrades.length&&grades.length&&!grades.some(g=>t.teachingGrades.includes(g)))return false;return teacherCourses().some(x=>x.id===cid)}return false}
 function allowedCourses(){
   if(isOwnerAdmin())return db.courses;
   if(isAdmin())return adminCourses();
   if(isTeacher())return teacherCourses();
-  return db.courses.filter(c=>(db.studentCourseAccess[session.id]||[]).includes(c.id))
+  return db.courses.filter(c=>(db.studentCourseAccess[session.id]||[]).includes(c.id)&&courseLevel(c)===(session.level||'AL')&&(!courseGrades(c).filter(Boolean).length||courseGrades(c).includes(session.grade)))
 }
 
 function canSeeLesson(l){
-  return isAdmin()||(isTeacher()&&canManageCourse(l.courseId))||(allowedCourses().some(c=>c.id===l.courseId)&&(l.allowedStudentIds===null||l.allowedStudentIds===undefined||l.allowedStudentIds.includes(session.id)))
+  const gradeOk=!l.grades?.length||l.grades.includes(session?.grade);
+  return isAdmin()||(isTeacher()&&canManageCourse(l.courseId))||(gradeOk&&allowedCourses().some(c=>c.id===l.courseId)&&(l.allowedStudentIds===null||l.allowedStudentIds===undefined||l.allowedStudentIds.includes(session.id)))
 }
 
 function toast(msg){
@@ -1695,27 +1910,54 @@ function showLogin(){
 }
 
 function enterApp(user){
+  const now=Date.now();
+  const lastSeen=Number(user.lastLoginAt)||0;
+  const pendingLoginUpdates=(db.notifications||[]).filter(n=>n.toId===user.id&&!n.readAt&&Number(n.createdAt||0)>lastSeen);
+  user.lastLoginAt=now;
   session=user;
   knownMessageIds=new Set((db.messages||[]).filter(m=>m.toId===user.id).map(m=>m.id));knownNotificationIds=new Set((db.notifications||[]).filter(n=>n.toId===user.id).map(n=>n.id));
   $('#loginScreen').classList.add('hidden');
   $('#appScreen').classList.remove('hidden');
-  $('#sideName').textContent=user.name;
+  const displayName=String(user.name||user.username||'User');
+  $('#sideName').textContent=displayName;
   $('#sideRole').textContent=user.role==='admin'?'Administrator':user.role==='teacher'?'Teacher account':'Student account';
-  $('#sideAvatar').textContent=user.name[0].toUpperCase();
-  $('#topAvatar').textContent=user.name[0].toUpperCase();
-  $('#rolePill').textContent=user.role.toUpperCase();
+  $('#sideAvatar').textContent=displayName.charAt(0).toUpperCase();
+  $('#topAvatar').textContent=displayName.charAt(0).toUpperCase();
+  $('#rolePill').textContent=String(user.role||'student').toUpperCase();
   activePage='overview';
-  renderNav();
-  renderPage();
+  try {
+    renderNav();
+    renderPage();
+  } catch(dashboardError) {
+    console.error('Dashboard rendering error:',dashboardError);
+    // Keep the authenticated user inside the app even if a dashboard widget fails.
+    const nav=$('#nav');
+    if(nav)nav.innerHTML='<button class="active" data-page="overview"><span class="ico">▦</span>Overview</button><button data-page="courses"><span class="ico">▣</span>Subjects & lessons</button>';
+    const content=$('#pageContent');
+    if(content)content.innerHTML='<section class="welcome"><div class="pill">SIGNED IN</div><h2>Welcome to your classroom.</h2><p class="muted">Your account is signed in, but one dashboard component could not load. Please refresh the page. If this continues, contact the administrator.</p><button class="btn btn-primary" id="retryDashboard">Reload dashboard</button></section>';
+    if($('#retryDashboard'))$('#retryDashboard').onclick=()=>{try{renderNav();renderPage()}catch(e){console.error('Dashboard retry failed:',e);toast('Dashboard is still having a problem. Please refresh the page.')}};
+    if(nav)nav.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>{activePage=b.dataset.page;try{renderNav();renderPage()}catch(e){console.error('Page rendering error:',e);toast('This page could not load. Please refresh.')}});
+    setTitle('Classroom','Signed in');
+  }
+  if(!saveDB())console.warn('Could not save last login time; login reminders may repeat.');
+  if(pendingLoginUpdates.length){const count=pendingLoginUpdates.length;toast(`${count} new update${count===1?'':'s'} since your last login — check Notifications/Messages, Exams and Quiz.`);}
 }
 
+function navHasScheduledItem(key){
+  const today=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
+  if(key==='exams')return (db.exams||[]).some(e=>canSeeCourse(e.courseId)&&(!e.date||e.date>=today));
+  if(key==='quizzes')return (db.quizzes||[]).some(q=>canSeeCourse(q.courseId)&&q.published!==false&&quizState(q)!=='closed'&&quizState(q)!=='invalid');
+  if(key==='calendar')return (db.calendarEvents||[]).some(e=>(isAdmin()||e.published!==false)&&(!e.date||e.date>=today)&&(!e.courseId||canSeeCourse(e.courseId)));
+  return false;
+}
+function studentHasUnpaidFees(){return !!session&&session.role==='student'&&(db.fees||[]).some(f=>String(f.studentId)===String(session.id)&&!f.paid&&!(f.paymentSubmission&&f.paymentSubmission.status==='received'));}
 function renderNav(){
   const items=isAdmin()?
-    [['overview','▦','Overview'],['courses','▣','Subjects & lessons'],['papers','▤','PDF papers'],['quizzes','✓','Quiz'],['exams','📝','Exams'],['marks','★','Marks'],['messages','✉','Messages'],['fees','＄','Fees'],['deliver','📦','Deliver'],...(isOwnerAdmin()?[['accounts','♙','Admin accounts']]:[]),['students','♙','Students'],['registrations','📝','Registration Requests'],['calendar','▦','Monthly calendar'],['extras','✦','Exams & programs'],['settings','⚙','Settings']]:isTeacher()?
-    [['overview','▦','Teacher dashboard'],['courses','▣','My subjects'],['papers','▤','Subject papers'],['quizzes','✓','Subject quizzes'],['exams','📝','Exams'],['marks','★','Marks'],['messages','✉','Messages'],['fees','＄','Fees'],['deliver','📦','Deliver'],['accounts','♙','Admin accounts'],['students','♙','My students']]:
-    [['overview','▦','Overview'],['courses','▣','My subjects'],['papers','▤','Notes & papers'],['quizzes','✓','Quiz'],['exams','📝','Exams'],['marks','★','Marks'],['messages','✉','Messages'],['fees','＄','Fees'],['reminder','🔔','Reminder'],['deliver','📦','Deliver'],['calendar','▦','Monthly calendar'],['extras','✦','Exams & programs'],['profile','♙','My profile']];
+    [['overview','▦','Overview'],['courses','▣','Subjects & lessons'],['paperclass','📄','Paper Class'],['masterblast','🚀','Master Blast'],['papers','▤','PDF papers'],['quizzes','✓','Quiz'],['exams','📝','Exams'],['marks','★','Marks'],['messages','✉','Messages'],['notifications','🔔','Notifications'],['fees','＄','Fees'],['deliver','📦','Deliver'],...(isOwnerAdmin()?[['accounts','♙','Admin accounts']]:[]),['students','♙','Students'],['registrations','📝','Registration Requests'],['calendar','▦','Monthly calendar'],['extras','✦','Exams & programs'],['settings','⚙','Settings']]:isTeacher()?
+    [['overview','▦','Teacher dashboard'],['courses','▣','My subjects'],['paperclass','📄','Paper Class'],['masterblast','🚀','Master Blast'],['papers','▤','Subject papers'],['quizzes','✓','Subject quizzes'],['exams','📝','Exams'],['marks','★','Marks'],['messages','✉','Messages'],['notifications','🔔','Notifications'],['fees','＄','Fees'],['deliver','📦','Deliver'],['accounts','♙','Admin accounts'],['students','♙','My students'],['calendar','▦','Monthly calendar']]:
+    [['overview','▦','Overview'],['courses','▣','My subjects'],['paperclass','📄','Paper Class'],['masterblast','🚀','Master Blast'],['papers','▤','Notes & papers'],['quizzes','✓','Quiz'],['exams','📝','Exams'],['marks','★','Marks'],['messages','✉','Messages'],['notifications','🔔','Notifications'],['fees','＄','Fees'],['reminder','🔔','Reminder'],['deliver','📦','Deliver'],['calendar','▦','Monthly calendar'],['extras','✦','Exams & programs'],['profile','♙','My profile']];
 
-  $('#nav').innerHTML=items.map(([key,ico,label])=>{const unread=key==='messages'?unreadMessageCount():0;return `<button class="${activePage===key?'active':''}" data-page="${key}"><span class="ico">${ico}</span>${label}${unread?` <span class="pill" style="margin-left:auto">${unread}</span>`:''}</button>`}).join('');
+  $('#nav').innerHTML=items.map(([key,ico,label])=>{const unread=key==='messages'?unreadMessageCount():key==='notifications'?unreadNotificationCount():0;const feeDot=(key==='fees'||key==='reminder')&&studentHasUnpaidFees();const scheduledDot=['exams','quizzes','calendar'].includes(key)&&navHasScheduledItem(key);const dot=feeDot?'<span class="nav-status-dot red" aria-label="Payment pending" title="Payment pending"></span>':scheduledDot?'<span class="nav-status-dot green" aria-label="Scheduled item" title="Scheduled item"></span>':'';return `<button class="${activePage===key?'active':''}" data-page="${key}"><span class="ico">${ico}</span>${label}${unread?` <span class="pill" style="margin-left:auto">${unread}</span>`:''}${dot}</button>`}).join('');
 
   $$('[data-page]').forEach(b=>b.onclick=()=>{
     activePage=b.dataset.page;
@@ -1734,6 +1976,8 @@ function renderPage(){
   if(activePage==='overview')renderOverview();
   else if(activePage==='courses')renderCourses();
   else if(activePage==='papers')renderPapers();
+  else if(activePage==='paperclass')renderSpecialClasses('paperclass');
+  else if(activePage==='masterblast')renderSpecialClasses('masterblast');
   else if(activePage==='quizzes')renderQuizzes();
   else if(activePage==='exams')renderExams();
   else if(activePage==='marks')renderMarks();
@@ -1747,6 +1991,7 @@ function renderPage(){
   else if(activePage==='registrations'&&isAdmin())renderRegistrations();
   else if(activePage==='extras')renderExtras();
   else if(activePage==='calendar')renderCalendar();
+  else if(activePage==='notifications')renderNotifications();
   else if(activePage==='settings'&&isAdmin())renderSettings();
   else if(activePage==='profile'&&!isAdmin()&&!isTeacher())renderStudentProfile();
   else{activePage='overview';renderOverview()}
@@ -1765,7 +2010,7 @@ function messagePeers(courseId=''){
  }
  return [];
 }
-function unreadMessageCount(){return (db.messages||[]).filter(m=>m.toId===session?.id&&!m.readAt).length;}
+function unreadMessageCount(){return (db.messages||[]).filter(m=>m.toId===session?.id&&!m.readAt&&!(m.deletedForIds||[]).includes(session?.id)).length;}
 function renderMessages(){
  if(!Array.isArray(db.messages))db.messages=[];
  const student=session?.role==='student';
@@ -1787,16 +2032,18 @@ function renderMessages(){
 }
 
 function renderPaymentReminders(){
+ renderNav();
  const ownFees=(db.fees||[]).filter(f=>f.studentId===session.id);
  setTitle('Payment Reminder','Submit payment details and ask the admin to confirm receipt');
  const rows=ownFees.map(f=>{const sub=f.paymentSubmission||null;return `<article class="card" style="padding:16px;margin-bottom:12px"><div class="row" style="justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap"><div><h3 style="margin:0 0 5px">${esc(courseName(f.courseId))} · ${esc(f.type)}</h3><div class="muted small">${esc(f.description||'Fee')} · Rs. ${Number(f.amount||0).toLocaleString()}</div></div><span class="pill">${f.paid?'Received ✓':sub?(sub.status==='received'?'Received ✓':'Confirmation pending'):'Payment pending'}</span></div>${f.paid?`<p class="small" style="margin:12px 0 0">Payment has been marked as received by the admin.</p>`:sub?`<div class="card" style="padding:12px;margin-top:12px;background:var(--surface)"><strong>Your submitted payment details</strong><p style="white-space:pre-wrap;margin:6px 0">${esc(sub.description||'No description')}</p><div class="small muted">Submitted: ${new Date(sub.submittedAt).toLocaleString()} · Status: ${esc(sub.status==='received'?'Received by admin':'Waiting for admin confirmation')}</div></div><p class="small muted">If you need to correct these details, contact your teacher/admin.</p>`:`<form data-payment-submit="${esc(f.id)}" style="margin-top:12px"><div class="field"><label>Payment description</label><textarea name="description" rows="3" required maxlength="1000" placeholder="e.g. Paid by bank transfer on 28 Oct. Add reference number or payment details."></textarea></div><button class="btn btn-primary" type="submit">I have paid — send for confirmation</button></form>`}</article>`}).join('');
  $('#pageContent').innerHTML=`<section class="card" style="padding:18px"><h2>Payment reminders</h2><p class="muted">After you pay, submit a short description or payment reference. Your teacher/admin will check it and update the status to Received. Do not enter passwords or PINs.</p>${rows||'<div class="empty">No fees have been assigned to your account yet.</div>'}</section>`;
- $$('[data-payment-submit]').forEach(form=>form.onsubmit=e=>{e.preventDefault();const fee=db.fees.find(x=>x.id===form.dataset.paymentSubmit&&x.studentId===session.id);if(!fee||fee.paid||fee.paymentSubmission)return alert('This fee cannot be submitted again.');const description=String(new FormData(form).get('description')||'').trim();if(!description)return alert('Enter a payment description.');fee.paymentSubmission={description,submittedAt:Date.now(),status:'pending',submittedBy:session.id};db.notifications=db.notifications||[];db.messages=db.messages||[];const managers=db.users.filter(u=>(u.role==='admin'||u.role==='teacher')&&canManageCourseForUser(u.id,fee.courseId));managers.forEach(u=>{db.notifications.push({id:id('notice'),toId:u.id,courseId:fee.courseId,title:'Student payment confirmation',body:`${session.name} submitted payment details for ${fee.type}: Rs. ${Number(fee.amount).toLocaleString()}.`,createdAt:Date.now(),readAt:null});db.messages.push({id:id('msg'),fromId:session.id,toId:u.id,subject:`Payment confirmation: ${courseName(fee.courseId)}`,body:`Student: ${session.name} (${session.studentId||session.username})\nFee: ${fee.type} — ${fee.description}\nAmount: Rs. ${Number(fee.amount).toLocaleString()}\nPayment details: ${description}\nPlease review and confirm receipt in the Fees tab.`,courseId:fee.courseId,createdAt:Date.now(),readAt:null});});if(!saveDB())return alert('Could not save payment confirmation.');renderPaymentReminders();toast('Payment details sent for admin confirmation');});
+ $$('[data-payment-submit]').forEach(form=>form.onsubmit=e=>{e.preventDefault();const fee=db.fees.find(x=>x.id===form.dataset.paymentSubmit&&x.studentId===session.id);if(!fee||fee.paid||fee.paymentSubmission)return alert('This fee cannot be submitted again.');const description=String(new FormData(form).get('description')||'').trim();if(!description)return alert('Enter a payment description.');fee.paymentSubmission={description,submittedAt:Date.now(),status:'pending',submittedBy:session.id};db.notifications=db.notifications||[];db.messages=db.messages||[];const managers=db.users.filter(u=>(u.role==='admin'||u.role==='teacher')&&canManageCourseForUser(u.id,fee.courseId));managers.forEach(u=>{db.notifications.push({id:id('notice'),toId:u.id,courseId:fee.courseId,title:'Student payment confirmation',body:`${session.name} submitted payment details for ${fee.type}: Rs. ${Number(fee.amount).toLocaleString()}.`,createdAt:Date.now(),readAt:null});db.messages.push({id:id('msg'),fromId:session.id,toId:u.id,subject:`Payment confirmation: ${courseName(fee.courseId)}`,body:`Student: ${session.name} (${session.studentId||session.username})\nFee: ${fee.type} — ${fee.description}\nAmount: Rs. ${Number(fee.amount).toLocaleString()}\nPayment details: ${description}\nPlease review and confirm receipt in the Fees tab.`,courseId:fee.courseId,createdAt:Date.now(),readAt:null});});if(!saveDB())return alert('Could not save payment confirmation.');renderPaymentReminders();renderNav();toast('Payment details sent for admin confirmation');});
 }
 
 function feeCourses(){return isOwnerAdmin()?db.courses:allowedCourses();}
 function scopedStudents(courseId){return db.users.filter(u=>u.role==='student'&&(db.studentCourseAccess?.[u.id]||[]).includes(courseId));}
 function renderFees(){
+ if(session?.role==='student')renderNav();
  const student=session?.role==='student'; const courses=student?db.courses.filter(c=>(db.studentCourseAccess?.[session.id]||[]).includes(c.id)):feeCourses();
  setTitle('Fees',student?'View your subject fees and payment status':'Manage monthly, lesson and exam fees');
  if(student){const rows=(db.fees||[]).filter(f=>f.studentId===session.id).map(f=>`<tr><td>${esc(courseName(f.courseId))}</td><td>${esc(f.type)}</td><td>${esc(f.description||'—')}</td><td>Rs. ${Number(f.amount||0).toLocaleString()}</td><td>${f.paid?'Paid':'Pending'}</td></tr>`).join('');$('#pageContent').innerHTML=`<section class="card" style="padding:18px"><h2>My fees</h2><div class="table-wrap"><table class="table"><thead><tr><th>Subject</th><th>Fee type</th><th>Details</th><th>Amount</th><th>Status</th></tr></thead><tbody>${rows||'<tr><td colspan="5">No fees have been added yet.</td></tr>'}</tbody></table></div></section>`;return;}
@@ -1816,7 +2063,6 @@ function renderDeliver(){
  const upd=()=>$('#deliveryStudent').innerHTML=scopedStudents($('#deliveryCourse').value).map(u=>`<option value="${esc(u.id)}">${esc(u.name)} · ${esc(u.accountNumber||u.username)}</option>`).join('')||'<option value="">No students registered in this subject</option>';$('#deliveryCourse').onchange=upd;upd();
  $('#deliveryForm').onsubmit=e=>{e.preventDefault();const f=new FormData(e.currentTarget),courseId=String(f.get('courseId')),studentId=String(f.get('studentId')),u=db.users.find(x=>x.id===studentId);if(!canManageCourse(courseId)||!scopedStudents(courseId).some(x=>x.id===studentId))return alert('Choose a student in a subject you manage.');const d={id:id('delivery'),courseId,studentId,packNumber:String(f.get('packNumber')).trim(),details:String(f.get('details')).trim(),status:String(f.get('status')),createdAt:Date.now(),updatedAt:Date.now()};db.deliveries.push(d);u.tutePackNumber=d.packNumber;db.notifications=db.notifications||[];db.notifications.push({id:id('notice'),toId:studentId,courseId,title:'Tute pack delivery update',body:`${d.packNumber}: ${d.status}`,createdAt:Date.now(),readAt:null});notifyCourseUsers(courseId,'Tute pack added',`${u.name} · ${d.packNumber} · ${d.status}`,session.id);db.messages=db.messages||[];db.messages.push({id:id('msg'),fromId:session.id,toId:studentId,subject:`Tute pack delivery: ${courseName(courseId)}`,body:`Your tute pack ${d.packNumber} (${d.details}) status is: ${d.status}.`,courseId,createdAt:Date.now(),readAt:null});if(!saveDB())return alert('Could not save delivery.');renderDeliver();toast('Delivery saved and student notified');};
  $$('[data-delivery-status]').forEach(el=>el.onchange=()=>{const d=db.deliveries.find(x=>x.id===el.dataset.deliveryStatus);if(!d||!canManageCourse(d.courseId))return alert('You cannot manage this subject.');d.status=el.value;d.updatedAt=Date.now();db.notifications=db.notifications||[];db.notifications.push({id:id('notice'),toId:d.studentId,courseId:d.courseId,title:'Tute pack status changed',body:`${d.packNumber}: ${d.status}`,createdAt:Date.now(),readAt:null});notifyCourseUsers(d.courseId,'Delivery status updated',`${d.packNumber}: ${d.status}`,session.id);db.messages=db.messages||[];db.messages.push({id:id('msg'),fromId:session.id,toId:d.studentId,subject:`Tute pack update: ${courseName(d.courseId)}`,body:`Your tute pack ${d.packNumber} status is now: ${d.status}.`,courseId:d.courseId,createdAt:Date.now(),readAt:null});saveDB();renderDeliver();toast('Status updated and student notified');});
- $$('[data-delivery-received]').forEach(b=>b.onclick=()=>{const d=db.deliveries.find(x=>x.id===b.dataset.deliveryReceived&&x.studentId===session.id);if(!d||d.status!=='Delivered')return alert('The tute pack must be marked Delivered first.');d.receivedAt=Date.now();d.updatedAt=Date.now();db.messages=db.messages||[];const recipients=db.users.filter(u=>u.role==='admin'||u.role==='teacher');recipients.forEach(u=>{if(canManageCourseForUser(u.id,d.courseId))db.messages.push({id:id('msg'),fromId:session.id,toId:u.id,subject:`Tute pack received: ${courseName(d.courseId)}`,body:`${session.name} confirmed receiving pack ${d.packNumber} (${d.details}).`,courseId:d.courseId,createdAt:Date.now(),readAt:null});});if(!saveDB())return alert('Could not save confirmation.');renderDeliver();toast('Receipt confirmed');});
  $$('[data-delete-delivery]').forEach(b=>b.onclick=()=>{const d=db.deliveries.find(x=>x.id===b.dataset.deleteDelivery);if(!d||!d.receivedAt)return alert('Only student-confirmed deliveries can be deleted.');if(!canManageCourse(d.courseId))return alert('You cannot manage this subject.');if(confirm('Delete this confirmed delivery log? Export the register first if you need a permanent record.')){db.deliveries=db.deliveries.filter(x=>x.id!==d.id);if(!saveDB())return alert('Could not save changes.');renderDeliver();toast('Confirmed delivery log deleted');}});
  const exportRows=(db.deliveries||[]).filter(d=>courses.some(c=>c.id===d.courseId)).map(d=>{const u=db.users.find(x=>x.id===d.studentId)||{};const c=db.courses.find(x=>x.id===d.courseId)||{};const teacher=db.users.find(t=>t.role==='teacher'&&(db.teacherCourseAccess?.[t.id]||[]).includes(d.courseId));return {student:u.name||'',studentId:u.accountNumber||u.username||'',address:u.address||'',phone:u.phone||'',subject:c.title||'',teacher:teacher?.name||'',teacherPhone:teacher?.phone||'',packNumber:d.packNumber||'',details:d.details||'',status:d.status||'',received:d.receivedAt?'Yes':'No',updated:d.updatedAt?new Date(d.updatedAt).toLocaleString():''};});
  $('#exportDeliveriesCsv')?.addEventListener('click',()=>{const cols=['Student name','Student ID','Address','Student contact','Subject','Teacher name','Teacher contact','Tute pack number','Pack details','Delivery status','Student confirmed received','Last updated'];const keys=['student','studentId','address','phone','subject','teacher','teacherPhone','packNumber','details','status','received','updated'];const quote=v=>'"'+String(v??'').replace(/"/g,'""')+'"';const csv=[cols,...exportRows.map(r=>keys.map(k=>quote(r[k])))].map(r=>r.join(',')).join('\r\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));a.download='tute-delivery-register.csv';a.click();URL.revokeObjectURL(a.href);});
@@ -1829,9 +2075,10 @@ function renderAdminAccounts(){
  const admins=db.users.filter(u=>u.role==='admin'&&!u.isOwner&&u.id!=='u-sio');
  const subjectChecks=(selected=[])=>`<div class="subject-access-actions"><button type="button" class="btn btn-secondary" data-select-all-subjects>Select all subjects</button><button type="button" class="btn btn-secondary" data-clear-subjects>Clear selection</button></div><div class="subject-access-options">${db.courses.map(c=>`<label><input type="checkbox" name="access" value="${esc(c.id)}" ${selected.includes(c.id)?'checked':''}><span>${esc(c.title)}</span></label>`).join('')||'<p>No subjects have been created yet. Add a subject first.</p>'}</div>`;
  $('#pageContent').innerHTML=`<section class="card" style="padding:20px"><h2>Add admin account</h2><p class="muted">Select one or more subjects. This admin will only be able to manage the selected subjects.</p><form id="adminAccountForm"><div class="field"><label>Full name</label><input name="name" required></div><div class="field"><label>Username</label><input name="username" required></div><div class="field"><label>Temporary password</label><input name="password" type="password" minlength="6" required></div><div class="field"><label>Subjects this admin can manage</label>${subjectChecks()}</div><button class="btn btn-primary" type="submit" ${db.courses.length?'':'disabled'}>Add admin with selected subjects</button></form></section><section class="card" style="padding:20px;margin-top:16px"><h2>Admin accounts & subject access</h2><p class="muted">Use “Select subjects” to change the subjects assigned to each admin at any time.</p><div class="table-wrap"><table class="table"><thead><tr><th>Name</th><th>Username</th><th>Managed subjects</th><th>Actions</th></tr></thead><tbody>${admins.map(u=>`<tr><td>${esc(u.name)}</td><td>${esc(u.username)}</td><td>${(db.adminCourseAccess?.[u.id]||[]).map(courseName).map(esc).join(', ')||'None assigned'}</td><td><button class="btn btn-secondary" data-edit-admin-access="${esc(u.id)}">Select subjects</button> <button class="btn btn-danger" data-remove-admin="${esc(u.id)}">Remove</button></td></tr>`).join('')||'<tr><td colspan="4">No additional admin accounts.</td></tr>'}</tbody></table></div></section>`;
+ if(!isOwnerAdmin()){$('#adminAccountForm')?.closest('section')?.remove();$$('[data-edit-admin-access],[data-remove-admin]').forEach(b=>b.remove());return;}
  const wireSubjectSelection=(root)=>{root.querySelector('[data-select-all-subjects]')?.addEventListener('click',()=>root.querySelectorAll('input[name="access"]').forEach(x=>x.checked=true));root.querySelector('[data-clear-subjects]')?.addEventListener('click',()=>root.querySelectorAll('input[name="access"]').forEach(x=>x.checked=false));};
  wireSubjectSelection($('#adminAccountForm'));
- $('#adminAccountForm').onsubmit=e=>{e.preventDefault();const f=new FormData(e.currentTarget),name=String(f.get('name')||'').trim(),username=String(f.get('username')||'').trim(),password=String(f.get('password')||''),access=f.getAll('access');if(!name||!username||password.length<6)return alert('Enter a name, username and password of at least 6 characters.');if(!access.length)return alert('Please tick at least one subject using the checkboxes.');if(db.users.some(u=>String(u.username).toLowerCase()===username.toLowerCase()))return alert('Username already exists.');const uid=id('admin');db.users.push({id:uid,name,username,password,role:'admin',createdBy:session.id});db.adminCourseAccess=db.adminCourseAccess||{};db.adminCourseAccess[uid]=access;if(!saveDB())return alert('Could not save account.');renderAdminAccounts();toast('Admin account added with selected subject access');};
+ $('#adminAccountForm').onsubmit=async e=>{e.preventDefault();if(!isOwnerAdmin())return alert('Only the owner can add admin accounts.');const f=new FormData(e.currentTarget),name=String(f.get('name')||'').trim(),username=String(f.get('username')||'').trim(),password=String(f.get('password')||''),access=f.getAll('access');if(!name||!username||password.length<6)return alert('Enter a name, username and password of at least 6 characters.');if(!access.length)return alert('Please tick at least one subject using the checkboxes.');if(db.users.some(u=>String(u.username).toLowerCase()===username.toLowerCase()))return alert('Username already exists.');const uid=id('admin');db.users.push({id:uid,name,username,password:await hashPassword(password),role:'admin',createdBy:session.id});db.adminCourseAccess=db.adminCourseAccess||{};db.adminCourseAccess[uid]=access;if(!saveDB())return alert('Could not save account.');renderAdminAccounts();toast('Admin account added with selected subject access');};
  $$('[data-edit-admin-access]').forEach(b=>b.onclick=()=>{const u=db.users.find(x=>x.id===b.dataset.editAdminAccess);if(!u)return;const current=db.adminCourseAccess?.[u.id]||[];openModal(`Select subjects for ${esc(u.name)}`,`<p class="muted">Tick every subject this admin is allowed to manage. Unticked subjects will not be accessible to this admin.</p>${subjectChecks(current)}`,'Save selected subjects',f=>{const access=f.getAll('access');if(!access.length)throw new Error('Select at least one subject before saving.');db.adminCourseAccess=db.adminCourseAccess||{};db.adminCourseAccess[u.id]=access;if(!saveDB())throw new Error('Could not save subject access.');closeModal();renderAdminAccounts();toast('Admin subject access updated');});wireSubjectSelection($('#modalForm'));});
  $$('[data-remove-admin]').forEach(b=>b.onclick=()=>{const u=db.users.find(x=>x.id===b.dataset.removeAdmin);if(!u||u.isOwner)return alert('Owner account cannot be removed here.');if(confirm(`Remove admin account ${u.name}?`)){db.users=db.users.filter(x=>x.id!==u.id);if(db.adminCourseAccess)delete db.adminCourseAccess[u.id];if(!saveDB())return alert('Could not save changes.');renderAdminAccounts();toast('Admin account removed');}});
 }
@@ -1846,12 +2093,13 @@ function renderSupportFooter(){
 function renderSettings(){
  setTitle('Settings','Manage student portal support contact');
  const num=String(db.settings?.whatsappNumber||'+94 xx xxx xxxx');
- $('#pageContent').innerHTML=`<section class="card" style="max-width:720px;padding:24px"><h2>Student support</h2><p class="muted">This number appears at the bottom of the student portal. Use the international format, e.g. +94 77 123 4567.</p><form id="settingsForm"><div class="field"><label for="supportNumber">24x7 Support WhatsApp Number</label><input id="supportNumber" name="supportNumber" value="${esc(num)}" placeholder="+94 xx xxx xxxx" required><div class="small muted">Use a real WhatsApp number for the clickable contact link.</div></div><button class="btn btn-primary" type="submit">Save settings</button></form></section>${isOwnerAdmin()?`<section class="card" style="max-width:720px;padding:24px;margin-top:18px"><h2>Sio Creations admin account</h2><p class="muted">Change your own owner account name, username and password.</p><form id="ownerAccountForm"><div class="field"><label>Display name</label><input name="name" required value="${esc(session.name)}"></div><div class="field"><label>Username</label><input name="username" required value="${esc(session.username)}"></div><div class="field"><label>New password</label><input name="password" type="password" minlength="4" placeholder="Enter a new password (leave blank to keep current)"></div><button class="btn btn-primary" type="submit">Update owner account</button></form></section>
+ $('#pageContent').innerHTML=`<section class="card" style="max-width:720px;padding:24px"><h2>Student support</h2><p class="muted">This number appears at the bottom of the student portal. Use the international format, e.g. +94 77 123 4567.</p><form id="settingsForm"><div class="field"><label for="supportNumber">24x7 Support WhatsApp Number</label><input id="supportNumber" name="supportNumber" value="${esc(num)}" placeholder="+94 xx xxx xxxx" required><div class="small muted">Use a real WhatsApp number for the clickable contact link.</div></div><button class="btn btn-primary" type="submit">Save settings</button></form></section>${isOwnerAdmin()?`<section class="card" style="max-width:720px;padding:24px;margin-top:18px;border:1px solid rgba(212,175,85,.55)"><h2>🎄 Seasonal Theme Pack</h2><p class="muted">Owner-only appearance pack. Christmas colors, gentle snow and festive sparkle effects apply across the whole LMS for every account. You can turn it off any time.</p><div class="field" style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap"><div><strong>Christmas theme</strong><div class="small muted">${db.settings?.christmasThemeEnabled?'Currently enabled':'Currently disabled'}</div></div><label style="display:flex;align-items:center;gap:10px;cursor:pointer"><input id="christmasThemeToggle" type="checkbox" style="width:22px;height:22px;accent-color:#16834a" ${db.settings?.christmasThemeEnabled?'checked':''}><span>Enable festive theme</span></label></div><div class="small muted">Only Dasun (owner) can change this setting. The selection is saved with LMS settings in this browser.</div></section><section class="card" style="max-width:720px;padding:24px;margin-top:18px"><h2>Sio Creations admin account</h2><p class="muted">Change your own owner account name, username and password.</p><form id="ownerAccountForm"><div class="field"><label>Display name</label><input name="name" required value="${esc(session.name)}"></div><div class="field"><label>Username</label><input name="username" required value="${esc(session.username)}"></div><div class="field"><label>New password</label><input name="password" type="password" minlength="4" placeholder="Enter a new password (leave blank to keep current)"></div><button class="btn btn-primary" type="submit">Update owner account</button></form></section>
  <section class="card" style="max-width:720px;padding:24px;margin-top:18px"><h2>Backup & restore data</h2><p class="muted">Owner-only tools. Download a backup before resetting or restoring the classroom system.</p><div class="toolbar" style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-primary" type="button" id="backupDataBtn">⬇ Download full backup (.json)</button><button class="btn btn-secondary" type="button" id="restoreDataBtn">⬆ Restore from backup</button><input id="restoreDataFile" type="file" accept=".json,application/json" style="display:none"></div><p class="small muted">The backup includes student and teacher accounts, subjects, lessons, PDFs metadata, marks, exams, quizzes, messages, fees, delivery records, permissions and settings. Keep the backup file private because it may contain account details.</p></section>
  <section class="card" style="max-width:720px;padding:24px;margin-top:18px;border:1px solid #d97757"><h2 style="color:#d97757">Reset classroom data</h2><p class="muted">Deletes classroom records from this browser and starts with an empty portal. Your current Dasun owner account and support WhatsApp setting will be kept. This cannot be undone unless you have a backup.</p><button class="btn btn-danger" type="button" id="resetAllDataBtn">Reset all classroom data</button></section>`:''}`;
  $('#settingsForm').onsubmit=e=>{e.preventDefault();const value=$('#supportNumber').value.trim();if(!value) return alert('Enter a WhatsApp support number.');db.settings=db.settings||{};db.settings.whatsappNumber=value;if(!saveDB())return alert('Could not save settings in this browser.');renderPage();toast('Support number updated');};
  if(isOwnerAdmin()){
-  $('#ownerAccountForm').onsubmit=e=>{e.preventDefault();const f=new FormData(e.currentTarget),name=String(f.get('name')||'').trim(),username=String(f.get('username')||'').trim(),password=String(f.get('password')||'');if(!name||!username)return alert('Name and username are required.');if(db.users.some(u=>u.id!==session.id&&String(u.username).toLowerCase()===username.toLowerCase()))return alert('That username is already in use.');if(password&&password.length<4)return alert('Password must be at least 4 characters.');const u=db.users.find(x=>x.id===session.id);Object.assign(u,{name,username,isOwner:true,role:'admin'});if(password)u.password=password;session=u;if(!saveDB())return alert('Could not save account settings.');$('#sideName').textContent=u.name;renderNav();renderPage();toast('Owner account updated');};
+  $('#christmasThemeToggle').onchange=e=>{db.settings=db.settings||{};db.settings.christmasThemeEnabled=!!e.target.checked;if(!saveDB()){e.target.checked=!e.target.checked;db.settings.christmasThemeEnabled=!!e.target.checked;return alert('Could not save the theme setting in this browser.');}applyChristmasTheme();renderSettings();toast(db.settings.christmasThemeEnabled?'Christmas theme enabled for the LMS':'Christmas theme turned off');};
+  $('#ownerAccountForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.currentTarget),name=String(f.get('name')||'').trim(),username=String(f.get('username')||'').trim(),password=String(f.get('password')||'');if(!name||!username)return alert('Name and username are required.');if(db.users.some(u=>u.id!==session.id&&String(u.username).toLowerCase()===username.toLowerCase()))return alert('That username is already in use.');if(password&&password.length<4)return alert('Password must be at least 4 characters.');const u=db.users.find(x=>x.id===session.id);Object.assign(u,{name,username,isOwner:true,role:'admin'});if(password)u.password=await hashPassword(password);session=u;if(!saveDB())return alert('Could not save account settings.');$('#sideName').textContent=u.name;renderNav();renderPage();toast('Owner account updated');};
   $('#backupDataBtn').onclick=()=>{try{const payload={app:'Classroom LMS',formatVersion:1,createdAt:new Date().toISOString(),data:db};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='classroom-lms-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Backup downloaded');}catch(err){console.error(err);alert('Backup failed. Please try again.');}};
   $('#restoreDataBtn').onclick=()=>$('#restoreDataFile').click();
   $('#restoreDataFile').onchange=async e=>{const file=e.target.files?.[0];if(!file)return;try{const parsed=JSON.parse(await file.text());const incoming=parsed?.data||parsed;if(!incoming||!Array.isArray(incoming.users)||!Array.isArray(incoming.courses)||!Array.isArray(incoming.lessons)||!Array.isArray(incoming.papers))throw new Error('This does not look like a valid Classroom LMS backup.');if(!confirm('Restore this backup? Current classroom data will be replaced. Download a backup of current data first if you may need it.')){e.target.value='';return;}const owner=db.users.find(u=>u.id===session.id)||db.users.find(isOwnerAdminUser);if(!owner)throw new Error('Could not find the current owner account.');incoming.users=incoming.users.filter(u=>u.id!==owner.id&&String(u.username||'').toLowerCase()!==String(owner.username||'').toLowerCase()&&!u.isOwner);incoming.users.push(owner);incoming.settings={...(incoming.settings||{}),whatsappNumber:incoming.settings?.whatsappNumber||db.settings?.whatsappNumber||'+94 75 510 3772'};db=incoming;if(!saveDB())throw new Error('Could not save restored data in this browser. Check browser storage and try again.');alert('Backup restored successfully. The current Dasun owner account was kept. The page will reload now.');window.location.reload();}catch(err){console.error(err);alert('Restore failed: '+(err?.message||'Invalid backup file.'));}finally{e.target.value='';}};
@@ -1880,7 +2128,7 @@ function renderOverview(){
 
 function courseCard(c){
   const count=db.lessons.filter(l=>l.courseId===c.id).length;
-  return `<article class="card course">${c.coverDataUrl?`<img src="${c.coverDataUrl}" alt="${esc(c.title)} cover" style="width:100%;height:150px;object-fit:cover;border-radius:12px 12px 0 0">`:`<div class="course-art">${esc(c.subject||'SUBJECT')}</div>`}<div class="course-body"><h3>${esc(c.title)}</h3><div class="course-meta">${count} lesson${count===1?'':'s'} · ${esc(c.description||'Course materials')}</div><div class="row"><span class="pill">COURSE</span><button class="btn btn-secondary" data-open-course="${c.id}">Open →</button></div></div></article>`
+  return `<article class="card course">${c.coverDataUrl?`<img src="${safeImg(c.coverDataUrl)}" alt="${esc(c.title)} cover" style="width:100%;height:150px;object-fit:cover;border-radius:12px 12px 0 0">`:`<div class="course-art">${esc(c.subject||'SUBJECT')}</div>`}<div class="course-body"><h3>${esc(c.title)}</h3><div class="course-meta">${count} lesson${count===1?'':'s'} · ${esc(c.description||'Course materials')}</div><div class="row"><span class="pill">COURSE</span><button class="btn btn-secondary" data-open-course="${c.id}">Open →</button></div></div></article>`
 }
 
 function renderCourses(){
@@ -1909,7 +2157,7 @@ function openCourse(cid){
   renderNav();
   if(!$('#courseDetail'))renderPage();
   activeCourse=cid;
-  const lessons=db.lessons.filter(l=>l.courseId===cid);
+  const lessons=db.lessons.filter(l=>l.courseId===cid&&canSeeLesson(l));
   activeLesson=lessons[0]?.id||null;
   renderCourseDetail();
   const detail=$('#courseDetail');
@@ -1989,7 +2237,7 @@ function renderCourseDetail(){
   const papers=lessonUnlocked?db.papers.filter(p=>p.courseId===c.id&&(!p.lessonId||p.lessonId===l?.id)&&(isAdmin()||!p.lessonId||canSeeLesson(db.lessons.find(x=>x.id===p.lessonId)||{}))):[];
 
   const host=$('#courseDetail');
-  host.innerHTML=`${c.coverDataUrl?`<img src="${c.coverDataUrl}" alt="${esc(c.title)} cover" style="width:100%;max-height:220px;object-fit:cover;border-radius:16px;margin:0 0 16px">`:''}<div class="section-head"><h2>${esc(c.title)} <span class="muted">/ Lessons</span></h2>${isAdmin()?`<button class="btn btn-secondary" id="editCourse">Edit subject</button>`:''}</div><div class="lesson-layout"><div><div class="custom-player-shell"><div class="video-frame">${video?`<iframe id="ytCustomFrame" src="${video}" title="${esc(l?.title||'Video')}" allow="autoplay; encrypted-media" referrerpolicy="strict-origin-when-cross-origin" tabindex="-1"></iframe>`:`<div class="video-placeholder"><div class="play">▶</div><h3>${l?esc(l.title):'No lessons yet'}</h3><p class="muted">${l?'The admin needs to add a valid YouTube video ID for this lesson.':'Lessons will appear here once added by the admin.'}</p></div>`}</div>${video?`<div class="custom-player-controls"><button type="button" id="ytPlayPause">▶ Play</button><button type="button" id="ytBack">↶ 10s</button><button type="button" id="ytForward">10s ↷</button><span class="time" id="ytTime">0:00 / 0:00</span><input id="ytSeek" type="range" min="0" max="100" value="0" aria-label="Seek video"><label class="time">🔊 <input id="ytVolume" type="range" min="0" max="100" value="100" aria-label="Volume" style="width:90px;min-width:70px;vertical-align:middle"></label><button type="button" id="ytFullscreen" aria-label="Toggle fullscreen">⛶ Fullscreen</button></div>`:''}</div>${video?`<p class="small muted" id="ytPlayerStatus" style="margin:7px 0">Use these controls to play, pause, seek and adjust volume.</p>`:''}<p class="small muted" style="margin:8px 0">For reliable playback, use an HTTPS-hosted site. Some videos disable embedding or require sign-in. YouTube still controls playback availability.</p><h2 style="font-size:21px;margin:18px 0 5px">${l?esc(l.title):'Select a lesson'}</h2><p class="muted">${!l?'Choose a lesson from the list to start learning.':!lessonUnlocked?'This lesson is locked. Ask your class admin to enable access.':esc(l.description||'Choose a lesson from the list to start learning.')}</p>${l&&lessonUnlocked&&!isAdmin()&&!isTeacher()?`<div class="card" style="padding:13px 15px;margin:12px 0;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><strong>Lesson completion</strong><div class="small muted">Mark this lesson complete after watching it.</div></div><button type="button" class="btn ${isLessonComplete(session.id,l.id)?'btn-primary':'btn-secondary'}" id="lessonCompleteToggle" aria-pressed="${isLessonComplete(session.id,l.id)}">${isLessonComplete(session.id,l.id)?'✓ Completed · ON':'Mark complete · OFF'}</button></div>`:''}${!lessonUnlocked&&l?'<div class="card" style="padding:18px;margin:14px 0;border-color:var(--line)"><strong>🔒 Lesson locked</strong><p class="muted" style="margin:6px 0 0">You can see this lesson in your course, but its video and PDF resources are available only when the admin turns your permission ON.</p></div>':''}<div class="section-head"><h2>Lesson resources</h2></div><div class="resource-list">${papers.map(p=>resourceCard(p)).join('')||`<div class="empty">${lessonUnlocked?'No PDFs attached to this lesson yet.':'🔒 Resources are locked for this lesson.'}</div>`}</div></div><div><div class="section-head" style="margin-top:0"><h2>Course lessons</h2>${canManageCourse(c.id)?'<button class="btn btn-secondary" id="addCourseLesson">＋</button>':''}</div><div class="lesson-list">${allLessons.map((x,i)=>{const unlocked=isAdmin()||canSeeLesson(x);return `<button class="lesson-item ${x.id===activeLesson?'active':''} ${!unlocked?'lesson-locked':''}" data-lesson="${x.id}"><span class="lesson-num">${String(i+1).padStart(2,'0')}</span><span><strong>${esc(x.title)}</strong><small>${!unlocked?'🔒 Locked':x.videoId?'Video lesson':'Video not added'}</small></span>${!unlocked?'<span class="lesson-lock" aria-label="Locked lesson">🔒</span>':''}</button>`}).join('')||'<div class="empty">No lessons added yet.</div>'}</div>${canManageCourse(c.id)?`<div class="section-head"><h2>Subject tools</h2></div><div class="resource-list">${allLessons.map(x=>`<div class="resource"><div class="resinfo"><strong>${esc(x.title)}</strong><div class="small muted">${x.videoId?'YouTube ID set':'No video ID'}</div></div><button class="btn btn-secondary" data-edit-lesson="${x.id}">Edit</button>${isAdmin()?`<button class="btn btn-secondary permission-btn" data-permission-lesson="${x.id}">Permissions</button>`:''}<button class="btn btn-danger" data-delete-lesson="${x.id}">×</button></div>`).join('')}</div>`:''}</div></div>`;
+  host.innerHTML=`${c.coverDataUrl?`<img src="${safeImg(c.coverDataUrl)}" alt="${esc(c.title)} cover" style="width:100%;max-height:220px;object-fit:cover;border-radius:16px;margin:0 0 16px">`:''}<div class="section-head"><h2>${esc(c.title)} <span class="muted">/ Lessons</span></h2>${canManageCourse(c.id)?`<button class="btn btn-secondary" id="editCourse">Edit subject / cover</button>`:''}</div><div class="lesson-layout"><div><div class="custom-player-shell"><div class="video-frame">${video?`<iframe id="ytCustomFrame" src="${video}" title="${esc(l?.title||'Video')}" allow="autoplay; encrypted-media" referrerpolicy="strict-origin-when-cross-origin" tabindex="-1"></iframe>`:`<div class="video-placeholder"><div class="play">▶</div><h3>${l?esc(l.title):'No lessons yet'}</h3><p class="muted">${l?'The admin needs to add a valid YouTube video ID for this lesson.':'Lessons will appear here once added by the admin.'}</p></div>`}</div>${video?`<div class="custom-player-controls"><button type="button" id="ytPlayPause">▶ Play</button><button type="button" id="ytBack">↶ 10s</button><button type="button" id="ytForward">10s ↷</button><span class="time" id="ytTime">0:00 / 0:00</span><input id="ytSeek" type="range" min="0" max="100" value="0" aria-label="Seek video"><label class="time">🔊 <input id="ytVolume" type="range" min="0" max="100" value="100" aria-label="Volume" style="width:90px;min-width:70px;vertical-align:middle"></label><button type="button" id="ytFullscreen" aria-label="Toggle fullscreen">⛶ Fullscreen</button></div>`:''}</div>${video?`<p class="small muted" id="ytPlayerStatus" style="margin:7px 0">Video surface locked. Use Play/Pause, skip, seek and volume controls below.</p>`:''}<p class="small muted" style="margin:8px 0">Video surface interactions are disabled to prevent accidental YouTube navigation; use the controls below. Some videos disable embedding or require sign-in. YouTube still controls playback availability, so no HTML player can guarantee blocking every YouTube-owned overlay on every device.</p><h2 style="font-size:21px;margin:18px 0 5px">${l?esc(l.title):'Select a lesson'}</h2><p class="muted">${!l?'Choose a lesson from the list to start learning.':!lessonUnlocked?'This lesson is locked. Ask your class admin to enable access.':esc(l.description||'Choose a lesson from the list to start learning.')}</p>${l&&lessonUnlocked&&!isAdmin()&&!isTeacher()?`<div class="card" style="padding:13px 15px;margin:12px 0;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><strong>Lesson completion</strong><div class="small muted">Mark this lesson complete after watching it.</div></div><button type="button" class="btn ${isLessonComplete(session.id,l.id)?'btn-primary':'btn-secondary'}" id="lessonCompleteToggle" aria-pressed="${isLessonComplete(session.id,l.id)}">${isLessonComplete(session.id,l.id)?'✓ Completed · ON':'Mark complete · OFF'}</button></div>`:''}${!lessonUnlocked&&l?'<div class="card" style="padding:18px;margin:14px 0;border-color:var(--line)"><strong>🔒 Lesson locked</strong><p class="muted" style="margin:6px 0 0">You can see this lesson in your course, but its video and PDF resources are available only when the admin turns your permission ON.</p></div>':''}<div class="section-head"><h2>Lesson resources</h2></div><div class="resource-list">${papers.map(p=>resourceCard(p)).join('')||`<div class="empty">${lessonUnlocked?'No PDFs attached to this lesson yet.':'🔒 Resources are locked for this lesson.'}</div>`}</div></div><div><div class="section-head" style="margin-top:0"><h2>Course lessons</h2>${canManageCourse(c.id)?'<button class="btn btn-secondary" id="addCourseLesson">＋</button>':''}</div><div class="lesson-list">${allLessons.map((x,i)=>{const unlocked=isAdmin()||canSeeLesson(x);return `<button class="lesson-item ${x.id===activeLesson?'active':''} ${!unlocked?'lesson-locked':''}" data-lesson="${x.id}"><span class="lesson-num">${String(i+1).padStart(2,'0')}</span><span><strong>${esc(x.title)}</strong><small>${!unlocked?'🔒 Locked':x.videoId?'Video lesson':'Video not added'}</small></span>${!unlocked?'<span class="lesson-lock" aria-label="Locked lesson">🔒</span>':''}</button>`}).join('')||'<div class="empty">No lessons added yet.</div>'}</div>${canManageCourse(c.id)?`<div class="section-head"><h2>Subject tools</h2></div><div class="resource-list">${allLessons.map(x=>`<div class="resource"><div class="resinfo"><strong>${esc(x.title)}</strong><div class="small muted">${x.videoId?'YouTube ID set':'No video ID'}</div></div><button class="btn btn-secondary" data-edit-lesson="${x.id}">Edit</button>${isAdmin()?`<button class="btn btn-secondary permission-btn" data-permission-lesson="${x.id}">Permissions</button>`:''}<button class="btn btn-danger" data-delete-lesson="${x.id}">×</button></div>`).join('')}</div>`:''}</div></div>`;
 
   const completeBtn=$('#lessonCompleteToggle');if(completeBtn)completeBtn.onclick=()=>{const next=!isLessonComplete(session.id,l.id);db.lessonProgress[session.id]=db.lessonProgress[session.id]||{};if(next)db.lessonProgress[session.id][l.id]={completed:true,updatedAt:Date.now()};else delete db.lessonProgress[session.id][l.id];if(!saveDB())return alert('Could not save lesson progress in this browser.');renderCourseDetail();toast(next?'Lesson marked complete':'Lesson marked incomplete');};
   if(video){
@@ -2038,7 +2286,46 @@ function renderCourseDetail(){
 function resourceCard(p){
   const lesson=db.lessons.find(l=>l.id===p.lessonId);
   const context=[courseName(p.courseId),lesson?.title||'General resource'].filter(Boolean).map(esc).join(' · ');
-  return `<div class="resource"><div class="fileico">📄</div><div class="resinfo"><strong>${esc(p.title)}</strong><div class="small muted">${context} · ${(p.dataUrl||p.url)?'PDF resource':'File unavailable'}</div></div>${(p.dataUrl||p.url)?`<a class="btn btn-secondary" href="${esc(p.dataUrl||p.url)}" ${p.dataUrl?`download="${esc(p.fileName||p.title+'.pdf')}"`:'target="_blank" rel="noopener noreferrer"'}>Open / Download</a>`:'<span class="small muted">No file</span>'}${isAdmin()?`<button class="btn btn-danger" data-delete-paper="${p.id}">×</button>`:''}</div>`
+  return `<div class="resource"><div class="fileico">📄</div><div class="resinfo"><strong>${esc(p.title)}</strong><div class="small muted">${context} · ${(p.dataUrl||p.url)?'PDF resource':'File unavailable'}</div></div>${(p.dataUrl||p.url)?`<a class="btn btn-secondary" href="${safeUrl(p.dataUrl||p.url)}" ${p.dataUrl?`download="${esc(p.fileName||p.title+'.pdf')}"`:'target="_blank" rel="noopener noreferrer"'}>Open / Download</a>`:'<span class="small muted">No file</span>'}${isAdmin()?`<button class="btn btn-danger" data-delete-paper="${p.id}">×</button>`:''}</div>`
+}
+
+function specialClassName(type){return type==='masterblast'?'Master Blast':'Paper Class'}
+function specialClasses(){db.specialClasses=Array.isArray(db.specialClasses)?db.specialClasses:[];return db.specialClasses}
+function renderSpecialClasses(type){
+  const label=specialClassName(type), cs=allowedCourses();
+  setTitle(label, type==='masterblast'?'Revision classes, videos and PDF materials by subject':'Paper-focused classes, videos and downloadable PDFs by subject');
+  const items=specialClasses().filter(x=>x.type===type&&canSeeCourse(x.courseId)&&(!x.grades?.length||x.grades.includes(session.grade))&&(!x.studentIds?.length||x.studentIds.includes(session.id))); 
+  const canAdd=(isOwnerAdmin()||isAdmin()||isTeacher())&&cs.length>0;
+  $('#pageContent').innerHTML=`<div class="toolbar"><input id="specialSearch" placeholder="Search ${label}...">${canAdd?`<button class="btn btn-primary" id="addSpecial">＋ Add ${label}</button>`:''}</div><div class="course-grid" id="specialGrid">${items.map(x=>specialCard(x)).join('')||`<div class="empty">No ${label} sessions yet.</div>`}</div><div id="specialDetail"></div>`;
+  if(canAdd)$('#addSpecial').onclick=()=>specialClassModal(type);
+  $('#specialSearch').oninput=()=>{const q=$('#specialSearch').value.toLowerCase();$('#specialGrid').innerHTML=items.filter(x=>(x.title+' '+courseName(x.courseId)+' '+(x.description||'')).toLowerCase().includes(q)).map(specialCard).join('')||'<div class="empty">No matching sessions.</div>';wireSpecialCards(type)};
+  wireSpecialCards(type);
+}
+function specialCard(x){return `<article class="course-card" style="cursor:pointer" data-open-special="${esc(x.id)}"><div class="course-card-body"><div class="pill">${esc(courseName(x.courseId))}</div><h3>${esc(x.title)}</h3><p class="muted">${esc(x.description||specialClassName(x.type))}</p><div class="small muted">${x.date?esc(x.date)+(x.time?' · '+esc(x.time):'')+' · ':''}${x.grades?.length?esc(x.grades.join(', '))+' · ':''}${x.videoId?'▶ Video included':'No video'} · ${(x.pdfDataUrl||x.pdfUrl)?'PDF included':'No PDF yet'}</div><button class="btn btn-secondary" type="button" data-view-special="${esc(x.id)}">View details</button></div></article>`}
+function wireSpecialCards(type){
+  $$('[data-open-special],[data-view-special]').forEach(b=>b.onclick=e=>{e.stopPropagation();openSpecialClass(b.dataset.openSpecial||b.dataset.viewSpecial,type)});
+}
+function openSpecialClass(itemId,type){
+  const x=specialClasses().find(v=>String(v.id)===String(itemId)&&v.type===type&&canSeeCourse(v.courseId)&&(!v.grades?.length||v.grades.includes(session.grade))&&(!v.studentIds?.length||v.studentIds.includes(session.id))); if(!x)return;
+  const canEdit=canManageCourse(x.courseId);
+  const videoId=normalizeYouTubeId(x.videoId||'');
+  const host=$('#specialDetail');if(!host)return;
+  host.innerHTML=`<section class="card" style="padding:18px;margin-top:18px"><div class="section-head"><div><div class="pill">${esc(courseName(x.courseId))}</div><h2>${esc(x.title)}</h2></div><div class="row" style="gap:8px;flex-wrap:wrap">${canEdit?`<button class="btn btn-secondary" id="editSpecial">✎ Edit</button><button class="btn btn-danger" id="deleteSpecial">Remove</button>`:''}<button class="btn btn-secondary" id="closeSpecial">Close</button></div></div><p class="muted">${esc(x.description||'')}</p>${videoId?`<div class="custom-player-shell"><div class="video-frame"><iframe id="ytCustomFrame" title="${esc(x.title)}" allow="autoplay; encrypted-media" referrerpolicy="strict-origin-when-cross-origin" tabindex="-1"></iframe></div><div class="custom-player-controls"><button type="button" id="ytPlayPause">▶ Play</button><button type="button" id="ytBack">↶ 10s</button><button type="button" id="ytForward">10s ↷</button><span class="time" id="ytTime">0:00 / 0:00</span><input id="ytSeek" type="range" min="0" max="100" value="0" aria-label="Seek video"><label class="time">🔊 <input id="ytVolume" type="range" min="0" max="100" value="100" aria-label="Volume" style="width:90px;min-width:70px;vertical-align:middle"></label><button type="button" id="ytFullscreen">⛶ Fullscreen</button></div></div><p class="small muted" id="ytPlayerStatus">Use the controls below the locked video surface. YouTube may restrict embedding for some videos.</p>`:'<div class="empty">No video added to this session.</div>'}<div class="section-head"><h3>PDF materials</h3></div><div class="resource-list">${(x.pdfDataUrl||x.pdfUrl)?`<div class="resource"><div class="fileico">📄</div><div class="resinfo"><strong>${esc(x.pdfTitle||'Class PDF')}</strong><div class="small muted">${esc(x.pdfFileName||'PDF material')}</div></div>${x.pdfDataUrl?`<a class="btn btn-secondary" href="${safeUrl(x.pdfDataUrl)}" download="${esc(x.pdfFileName||'class-material.pdf')}">Open / Download</a>`:`<a class="btn btn-secondary" href="${safeUrl(x.pdfUrl)}" target="_blank" rel="noopener noreferrer">Open / Download</a>`}</div>`:'<div class="empty">No PDF materials uploaded yet.</div>'}</div></section>`;
+  if(videoId){initCustomYTPlayer(videoId);const bind=(id,fn)=>{const el=$('#'+id);if(el)el.addEventListener('click',fn)};bind('ytPlayPause',()=>{if(!ytPlayer)return;try{ytPlayer.getPlayerState()===1?ytPlayer.pauseVideo():ytPlayer.playVideo()}catch(_){}});bind('ytBack',()=>{if(ytPlayer)ytPlayer.seekTo(Math.max(0,ytPlayer.getCurrentTime()-10),true)});bind('ytForward',()=>{if(ytPlayer)ytPlayer.seekTo(Math.min(ytPlayer.getDuration(),ytPlayer.getCurrentTime()+10),true)});const seek=$('#ytSeek');if(seek)seek.addEventListener('change',()=>{if(ytPlayer)ytPlayer.seekTo(Number(seek.value),true)});const vol=$('#ytVolume');if(vol)vol.addEventListener('input',()=>{if(ytPlayer)ytPlayer.setVolume(Number(vol.value))});bind('ytFullscreen',()=>{const shell=host.querySelector('.custom-player-shell');if(!shell)return;if(document.fullscreenElement)document.exitFullscreen?.();else shell.requestFullscreen?.()});}
+  $('#closeSpecial').onclick=()=>host.innerHTML='';if(canEdit)$('#editSpecial').onclick=()=>specialClassModal(type,x);if(canEdit)$('#deleteSpecial').onclick=()=>{if(!confirm(`Remove this ${specialClassName(type)} session?`))return;db.specialClasses=specialClasses().filter(v=>String(v.id)!==String(x.id));if(!saveDB())return alert('Could not save this change in browser storage.');host.innerHTML='';renderSpecialClasses(type);toast('Session removed')};
+}
+function specialClassModal(type,item=null){
+  const label=specialClassName(type), cs=allowedCourses().filter(c=>canManageCourse(c.id));if(!cs.length){alert('You need access to a subject before creating a session.');return}
+  if(item&&!canManageCourse(item.courseId)){alert('You can only manage sessions for subjects assigned to your account.');return}
+  const opts=cs.map(c=>`<option value="${esc(c.id)}" ${(item?.courseId||cs[0].id)===c.id?'selected':''}>${esc(c.title)}</option>`).join('');
+  openModal(item?`Edit ${label}`:`Add ${label}`,`<div class="field"><label>Subject</label><select name="courseId" required>${opts}</select></div><div class="field"><label>${label} title</label><input name="title" required value="${esc(item?.title||'')}" placeholder="e.g. Accounting Paper Discussion / 2027 Revision"></div><div class="row" style="gap:10px"><div class="field" style="flex:1"><label>Session date (optional)</label><input name="date" type="date" value="${esc(item?.date||'')}"></div><div class="field" style="flex:1"><label>Time (optional)</label><input name="time" type="time" value="${esc(item?.time||'')}"></div></div><div class="field"><label>Applicable grades / A/L years (multiple)</label><div class="checkbox-group">${gradeChecks('specialGrades',item?.grades||[],courseLevel(cs.find(c=>c.id===(item?.courseId||cs[0].id)))||'AL')}</div></div><div class="field"><label>Available to students (select specific students, optional)</label><div class="checkbox-group">${db.users.filter(u=>u.role==='student'&&(db.studentCourseAccess[u.id]||[]).includes(item?.courseId||cs[0].id)).map(u=>`<label class="checkbox-item" style="display:flex;gap:8px;padding:6px"><input type="checkbox" name="specialStudents" value="${esc(u.id)}" ${(item?.studentIds||[]).includes(u.id)?'checked':''}><span>${esc(u.name)} · ${esc('A/L')} ${esc(u.grade||'')}</span></label>`).join('')||'<p class="small muted">Student list will appear once the subject is selected and assigned.</p>'}</div><p class="small muted">Leave all students unchecked to make it available to all students who have access to this subject and matching grade.</p></div><div class="field"><label>Description</label><textarea name="description" rows="3">${esc(item?.description||'')}</textarea></div><div class="field"><label>YouTube video URL or ID (optional)</label><input name="videoId" value="${esc(item?.videoId||'')}" placeholder="Paste video URL or 11-character ID"><div class="small muted">Embedded playback works only when YouTube allows embedding.</div></div><div class="field"><label>PDF title</label><input name="pdfTitle" value="${esc(item?.pdfTitle||'')}" placeholder="Class paper / answer guide"></div><div class="field"><label>Upload PDF (optional)</label><input name="pdfFile" type="file" accept="application/pdf,.pdf"><div class="small muted">Small files up to 1.5 MB are stored in this browser demo.</div></div><div class="field"><label>Or PDF URL</label><input name="pdfUrl" type="url" value="${esc(item?.pdfUrl||'')}" placeholder="https://..."></div>${item?.pdfFileName?`<p class="small muted">Current PDF: ${esc(item.pdfFileName)}</p>`:''}`,item?'Save changes':`Create ${label}`,async f=>{
+    const courseId=String(f.get('courseId')||''),title=String(f.get('title')||'').trim(),description=String(f.get('description')||'').trim(),rawVideo=String(f.get('videoId')||'').trim(),videoId=normalizeYouTubeId(rawVideo),pdfTitle=String(f.get('pdfTitle')||'').trim(),pdfUrl=String(f.get('pdfUrl')||'').trim(),file=f.get('pdfFile');
+    if(!title)throw Error('Enter a title.');if(!canManageCourse(courseId))throw Error('You do not have permission to manage this subject.');if(rawVideo&&!videoId)throw Error('Enter a valid YouTube URL or video ID.');if(pdfUrl&&!/^https?:\/\//i.test(pdfUrl))throw Error('Enter a valid PDF URL.');if(file&&file.size>1500000)throw Error('Choose a PDF under 1.5 MB or use a cloud URL.');if(file&&file.size&&file.type&&file.type!=='application/pdf'&&!file.name.toLowerCase().endsWith('.pdf'))throw Error('Please choose a PDF file.');
+    let pdfDataUrl=item?.pdfDataUrl||'',pdfFileName=item?.pdfFileName||'';if(file&&file.size){pdfDataUrl=await readPdfDataUrl(file);pdfFileName=file.name}
+    const vals={type,courseId,title,description,videoId,date:String(f.get('date')||''),time:String(f.get('time')||''),grades:f.getAll('specialGrades'),studentIds:f.getAll('specialStudents'),pdfTitle:pdfTitle||pdfFileName||'Class PDF',pdfUrl:pdfUrl||((file&&file.size)?'':(item?.pdfUrl||'')),pdfDataUrl,pdfFileName,updatedAt:Date.now(),updatedBy:session.id};
+    const list=specialClasses();if(item){const current=list.find(v=>String(v.id)===String(item.id));if(!current)throw Error('This session no longer exists. Refresh and try again.');Object.assign(current,vals)}else list.push({id:id('sc'),...vals,createdAt:Date.now(),createdBy:session.id});
+    if(!saveDB())throw Error('Could not save. Browser storage may be unavailable or full. Try a smaller PDF or use a cloud URL.');closeModal();renderSpecialClasses(type);toast(item?`${label} updated`:`${label} created`);
+  });
 }
 
 function renderPapers(){
@@ -2089,15 +2376,15 @@ function renderRegistrations(){
   wireRegistrationButtons();
 }
 function registrationRow(r){
-  return `<tr><td><strong>${esc(r.name)}</strong><br><span class="muted">${esc(r.username)}</span></td><td>${esc(r.email)}<br>${esc(r.phone||'No phone')}<br><span class="muted">${esc(r.institution)}</span></td><td><span class="pill">${esc(r.status||'pending')}</span></td><td><div class="actions">${(r.status||'pending')==='pending'?`<button class="btn btn-primary" data-approve-registration="${r.id}">Approve</button><button class="btn btn-danger" data-reject-registration="${r.id}">Reject</button>`:'—'}</div></td></tr>`;
+  return `<tr><td><strong>${esc(r.name)}</strong><br><span class="muted">${esc(r.username)}</span></td><td>${esc(r.email)}<br>${esc(r.phone||'No phone')}<br><span class="muted">${esc(r.institution)}<br><span class="pill">${esc('A/L')} · ${esc(r.grade||'Grade not set')}</span><br><span class="small muted">Subjects requested: ${(r.requestedCourseIds||[]).map(cid=>esc(courseName(cid))).join(', ')||'None selected'}</span></span></td><td><span class="pill">${esc(r.status||'pending')}</span></td><td><div class="actions">${(r.status||'pending')==='pending'?`<button class="btn btn-primary" data-approve-registration="${r.id}">Approve</button><button class="btn btn-danger" data-reject-registration="${r.id}">Reject</button>`:'—'}</div></td></tr>`;
 }
 function wireRegistrationButtons(){
   $$('[data-approve-registration]').forEach(b=>b.onclick=()=>{
     const r=db.registrationRequests.find(x=>x.id===b.dataset.approveRegistration);
     if(!r||r.status!=='pending')return;
     if(db.users.some(u=>u.username.toLowerCase()===r.username.toLowerCase())){alert('That username already exists. Remove or resolve the duplicate before approving.');return}
-    const user={id:id('u'),studentId:'',name:r.name,username:r.username,password:r.password,role:'student',email:r.email,phone:r.phone,institution:r.institution};
-    db.users.push(user);ensureStudentIds(); db.studentCourseAccess[user.id]=[];
+    const user={id:id('u'),studentId:'',name:r.name,username:r.username,password:r.password,role:'student',email:r.email,phone:r.phone,institution:r.institution,level:r.level||'AL',grade:r.grade||''};
+    db.users.push(user);ensureStudentIds(); db.studentCourseAccess[user.id]=Array.isArray(r.requestedCourseIds)?r.requestedCourseIds.filter(cid=>db.courses.some(c=>c.id===cid&&courseLevel(c)===(r.level||'AL')&&(!courseGrades(c).filter(Boolean).length||courseGrades(c).includes(r.grade)))):[];
     r.status='approved'; r.reviewedAt=new Date().toISOString();
     if(!saveDB()){db.users=db.users.filter(u=>u.id!==user.id);delete db.studentCourseAccess[user.id];r.status='pending';alert('Could not save. Browser storage may be full or blocked.');return}
     renderRegistrations();toast('Registration approved. Assign subjects from Students.');
@@ -2122,7 +2409,14 @@ function showAuthTab(tab){
 }
 $('#loginTabBtn').addEventListener('click',()=>showAuthTab('login'));
 $('#registerTabBtn').addEventListener('click',()=>showAuthTab('register'));
-$('#registerForm').addEventListener('submit',function(e){
+function gradeOptions(){return ['2026 A/L','2027 A/L','2028 A/L','2029 A/L','Other A/L year'];}
+function gradeLabel(level,grade){return grade||'A/L year';}
+function courseGrades(c){return Array.isArray(c?.grades)&&c.grades.length?c.grades:[c?.grade||''];}
+function courseLevel(c){return c?.level||c?.examLevel||'AL';}
+function gradeChecks(name,selected=[],level='AL',prefix='grade'){return gradeOptions(level).map((g,i)=>`<label class="checkbox-item" style="display:inline-flex;align-items:center;gap:6px;margin:3px 8px 3px 0;padding:6px 9px"><input type="checkbox" name="${name}" value="${esc(g)}" ${selected.includes(g)?'checked':''}><span>${esc(g)}</span></label>`).join('');}
+function registrationSubjectOptions(level,grade,selected=[]){return (db?.courses||[]).filter(c=>courseLevel(c)===level&&(!courseGrades(c).filter(Boolean).length||courseGrades(c).includes(grade))).map(c=>`<label class="checkbox-item" style="display:flex;gap:8px;align-items:center;padding:8px 10px"><input type="checkbox" name="regSubjects" value="${esc(c.id)}" ${selected.includes(c.id)?'checked':''}><span>${esc(c.title)}</span></label>`).join('')||'<p class="small muted">No subjects currently match this level/grade. You can submit and ask admin to assign subjects later.</p>';}
+function refreshRegistrationSubjects(){const level=document.querySelector('[name=regLevel]')?.value||'AL',grade=document.querySelector('[name=regGrade]')?.value||'';const box=$('#regSubjectsBox');if(box)box.innerHTML=registrationSubjectOptions(level,grade);}
+$('#registerForm').addEventListener('submit',async function(e){
   e.preventDefault();
   const error=$('#registerError'),success=$('#registerSuccess');
   error.style.display='none';success.style.display='none';
@@ -2140,13 +2434,15 @@ $('#registerForm').addEventListener('submit',function(e){
   if(!Array.isArray(db.registrationRequests))db.registrationRequests=[];
      if(!db.users.some(u=>u.username&&u.username.toLowerCase()==='dasun'&&u.role==='admin'))db.users.unshift({id:'u-sio',name:'Sio Creations',username:'dasun',password:'dasun',role:'admin',isOwner:true});
      const sio=db.users.find(u=>u.username&&u.username.toLowerCase()==='dasun'&&u.role==='admin');if(sio){sio.name='Sio Creations';sio.isOwner=true;}
-  const request={id:id('reg'),name,email,username,password,phone,institution,status:'pending',createdAt:new Date().toISOString()};
+  const level=$('#regLevel')?.value||'AL',grade=$('#regGrade')?.value||'',subjects=Array.from(document.querySelectorAll('[name=regSubjects]:checked')).map(x=>x.value);const request={id:id('reg'),name,email,username,password:await hashPassword(password),phone,institution,level,grade,requestedCourseIds:subjects,status:'pending',createdAt:new Date().toISOString()};
   db.registrationRequests.push(request);
   if(!saveDB()){db.registrationRequests.pop();return fail('Could not save registration. Please allow browser storage or open the site through HTTPS hosting and try again.');}
   this.reset();
   success.textContent='Registration submitted successfully. Please wait for admin approval before signing in.';
   success.style.display='block';
 });
+function refreshRegGradeOptions(){const level=$('#regLevel')?.value||'AL',sel=$('#regGrade');if(!sel)return;const old=sel.value;sel.innerHTML=gradeOptions(level).map(g=>`<option value="${esc(g)}">${esc(g)}</option>`).join('');if(gradeOptions(level).includes(old))sel.value=old;refreshRegistrationSubjects();}
+$('#regLevel')?.addEventListener('change',refreshRegGradeOptions);$('#regGrade')?.addEventListener('change',refreshRegistrationSubjects);
 
 function isLessonComplete(userId,lessonId){return !!db.lessonProgress?.[userId]?.[lessonId]?.completed;}
 function progressStats(userId){const assigned=db.lessons.filter(l=>{const courses=db.studentCourseAccess?.[userId]||[];return courses.includes(l.courseId)&&(l.allowedStudentIds==null||l.allowedStudentIds.includes(userId));});const done=assigned.filter(l=>isLessonComplete(userId,l.id));return {assigned,done,pct:assigned.length?Math.round(done.length/assigned.length*100):0};}
@@ -2168,7 +2464,7 @@ function adminProgressDashboard(){
  const donePct=assignedTotal?Math.round(completed/assignedTotal*100):0;
  return `<section class="card" style="padding:20px;margin:20px 0"><div class="section-head"><div><h2 style="margin:0">Student progress overview</h2><p class="muted small">Class-wide completion, assessment performance and subject trends.</p></div><button class="btn btn-secondary" id="goStudents">Manage students →</button></div><div class="stats"><div class="stat"><div class="num">${students.length}</div><div class="label">Students</div></div><div class="stat"><div class="num">${completed}</div><div class="label">Completed lessons</div></div><div class="stat"><div class="num">${marks.length}</div><div class="label">Marks recorded</div></div><div class="stat"><div class="num">${avg}%</div><div class="label">Class average</div></div></div><div class="dash-chart-grid"><article class="dash-chart"><h3>Overall lesson completion</h3><div class="dash-chart-sub">Assigned lesson completions across all students</div><div class="dash-donut-wrap"><div class="dash-donut" style="--pct:${donePct}"><div class="dash-donut-center"><strong>${donePct}%</strong><span>complete</span></div></div><div class="dash-legend"><div class="dash-legend-item"><i class="dash-dot done"></i><span>Completed <strong>${completed}</strong></span></div><div class="dash-legend-item"><i class="dash-dot left"></i><span>Not complete <strong>${remaining}</strong></span></div><div class="dash-legend-item"><i class="dash-dot marks"></i><span>Marks entered <strong>${marks.length}</strong></span></div></div></div><div class="dash-mini-note">Completion percentage uses total assigned student-lesson pairs, not the number of unique lessons.</div></article><article class="dash-chart"><h3>Student progress comparison</h3><div class="dash-chart-sub">Top ${Math.min(7,students.length)} students by completed lesson percentage</div><div class="dash-bars">${studentBars||'<div class="empty">Add students and assign lessons to see progress charts.</div>'}</div></article><article class="dash-chart"><h3>Subject completion</h3><div class="dash-chart-sub">Completion rate for assigned lessons within each subject</div><div class="dash-bars">${subjectBars||'<div class="empty">No assigned subject lessons to chart yet.</div>'}</div></article><article class="dash-chart"><h3>Assessment snapshot</h3><div class="dash-highlight"><div class="emoji">📊</div><div><strong>${avg}% class average</strong><span>${marks.length} recorded assessments across ${new Set(marks.map(m=>m.studentId)).size} students</span></div></div><div class="dash-highlight"><div class="emoji">🎯</div><div><strong>${studentStats.filter(x=>x.ms.length===0).length} students without marks</strong><span>Use Student details to add quiz or paper results.</span></div></div><div class="dash-highlight"><div class="emoji">📚</div><div><strong>${students.filter(u=>progressStats(u.id).pct===100&&progressStats(u.id).assigned.length>0).length} students completed all assigned lessons</strong><span>Based on each student's current lesson access.</span></div></div></article></div><div class="section-head" style="margin-top:20px"><h2>Student-by-student summary</h2></div><div class="table-wrap"><table class="table"><thead><tr><th>Student</th><th>Lessons</th><th>Progress</th><th>Marks</th><th>Average</th></tr></thead><tbody>${rows||'<tr><td colspan="5">No students yet.</td></tr>'}</tbody></table></div></section>`
 }
-function renderStudentProfile(){const u=db.users.find(x=>x.id===session.id)||session;setTitle('My profile','Update your contact details and account information');$('#pageContent').innerHTML=`<section class="card" style="padding:22px;max-width:680px"><h2>Account details</h2><p class="muted">Changes saved here will be visible in the admin Students tab when using the same shared data store/browser.</p><form id="studentProfileForm"><div class="field"><label>Full name (locked)</label><input value="${esc(u.name||'')}" readonly aria-readonly="true"><p class="small muted">Your registered full name is locked. Contact the admin if it needs correction.</p></div><div class="field"><label>Phone number</label><input name="phone" value="${esc(u.phone||'')}" placeholder="+94 7X XXX XXXX"></div><div class="field"><label>Student ID</label><input value="${esc(u.studentId||'Will be assigned automatically')}" readonly></div><div class="field"><label>Account number (optional)</label><input name="accountNumber" value="${esc(u.accountNumber||'')}"></div><div class="field"><label>Email</label><input type="email" name="email" value="${esc(u.email||'')}"></div><div class="field"><label>Home address</label><textarea name="address" rows="2">${esc(u.address||'')}</textarea></div><div class="field"><label>Tute pack number</label><input value="${esc(u.tutePackNumber||'Not assigned')}" disabled></div><div class="field"><label>New password (optional)</label><input type="password" name="password" minlength="6" placeholder="Leave blank to keep current password"></div><button class="btn btn-primary" type="submit">Save my details</button></form></section>`;$('#studentProfileForm').onsubmit=e=>{e.preventDefault();const f=new FormData(e.currentTarget),password=String(f.get('password')||'');if(password&&password.length<6)return alert('Password must be at least 6 characters.');u.phone=String(f.get('phone')||'').trim();u.accountNumber=String(f.get('accountNumber')||'').trim();u.address=String(f.get('address')||'').trim();u.tutePackNumber=String(f.get('tutePackNumber')||'').trim();u.email=String(f.get('email')||'').trim();if(password)u.password=password;session=u;saveDB();$('#sideName').textContent=u.name;$('#sideAvatar').textContent=u.name[0].toUpperCase();$('#topAvatar').textContent=u.name[0].toUpperCase();renderNav();renderPage();toast('Profile updated');};}
+function renderStudentProfile(){const u=db.users.find(x=>x.id===session.id)||session;setTitle('My profile','Update your contact details and account information');$('#pageContent').innerHTML=`<section class="card" style="padding:22px;max-width:680px"><h2>Account details</h2><p class="muted">Changes saved here will be visible in the admin Students tab when using the same shared data store/browser.</p><form id="studentProfileForm"><div class="field"><label>Full name (locked)</label><input value="${esc(u.name||'')}" readonly aria-readonly="true"><p class="small muted">Your registered full name is locked. Contact the admin if it needs correction.</p></div><div class="field"><label>Phone number</label><input name="phone" value="${esc(u.phone||'')}" placeholder="+94 7X XXX XXXX"></div><div class="field"><label>Student ID</label><input value="${esc(u.studentId||'Will be assigned automatically')}" readonly></div><div class="field"><label>Account number (optional)</label><input name="accountNumber" value="${esc(u.accountNumber||'')}"></div><div class="field"><label>Email</label><input type="email" name="email" value="${esc(u.email||'')}"></div><div class="field"><label>Home address</label><textarea name="address" rows="2">${esc(u.address||'')}</textarea></div><div class="field"><label>Tute pack number</label><input value="${esc(u.tutePackNumber||'Not assigned')}" disabled></div><div class="field"><label>New password (optional)</label><input type="password" name="password" minlength="6" placeholder="Leave blank to keep current password"></div><button class="btn btn-primary" type="submit">Save my details</button></form></section>`;$('#studentProfileForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.currentTarget),password=String(f.get('password')||'');if(password&&password.length<6)return alert('Password must be at least 6 characters.');u.phone=String(f.get('phone')||'').trim();u.accountNumber=String(f.get('accountNumber')||'').trim();u.address=String(f.get('address')||'').trim();u.tutePackNumber=String(f.get('tutePackNumber')||'').trim();u.email=String(f.get('email')||'').trim();if(password)u.password=await hashPassword(password);session=u;saveDB();$('#sideName').textContent=u.name;$('#sideAvatar').textContent=u.name[0].toUpperCase();$('#topAvatar').textContent=u.name[0].toUpperCase();renderNav();renderPage();toast('Profile updated');};}
 function studentDetailsModal(u){if(!u)return;const access=db.studentCourseAccess[u.id]||[],lessons=db.lessons.filter(l=>access.includes(l.courseId)&&(l.allowedStudentIds==null||l.allowedStudentIds.includes(u.id))),marks=studentMarks(u.id);const lessonRows=lessons.map(l=>`<tr><td>${esc(courseName(l.courseId))}</td><td>${esc(l.title)}</td><td>${isLessonComplete(u.id,l.id)?'<span class="pill">✓ Complete</span>':'<span class="pill">In progress</span>'}</td></tr>`).join('');const markRows=marks.map(m=>`<tr><td>${esc(m.title)}</td><td>${esc(courseName(m.courseId))}</td><td>${esc(db.lessons.find(l=>l.id===m.lessonId)?.title||'—')}</td><td>${Number(m.score)||0}/${Number(m.outOf)||100}</td><td><button type="button" class="btn btn-danger" data-delete-mark="${esc(m.id)}">×</button></td></tr>`).join('');openModal('Student details',`<div class="card" style="padding:14px;margin-bottom:14px"><h3 style="margin:0 0 8px">${esc(u.name)}</h3><div class="small">Username: ${esc(u.username)}</div><div class="small">Phone: ${esc(u.phone||'Not provided')}</div><div class="small"><strong>Student ID: ${esc(u.studentId||'Pending')}</strong></div><div class="small">Account number: ${esc(u.accountNumber||'Not provided')}</div><div class="small">Email: ${esc(u.email||'Not provided')}</div></div><h3>Accessible lessons & completion</h3><div class="table-wrap"><table class="table"><thead><tr><th>Subject</th><th>Lesson</th><th>Progress</th></tr></thead><tbody>${lessonRows||'<tr><td colspan="3">No assigned lessons.</td></tr>'}</tbody></table></div><h3 style="margin-top:18px">Add quiz / paper marks</h3><div id="studentMarkForm"><div class="field"><label>Assessment title</label><input id="markTitle" name="title" required placeholder="e.g. Lesson 03 Quiz"></div><div class="field"><label>Subject</label><select name="courseId" id="markCourse" required>${db.courses.filter(c=>access.includes(c.id)).map(c=>`<option value="${c.id}">${esc(c.title)}</option>`).join('')}</select></div><div class="field"><label>Lesson</label><select name="lessonId" id="markLesson" required></select></div><div class="field"><label>Type</label><select name="type"><option>Quiz</option><option>Paper</option><option>Assignment</option><option>Other</option></select></div><div class="row"><div class="field" style="flex:1"><label>Marks obtained</label><input type="number" name="score" min="0" step="0.5" required></div><div class="field" style="flex:1"><label>Total marks</label><input type="number" name="outOf" min="1" step="0.5" value="100" required></div></div><div class="field"><label>Feedback (optional)</label><textarea name="feedback" rows="2"></textarea></div><button class="btn btn-primary" type="button" id="saveStudentMark">Save marks</button></div><h3 style="margin-top:20px">Recorded marks</h3><div class="table-wrap"><table class="table"><thead><tr><th>Assessment</th><th>Subject</th><th>Lesson</th><th>Marks</th><th></th></tr></thead><tbody>${markRows||'<tr><td colspan="5">No marks recorded.</td></tr>'}</tbody></table></div>`, 'Done',()=>closeModal());const updateLessons=()=>{const cid=$('#markCourse')?.value,el=$('#markLesson');if(el)el.innerHTML=lessons.filter(l=>l.courseId===cid).map(l=>`<option value="${l.id}">${esc(l.title)}</option>`).join('')||'<option value="">No lessons</option>';};updateLessons();$('#markCourse')?.addEventListener('change',updateLessons);$('#saveStudentMark').onclick=()=>{const title=$('#markTitle').value.trim(),courseId=$('#markCourse').value,lessonId=$('#markLesson').value,type=$('#studentMarkForm select[name=type]').value,score=Number($('#studentMarkForm input[name=score]').value),outOf=Number($('#studentMarkForm input[name=outOf]').value),feedback=$('#studentMarkForm textarea[name=feedback]').value.trim();if(!title)return alert('Enter an assessment title.');if(score<0||outOf<=0||score>outOf)return alert('Marks must be between 0 and total marks.');if(!lessonId)return alert('Select a lesson.');db.marks=db.marks||[];db.marks.push({id:id('mark'),studentId:u.id,title,courseId,lessonId,type,score,outOf,feedback,updatedAt:Date.now()});if(!saveDB())return alert('Could not save marks.');closeModal();studentDetailsModal(u);toast('Marks saved and progress updated');};$$('[data-delete-mark]').forEach(b=>b.onclick=()=>{db.marks=db.marks.filter(m=>m.id!==b.dataset.deleteMark);saveDB();closeModal();studentDetailsModal(u);});}
 
 function renderStudents(){
@@ -2223,18 +2519,34 @@ function quizEligibleForStudent(q){
 }
 function renderQuizzes(){
   if(!Array.isArray(db.quizzes))db.quizzes=[];
-     if(!Array.isArray(db.exams))db.exams=[];
+  if(!Array.isArray(db.exams))db.exams=[];
   setTitle('Quiz','Scheduled quizzes linked to subjects and lessons');
   const items=db.quizzes.filter(q=>((isAdmin()||isTeacher())||q.published!==false)&&quizEligibleForStudent(q)).sort((a,b)=>(a.openingTime||'').localeCompare(b.openingTime||''));
   const cards=items.map(q=>{
     const state=quizState(q),lesson=db.lessons.find(l=>l.id===q.lessonId);
     const status=state==='open'?'OPEN NOW':state==='upcoming'?'UPCOMING':state==='closed'?'CLOSED':'INVALID SCHEDULE';
     const tone=state==='open'?'permission-on':state==='closed'?'permission-off':'';
-    return `<article class="content-type-card" id="quiz-card-${esc(q.id)}"><div class="row" style="justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span class="pill">${esc(courseName(q.courseId))}</span><span class="btn permission-toggle ${tone}" style="pointer-events:none;padding:5px 9px;font-size:11px">${status}</span></div><h3 style="margin-top:14px">${esc(q.title)}</h3><p class="muted">Lesson: ${esc(lesson?.title||'Lesson unavailable')}</p><div class="small muted">Opens: ${esc(formatQuizDate(q.openingTime))}</div><div class="small muted" style="margin-top:5px">Closes: ${esc(formatQuizDate(q.closingTime))}</div>${(isAdmin()||isTeacher())?`<div class="small muted" style="margin-top:7px">Visibility: ${q.published===false?'OFF':'ON'}</div><div class="small muted" style="margin-top:5px;overflow-wrap:anywhere">Quiz link: ${q.quizLink?esc(q.quizLink):'Not added'}</div><div class="row" style="margin-top:14px;gap:8px"><button class="btn btn-secondary" data-edit-quiz="${esc(q.id)}">Edit</button><button class="btn btn-danger" data-delete-quiz="${esc(q.id)}">Remove</button></div>`:state==='open'&&q.quizLink?`<a class="btn btn-primary" style="display:inline-flex;margin-top:14px;text-decoration:none" href="${esc(q.quizLink)}" target="_blank" rel="noopener noreferrer">Open quiz ↗</a>`:state==='open'?'<p class="small" style="margin-top:12px;color:var(--cyan)">Quiz is open now, but the quiz link has not been added yet.</p>':''}</article>`;
+    const canManage=canManageCourse(q.courseId)&&(isAdmin()||isTeacher());
+    return `<article class="content-type-card" id="quiz-card-${esc(q.id)}"><div class="row" style="justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span class="pill">${esc(courseName(q.courseId))}</span><span class="live-reminder"><span class="live-dot"></span> QUIZ SCHEDULED</span><span class="btn permission-toggle ${tone}" style="pointer-events:none;padding:5px 9px;font-size:11px">${status}</span></div><h3 style="margin-top:14px">${esc(q.title)}</h3><p class="muted">Lesson: ${esc(lesson?.title||'Lesson unavailable')}</p><div class="small muted">Opens: ${esc(formatQuizDate(q.openingTime))}</div><div class="small muted" style="margin-top:5px">Closes: ${esc(formatQuizDate(q.closingTime))}</div><div class="row" style="margin-top:14px;gap:8px;flex-wrap:wrap"><button class="btn btn-secondary" data-view-quiz="${esc(q.id)}">View details</button>${canManage?`<button class="btn btn-secondary" data-edit-quiz="${esc(q.id)}">✎ Edit</button><button class="btn btn-danger" data-delete-quiz="${esc(q.id)}">Remove</button>`:state==='open'&&q.quizLink?`<a class="btn btn-primary" style="display:inline-flex;text-decoration:none" href="${safeUrl(q.quizLink)}" target="_blank" rel="noopener noreferrer">Open quiz ↗</a>`:''}</div></article>`;
   }).join('');
-  $('#pageContent').innerHTML=`<div class="toolbar">${(isAdmin()||isTeacher())?'<button class="btn btn-primary" id="addQuiz">＋ Add quiz</button>':'<span class="muted small">Only quizzes matching your assigned subject and lesson access are shown.</span>'}</div><div class="content-type-grid">${cards||'<div class="empty">'+(isAdmin()?'No quizzes created yet.':'No quizzes are assigned to your accessible subjects and lessons.')+'</div>'}</div>`;
-  if(isAdmin()){$('#addQuiz').onclick=()=>quizModal();$$('[data-edit-quiz]').forEach(b=>b.onclick=()=>quizModal(db.quizzes.find(q=>q.id===b.dataset.editQuiz)));$$('[data-delete-quiz]').forEach(b=>b.onclick=()=>{const q=db.quizzes.find(x=>x.id===b.dataset.deleteQuiz);if(q&&confirm(`Remove quiz “${q.title}”?`)){db.quizzes=db.quizzes.filter(x=>x.id!==q.id);saveDB();renderQuizzes();toast('Quiz removed')}})}
-  else if(isTeacher()){$('#addQuiz').onclick=()=>teacherQuizModal();$$('[data-edit-quiz]').forEach(b=>b.onclick=()=>teacherQuizModal(db.quizzes.find(q=>q.id===b.dataset.editQuiz)));$$('[data-delete-quiz]').forEach(b=>b.onclick=()=>{const q=db.quizzes.find(x=>x.id===b.dataset.deleteQuiz);if(q&&canManageCourse(q.courseId)&&confirm(`Remove quiz “${q.title}”?`)){db.quizzes=db.quizzes.filter(x=>x.id!==q.id);saveDB();renderQuizzes();toast('Quiz removed')}})}
+  $('#pageContent').innerHTML=`<div class="toolbar">${(isAdmin()||isTeacher())?'<button class="btn btn-primary" id="addQuiz">＋ Add quiz</button>':'<span class="muted small">Only quizzes matching your assigned subject and lesson access are shown.</span>'}</div><div class="content-type-grid">${cards||'<div class="empty">No quizzes are available for your accessible subjects and lessons.</div>'}</div>`;
+  if(isAdmin()||isTeacher()){
+    $('#addQuiz').onclick=()=>isTeacher()&&!isAdmin()?teacherQuizModal():quizModal();
+    $$('[data-edit-quiz]').forEach(b=>b.onclick=()=>{const q=db.quizzes.find(x=>String(x.id)===String(b.dataset.editQuiz));if(!q||!canManageCourse(q.courseId))return alert('You can only edit quizzes for subjects assigned to your account.');isTeacher()&&!isAdmin()?teacherQuizModal(q):quizModal(q)});
+    $$('[data-delete-quiz]').forEach(b=>b.onclick=()=>{const q=db.quizzes.find(x=>String(x.id)===String(b.dataset.deleteQuiz));if(!q||!canManageCourse(q.courseId))return alert('Only the Dasun owner, an admin assigned to this subject, or the assigned teacher can remove this quiz.');if(confirm(`Remove quiz “${q.title}” and its results? This cannot be undone.`)){db.quizzes=db.quizzes.filter(x=>String(x.id)!==String(q.id));db.marks=(db.marks||[]).filter(m=>String(m.assessmentId)!==String(q.id));notifyCourseUsers(q.courseId,'Quiz removed',q.title,session?.id);if(!saveDB())return alert('Could not save the change. Check browser storage and try again.');renderQuizzes();toast('Quiz removed')}});
+  }
+  $$('[data-view-quiz]').forEach(b=>b.onclick=()=>{const q=db.quizzes.find(x=>String(x.id)===String(b.dataset.viewQuiz));if(q)quizDetailsModal(q)});
+}
+function quizDetailsModal(q){
+  const lesson=db.lessons.find(l=>String(l.id)===String(q.lessonId));
+  const state=quizState(q),canManage=(isAdmin()||isTeacher())&&canManageCourse(q.courseId);
+  const status=state==='open'?'Open now':state==='upcoming'?'Upcoming':state==='closed'?'Closed':'Invalid schedule';
+  const body=`<div class="field"><label>Quiz title</label><div class="card" style="padding:10px 12px">${esc(q.title||'Untitled quiz')}</div></div><div class="field"><label>Subject</label><div class="card" style="padding:10px 12px">${esc(courseName(q.courseId))}</div></div><div class="field"><label>Related lesson</label><div class="card" style="padding:10px 12px">${esc(lesson?.title||'Lesson unavailable')}</div></div><div class="field"><label>Status</label><div class="card" style="padding:10px 12px">${esc(status)}</div></div><div class="field"><label>Opens</label><div class="card" style="padding:10px 12px">${esc(formatQuizDate(q.openingTime))}</div></div><div class="field"><label>Closes</label><div class="card" style="padding:10px 12px">${esc(formatQuizDate(q.closingTime))}</div></div><div class="field"><label>Visibility</label><div class="card" style="padding:10px 12px">${q.published===false?'OFF — hidden from students':'ON — visible to eligible students'}</div></div>${canManage?`<div class="field"><label>Quiz link</label><div class="card" style="padding:10px 12px;overflow-wrap:anywhere">${q.quizLink?`<a href="${safeUrl(q.quizLink)}" target="_blank" rel="noopener noreferrer">${esc(q.quizLink)}</a>`:'Not added'}</div></div><div class="row" style="justify-content:flex-end;gap:8px;flex-wrap:wrap"><button type="button" class="btn btn-secondary" id="quizDetailEdit">✎ Edit quiz</button><button type="button" class="btn btn-danger" id="quizDetailRemove">Remove quiz</button></div>`:''}`;
+  openModal('Quiz details',body,'Close details',()=>closeModal());
+  if(canManage){
+    $('#quizDetailEdit').onclick=()=>{closeModal();isTeacher()&&!isAdmin()?teacherQuizModal(db.quizzes.find(x=>String(x.id)===String(q.id))):quizModal(db.quizzes.find(x=>String(x.id)===String(q.id)))};
+    $('#quizDetailRemove').onclick=()=>{const current=db.quizzes.find(x=>String(x.id)===String(q.id));if(!current||!canManageCourse(current.courseId))return alert('You do not have permission to remove this quiz.');if(confirm(`Remove quiz “${current.title}” and its results? This cannot be undone.`)){db.quizzes=db.quizzes.filter(x=>String(x.id)!==String(current.id));db.marks=(db.marks||[]).filter(m=>String(m.assessmentId)!==String(current.id));notifyCourseUsers(current.courseId,'Quiz removed',current.title,session?.id);if(!saveDB())return alert('Could not save the change. Check browser storage and try again.');closeModal();renderQuizzes();toast('Quiz removed')}};
+  }
 }
 
 function assessmentResults(item,type){
@@ -2261,7 +2573,7 @@ function syncAssessmentResult(item,type,studentId,result){
 
 function renderMarks(){
  // Refresh the saved database before rendering so newly added exams/quizzes are not hidden by stale in-memory data.
- try { const latestRaw=window.localStorage ? localStorage.getItem(STORE) : null; if(latestRaw){ const latest=JSON.parse(latestRaw); if(latest && Array.isArray(latest.users) && Array.isArray(latest.courses)) db=latest; } } catch(err) { console.warn('Could not refresh saved data before rendering marks',err); }
+ try { const latestRaw=window.localStorage ? localStorage.getItem(STORE) : null; if(latestRaw){ const latest=JSON.parse(latestRaw); if(latest && Array.isArray(latest.users) && Array.isArray(latest.courses)) { db=latest; rebindSession(); } } } catch(err) { console.warn('Could not refresh saved data before rendering marks',err); }
  if(!Array.isArray(db.exams))db.exams=[];
  if(!Array.isArray(db.quizzes))db.quizzes=[];
  if(!Array.isArray(db.marks))db.marks=[];
@@ -2314,7 +2626,7 @@ function showManualMarksList(title,courseId,type,records,student){if(student){co
 
 function renderExams(){
  // Refresh the saved database before rendering so the Exams tab uses the latest records.
- try { const latestRaw=window.localStorage ? localStorage.getItem(STORE) : null; if(latestRaw){ const latest=JSON.parse(latestRaw); if(latest && Array.isArray(latest.users) && Array.isArray(latest.courses)) db=latest; } } catch(err) { console.warn('Could not refresh saved data before rendering exams',err); }
+ try { const latestRaw=window.localStorage ? localStorage.getItem(STORE) : null; if(latestRaw){ const latest=JSON.parse(latestRaw); if(latest && Array.isArray(latest.users) && Array.isArray(latest.courses)) { db=latest; rebindSession(); } } } catch(err) { console.warn('Could not refresh saved data before rendering exams',err); }
  if(!Array.isArray(db.exams))db.exams=[];
  if(!db.studentCourseAccess)db.studentCourseAccess={};
  if(!db.teacherCourseAccess)db.teacherCourseAccess={};
@@ -2323,25 +2635,23 @@ function renderExams(){
  const items=db.exams.filter(x=>allowed.some(c=>c.id===x.courseId)).sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));
  const quizItems=(db.quizzes||[]).filter(q=>allowed.some(c=>c.id===q.courseId)&&(!isAdmin()&&!isTeacher()?q.published!==false:true)).map(q=>({id:q.id,title:q.title,courseId:q.courseId,lessonId:q.lessonId,date:(q.openingTime||'').slice(0,10),totalMarks:Number(q.totalMarks)||100,details:'Quiz · Opens '+formatQuizDate(q.openingTime),isQuiz:true,results:q.results||[]}));
  const localToday=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
- const canEditRole=isOwnerAdmin()||isTeacher();
+ const canEditRole=isAdmin()||isTeacher();
  setTitle('Exams',isOwnerAdmin()?'Manage upcoming exams':isTeacher()?'Edit upcoming exams for your assigned subjects':'View your exam schedule and reminders');
- const cards=[...items,...quizItems].map(ex=>{const course=courseName(ex.courseId),lesson=db.lessons.find(l=>l.id===ex.lessonId),canManage=canEditRole&&!ex.isQuiz&&canManageCourse(ex.courseId),canEdit=canManage&&(!ex.date||ex.date>=localToday);return `<article class="content-type-card"><div class="row" style="justify-content:space-between;gap:8px;align-items:center"><span class="pill">${esc(course)}</span><span class="small muted">${esc(ex.date||'Date not set')}</span></div><h3 style="margin-top:12px">${esc(ex.title)}</h3><p class="muted">${esc(ex.details||'No additional details')}</p><div class="small muted">Lesson: ${esc(lesson?.title||'General exam')}</div>${canManage?`<div class="row" style="gap:8px;margin-top:12px;flex-wrap:wrap">${canEdit?`<button class="btn btn-secondary" data-edit-exam="${esc(ex.id)}">✎ Edit exam</button>`:''}<button class="btn btn-danger" data-delete-exam="${esc(ex.id)}">Remove</button></div>`:(!ex.isQuiz&&canEditRole&&ex.date&&ex.date<localToday?'<p class="small muted" style="margin-top:12px">This exam date has passed; details remain visible, but editing is locked.</p>':`<p class="small muted" style="margin-top:12px">${ex.isQuiz?'Quiz details are managed in the Quiz tab.':'Exam details and instructions are available here.'}</p>`)}</article>`}).join('');
+ const cards=[...items,...quizItems].map(ex=>{const course=courseName(ex.courseId),lesson=db.lessons.find(l=>l.id===ex.lessonId),canManage=canEditRole&&!ex.isQuiz&&canManageCourse(ex.courseId),canEdit=canManage;return `<article class="content-type-card"><div class="row" style="justify-content:space-between;gap:8px;align-items:center"><span class="pill">${esc(course)}</span><span class="live-reminder"><span class="live-dot"></span>${ex.isQuiz?'QUIZ SCHEDULED':'EXAM SCHEDULED'}</span><span class="small muted">${esc(ex.date||'Date not set')}</span></div><h3 style="margin-top:12px">${esc(ex.title)}</h3><p class="muted">${esc(ex.details||'No additional details')}</p><div class="small muted">Lesson: ${esc(lesson?.title||'General exam')}</div>${canManage?`<div class="row" style="gap:8px;margin-top:12px;flex-wrap:wrap">${canEdit?`<button class="btn btn-secondary" data-edit-exam="${esc(ex.id)}">✎ Edit exam</button>`:''}<button class="btn btn-danger" data-delete-exam="${esc(ex.id)}">Remove</button></div>`:(!ex.isQuiz&&canEditRole&&ex.date&&ex.date<localToday?'<p class="small muted" style="margin-top:12px">This exam date has passed; details remain visible, but editing is locked.</p>':`<p class="small muted" style="margin-top:12px">${ex.isQuiz?'Quiz details are managed in the Quiz tab.':'Exam details and instructions are available here.'}</p>`)}</article>`}).join('');
  $('#pageContent').innerHTML=`<div class="toolbar">${canEditRole?'<button class="btn btn-primary" id="addExam">＋ Add exam</button>':'<span class="muted small">Your exam dates and instructions appear here as reminders.</span>'}</div><div class="content-type-grid">${cards||'<div class="empty">No exams are available yet.</div>'}</div>`;
  if(canEditRole){
   $('#addExam').onclick=()=>examModal();
   $$('[data-edit-exam]').forEach(b=>b.onclick=()=>examModal(db.exams.find(x=>x.id===b.dataset.editExam)));
-  $$('[data-delete-exam]').forEach(b=>b.onclick=()=>{const ex=(db.exams||[]).find(x=>String(x.id)===String(b.dataset.deleteExam));const permitted=!!ex&&(isOwnerAdmin()||(isTeacher()&&canManageCourse(ex.courseId)));if(!permitted)return alert('Only the Dasun owner or a teacher assigned to this subject can remove this exam.');if(confirm(`Remove exam “${ex.title}” and its results? This cannot be undone.`)){const removed={...ex};db.exams=(db.exams||[]).filter(x=>String(x.id)!==String(ex.id));db.notifications=db.notifications||[];notifyCourseUsers(removed.courseId,'Exam removed',`${removed.title} · ${removed.date||'Date not set'}`);if(!saveDB())return alert('Could not save the change. Please check browser storage and try again.');renderExams();toast('Exam removed; enrolled students and staff notified')}});
+  $$('[data-delete-exam]').forEach(b=>b.onclick=()=>{const ex=(db.exams||[]).find(x=>String(x.id)===String(b.dataset.deleteExam));const permitted=!!ex&&canManageCourse(ex.courseId)&&(isAdmin()||isTeacher());if(!permitted)return alert('Only an admin assigned to this subject, the Dasun owner, or the assigned teacher can remove this exam.');if(confirm(`Remove exam “${ex.title}” and its results? This cannot be undone.`)){const removed={...ex};db.exams=(db.exams||[]).filter(x=>String(x.id)!==String(ex.id));db.notifications=db.notifications||[];notifyCourseUsers(removed.courseId,'Exam removed',`${removed.title} · ${removed.date||'Date not set'}`,session?.id);if(!saveDB())return alert('Could not save the change. Please check browser storage and try again.');renderExams();toast('Exam removed; enrolled students and staff notified')}});
  }
 }
 function examModal(ex=null){
- const allowedEditor=isOwnerAdmin()||isTeacher();if(!allowedEditor)return alert('Only the Dasun owner or a teacher can manage exams.');
- const today=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
- if(ex&&ex.date&&ex.date<today)return alert('This exam date has passed. Only upcoming exams can be edited.');
- const courses=isOwnerAdmin()?db.courses:teacherCourses();if(!courses.length)return alert('No assigned subjects available.');
+ const allowedEditor=isAdmin()||isTeacher();if(!allowedEditor)return alert('Only an admin or a teacher assigned to the subject can manage exams.');
+ const courses=isOwnerAdmin()?db.courses:isAdmin()?adminCourses():teacherCourses();if(!courses.length)return alert('No assigned subjects available.');
  if(ex&&!canManageCourse(ex.courseId))return alert('You can only manage exams for your assigned subjects.');
  const courseOpts=courses.map(c=>`<option value="${esc(c.id)}" ${c.id===(ex?.courseId||courses[0].id)?'selected':''}>${esc(c.title)}</option>`).join('');
- const lessonsFor=cid=>db.lessons.filter(l=>l.courseId===cid);
- openModal(ex?'Edit exam':'Add exam',`<div class="field"><label>Exam name</label><input name="title" required value="${esc(ex?.title||'')}" placeholder="e.g. Term Test 01"></div><div class="field"><label>Subject</label><select name="courseId" id="examCourse">${courseOpts}</select></div><div class="field"><label>Related lesson (optional)</label><select name="lessonId" id="examLesson"><option value="">General exam / not lesson-specific</option>${lessonsFor(ex?.courseId||courses[0].id).map(l=>`<option value="${esc(l.id)}" ${l.id===ex?.lessonId?'selected':''}>${esc(l.title)}</option>`).join('')}</select></div><div class="field"><label>Exam date</label><input type="date" name="date" value="${esc(ex?.date||'')}"></div><div class="field"><label>Total marks</label><input type="number" name="totalMarks" min="1" step="0.5" required value="${Number(ex?.totalMarks)||100}"></div><div class="field"><label>Exam details / instructions</label><textarea name="details" rows="3">${esc(ex?.details||'')}</textarea></div>`,ex?'Save exam':'Create exam',f=>{const title=String(f.get('title')||'').trim(),courseId=String(f.get('courseId')||''),lessonId=String(f.get('lessonId')||''),totalMarks=Number(f.get('totalMarks')),date=String(f.get('date')||''),details=String(f.get('details')||'').trim();if(!title)throw Error('Enter an exam name.');if(!(isOwnerAdmin()||isTeacher()))throw Error('Only the Dasun owner or a teacher can manage exams.');if(ex&&ex.date&&ex.date<new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10))throw Error('This exam date has passed. Only upcoming exams can be edited.');if(!canManageCourse(courseId))throw Error('Choose an assigned subject.');if(lessonId&&!lessonsFor(courseId).some(l=>l.id===lessonId))throw Error('Choose a lesson from the selected subject.');if(totalMarks<=0)throw Error('Total marks must be above zero.');if(!Array.isArray(db.exams))db.exams=[];if(ex)Object.assign(ex,{title,courseId,lessonId,date,totalMarks,details,updatedAt:Date.now()});else db.exams.push({id:id('exam'),title,courseId,lessonId,date,totalMarks,details,results:[],createdAt:Date.now(),updatedAt:Date.now()});if(ex&&ex.courseId&&ex.courseId!==courseId)notifyCourseUsers(ex.courseId,'Exam updated',`${ex.title} moved to another subject`);notifyCourseUsers(courseId,ex?'Exam updated':'New exam added',`${title} · ${date||'Date not set'}`);if(!saveDB())throw Error('Could not save exam. Please download a backup and check browser storage space.');closeModal();renderExams();toast(ex?'Exam updated':'Exam created');});
+ const lessonsFor=cid=>db.lessons.filter(l=>l.courseId===cid&&canSeeLesson(l));
+ openModal(ex?'Edit exam':'Add exam',`<div class="field"><label>Exam name</label><input name="title" required value="${esc(ex?.title||'')}" placeholder="e.g. Term Test 01"></div><div class="field"><label>Subject</label><select name="courseId" id="examCourse">${courseOpts}</select></div><div class="field"><label>Related lesson (optional)</label><select name="lessonId" id="examLesson"><option value="">General exam / not lesson-specific</option>${lessonsFor(ex?.courseId||courses[0].id).map(l=>`<option value="${esc(l.id)}" ${l.id===ex?.lessonId?'selected':''}>${esc(l.title)}</option>`).join('')}</select></div><div class="field"><label>Exam date</label><input type="date" name="date" value="${esc(ex?.date||'')}"></div><div class="field"><label>Total marks</label><input type="number" name="totalMarks" min="1" step="0.5" required value="${Number(ex?.totalMarks)||100}"></div><div class="field"><label>Exam details / instructions</label><textarea name="details" rows="3">${esc(ex?.details||'')}</textarea></div>`,ex?'Save exam':'Create exam',f=>{const title=String(f.get('title')||'').trim(),courseId=String(f.get('courseId')||''),lessonId=String(f.get('lessonId')||''),totalMarks=Number(f.get('totalMarks')),date=String(f.get('date')||''),details=String(f.get('details')||'').trim();if(!title)throw Error('Enter an exam name.');if(!(isAdmin()||isTeacher()))throw Error('Only an admin or a teacher can manage exams.');if(!canManageCourse(courseId))throw Error('Choose an assigned subject.');if(lessonId&&!lessonsFor(courseId).some(l=>l.id===lessonId))throw Error('Choose a lesson from the selected subject.');if(totalMarks<=0)throw Error('Total marks must be above zero.');if(!Array.isArray(db.exams))db.exams=[];const current=ex?db.exams.find(x=>String(x.id)===String(ex.id)):null;if(ex&&!current)throw Error('This exam is no longer in the saved list. Refresh the page and try again.');const oldCourse=current?.courseId,oldTitle=current?.title;const values={title,courseId,lessonId,date,totalMarks,details,updatedAt:Date.now()};if(current)Object.assign(current,values);else db.exams.push({id:id('exam'),...values,results:[],createdAt:Date.now()});if(current&&oldCourse&&oldCourse!==courseId)notifyCourseUsers(oldCourse,'Exam updated',`${oldTitle} moved to another subject`,session?.id);notifyCourseUsers(courseId,current?'Exam updated':'New exam scheduled',`${title} · ${date||'Date not set'}`,session?.id);if(!saveDB())throw Error('Exam was not saved. Browser storage is unavailable or full. Export a backup, free storage, then try again.');closeModal();renderExams();toast(current?'Exam updated and saved':'Exam created and saved');});
  const update=()=>{const cid=$('#examCourse').value,lesson=$('#examLesson'),old=ex?.lessonId;lesson.innerHTML='<option value="">General exam / not lesson-specific</option>'+lessonsFor(cid).map(l=>`<option value="${esc(l.id)}" ${l.id===old?'selected':''}>${esc(l.title)}</option>`).join('')};$('#examCourse').onchange=update;
 }
 function examResultsModal(ex){
@@ -2351,7 +2661,7 @@ function examResultsModal(ex){
  const results=assessmentResults(ex,'Exam');
  host.innerHTML=`<section class="card" style="padding:16px;border:1px solid var(--border);border-radius:16px;max-height:65vh;overflow:auto"><div class="row" style="justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div><h2 style="margin:0">${esc(ex.title)} — Student Marks</h2><p class="muted" style="margin:6px 0 0">${esc(courseName(ex.courseId))} · Total marks: ${Number(ex.totalMarks)||100}</p></div><button type="button" class="btn btn-secondary" id="closeInlineMarks">Close</button></div><p class="muted">Enter marks for each student. The list stays inside the Marks tab.</p><div class="table-wrap"><table class="table"><thead><tr><th>Student name</th><th>Student ID</th><th>Username</th><th>Marks</th><th>Feedback</th><th>Save</th></tr></thead><tbody>${students.map(u=>{const r=results.find(x=>x.studentId===u.id)||{},locked=!!r.updatedAt&&!isOwnerAdmin()&&!isTeacher();return `<tr><td>${esc(u.name)}</td><td>${esc(u.studentId||'—')}</td><td>${esc(u.username)}</td><td><input style="min-width:85px;width:95px;padding:9px" type="number" min="0" max="${Number(ex.totalMarks)||100}" step="0.5" id="examScore-${esc(u.id)}" value="${r.score===undefined?'':Number(r.score)}" placeholder="—" ${locked?'disabled':''}></td><td><input style="min-width:110px" id="examFeedback-${esc(u.id)}" value="${esc(r.feedback||'')}" placeholder="Feedback" ${locked?'disabled':''}></td><td>${locked?'<span class="pill">Saved · locked</span>':`<button type="button" class="btn btn-primary" data-save-exam-result="${esc(u.id)}">Save</button>`}</td></tr>`}).join('')||'<tr><td colspan="6">No students currently have access to this subject.</td></tr>'}</tbody></table></div></section>`;
  $('#closeInlineMarks').onclick=()=>{host.innerHTML='';};
- $$('[data-save-exam-result]').forEach(b=>b.onclick=()=>{const sid=b.dataset.saveExamResult,raw=$(`#examScore-${sid}`).value.trim(),feedback=$(`#examFeedback-${sid}`).value.trim();if(!isOwnerAdmin()&&!isTeacher()&&(ex.results||[]).some(r=>r.studentId===sid))return alert('These marks are locked after the first save. Only a teacher or the Dasun owner account can edit them.');if(raw===''){syncAssessmentResult(ex,'Exam',sid,null);if(!saveDB())return alert('Could not save marks.');renderMarks();examResultsModal((db.exams||[]).find(x=>x.id===ex.id)||ex);return;}const score=Number(raw),outOf=Number(ex.totalMarks)||100;if(!Number.isFinite(score)||score<0||score>outOf)return alert(`Marks must be between 0 and ${outOf}.`);const savedResult={score,feedback,updatedAt:Date.now()};syncAssessmentResult(ex,'Exam',sid,savedResult);db.notifications=db.notifications||[];db.notifications.push({id:id('notice'),toId:sid,courseId:ex.courseId,title:`Exam result updated: ${ex.title}`,body:`Your marks are ${score}/${outOf}.`,createdAt:Date.now(),readAt:null});notifyCourseUsers(ex.courseId,'Exam marks updated',`${ex.title}: ${score}/${outOf}`,session.id);if(!saveDB())return alert('Could not save exam marks.');renderMarks();examResultsModal((db.exams||[]).find(x=>x.id===ex.id)||ex);toast('Student exam result saved');});
+ $$('[data-save-exam-result]').forEach(b=>b.onclick=()=>{const sid=b.dataset.saveExamResult,raw=$(`#examScore-${sid}`).value.trim(),feedback=$(`#examFeedback-${sid}`).value.trim();if(!isOwnerAdmin()&&!isTeacher()&&(ex.results||[]).some(r=>r.studentId===sid))return alert('These marks are locked after the first save. Only a teacher or the Dasun owner account can edit them.');if(raw===''){syncAssessmentResult(ex,'Exam',sid,session?.id);if(!saveDB())return alert('Could not save marks.');renderMarks();examResultsModal((db.exams||[]).find(x=>x.id===ex.id)||ex);return;}const score=Number(raw),outOf=Number(ex.totalMarks)||100;if(!Number.isFinite(score)||score<0||score>outOf)return alert(`Marks must be between 0 and ${outOf}.`);const savedResult={score,feedback,updatedAt:Date.now()};syncAssessmentResult(ex,'Exam',sid,savedResult);db.notifications=db.notifications||[];db.notifications.push({id:id('notice'),toId:sid,courseId:ex.courseId,title:`Exam result updated: ${ex.title}`,body:`Your marks are ${score}/${outOf}.`,createdAt:Date.now(),readAt:null});notifyCourseUsers(ex.courseId,'Exam marks updated',`${ex.title}: ${score}/${outOf}`,session.id);if(!saveDB())return alert('Could not save exam marks.');renderMarks();examResultsModal((db.exams||[]).find(x=>x.id===ex.id)||ex);toast('Student exam result saved');});
 }
 
 function quizMarksModal(q){
@@ -2361,23 +2671,29 @@ function quizMarksModal(q){
  const results=assessmentResults(q,'Quiz');
  host.innerHTML=`<section class="card" style="padding:16px;border:1px solid var(--border);border-radius:16px;max-height:65vh;overflow:auto"><div class="row" style="justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div><h2 style="margin:0">${esc(q.title)} — Student Marks</h2><p class="muted" style="margin:6px 0 0">${esc(courseName(q.courseId))} · Quiz</p></div><button type="button" class="btn btn-secondary" id="closeInlineMarks">Close</button></div><p class="muted">Enter marks for each student. The list stays inside the Marks tab.</p><div class="field" style="max-width:240px"><label>Total marks</label><input id="quizTotalMarks" type="number" min="1" value="${Number(q.totalMarks)||100}"></div><div class="table-wrap"><table class="table"><thead><tr><th>Student name</th><th>Student ID</th><th>Username</th><th>Marks</th><th>Feedback</th><th>Save</th></tr></thead><tbody>${students.map(u=>{const r=results.find(x=>x.studentId===u.id)||{},locked=!!r.updatedAt&&!isOwnerAdmin()&&!isTeacher();return `<tr><td>${esc(u.name)}</td><td>${esc(u.studentId||'—')}</td><td>${esc(u.username)}</td><td><input style="min-width:85px;width:95px;padding:9px" type="number" min="0" max="${Number(q.totalMarks)||100}" step="0.5" id="quizScore-${esc(u.id)}" value="${r.score===undefined?'':Number(r.score)}" placeholder="—" ${locked?'disabled':''}></td><td><input style="min-width:110px" id="quizFeedback-${esc(u.id)}" value="${esc(r.feedback||'')}" placeholder="Feedback" ${locked?'disabled':''}></td><td>${locked?'<span class="pill">Saved · locked</span>':`<button type="button" class="btn btn-primary" data-save-quiz-result="${esc(u.id)}">Save</button>`}</td></tr>`}).join('')||'<tr><td colspan="6">No students currently have access to this quiz.</td></tr>'}</tbody></table></div></section>`;
  $('#closeInlineMarks').onclick=()=>{host.innerHTML='';};
- $$('[data-save-quiz-result]').forEach(b=>b.onclick=()=>{const sid=b.dataset.saveQuizResult,raw=$(`#quizScore-${sid}`).value.trim(),feedback=$(`#quizFeedback-${sid}`).value.trim(),total=Number($('#quizTotalMarks').value)||100;if(!isOwnerAdmin()&&!isTeacher()&&(q.results||[]).some(r=>r.studentId===sid))return alert('These marks are locked after the first save. Only a teacher or the Dasun owner account can edit them.');if(total<=0)return alert('Total marks must be above zero.');if(raw===''){syncAssessmentResult(q,'Quiz',sid,null);q.totalMarks=total;if(!saveDB())return alert('Could not save marks.');renderMarks();quizMarksModal((db.quizzes||[]).find(x=>x.id===q.id)||q);return;}const score=Number(raw);if(score<0||score>total)return alert(`Marks must be between 0 and ${total}.`);q.totalMarks=total;syncAssessmentResult(q,'Quiz',sid,{score,feedback,updatedAt:Date.now()});db.notifications=db.notifications||[];db.notifications.push({id:id('notice'),toId:sid,courseId:q.courseId,title:`Quiz result updated: ${q.title}`,body:`Your marks are ${score}/${total}.`,createdAt:Date.now(),readAt:null});notifyCourseUsers(q.courseId,'Quiz marks updated',`${q.title}: ${score}/${total}`,session.id);if(!saveDB())return alert('Could not save quiz marks.');renderMarks();quizMarksModal((db.quizzes||[]).find(x=>x.id===q.id)||q);toast('Quiz marks saved');});
+ $$('[data-save-quiz-result]').forEach(b=>b.onclick=()=>{const sid=b.dataset.saveQuizResult,raw=$(`#quizScore-${sid}`).value.trim(),feedback=$(`#quizFeedback-${sid}`).value.trim(),total=Number($('#quizTotalMarks').value)||100;if(!isOwnerAdmin()&&!isTeacher()&&(q.results||[]).some(r=>r.studentId===sid))return alert('These marks are locked after the first save. Only a teacher or the Dasun owner account can edit them.');if(total<=0)return alert('Total marks must be above zero.');if(raw===''){syncAssessmentResult(q,'Quiz',sid,session?.id);q.totalMarks=total;if(!saveDB())return alert('Could not save marks.');renderMarks();quizMarksModal((db.quizzes||[]).find(x=>x.id===q.id)||q);return;}const score=Number(raw);if(score<0||score>total)return alert(`Marks must be between 0 and ${total}.`);q.totalMarks=total;syncAssessmentResult(q,'Quiz',sid,{score,feedback,updatedAt:Date.now()});db.notifications=db.notifications||[];db.notifications.push({id:id('notice'),toId:sid,courseId:q.courseId,title:`Quiz result updated: ${q.title}`,body:`Your marks are ${score}/${total}.`,createdAt:Date.now(),readAt:null});notifyCourseUsers(q.courseId,'Quiz marks updated',`${q.title}: ${score}/${total}`,session.id);if(!saveDB())return alert('Could not save quiz marks.');renderMarks();quizMarksModal((db.quizzes||[]).find(x=>x.id===q.id)||q);toast('Quiz marks saved');});
 }
 
 function formatQuizDate(value){const d=new Date(value);return Number.isNaN(d.getTime())?'Not set':d.toLocaleString([], {year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});}
 function quizModal(item=null){
-  const lessonOptions=db.lessons.map(l=>`<option value="${esc(l.id)}" data-course="${esc(l.courseId)}" ${(item?.lessonId===l.id)?'selected':''}>${esc(courseName(l.courseId))} — ${esc(l.title)}</option>`).join('');
-  const courseOptions=db.courses.map(c=>`<option value="${esc(c.id)}" ${(item?.courseId===c.id)?'selected':''}>${esc(c.title)}</option>`).join('');
+  const allowedQuizCourses=isOwnerAdmin()?db.courses:adminCourses();
+  if(item&&!canManageCourse(item.courseId))return alert('You can only edit quizzes for subjects assigned to your admin account.');
+  const lessonOptions=db.lessons.filter(l=>allowedQuizCourses.some(c=>c.id===l.courseId)).map(l=>`<option value="${esc(l.id)}" data-course="${esc(l.courseId)}" ${(item?.lessonId===l.id)?'selected':''}>${esc(courseName(l.courseId))} — ${esc(l.title)}</option>`).join('');
+  const courseOptions=allowedQuizCourses.map(c=>`<option value="${esc(c.id)}" ${(item?.courseId===c.id)?'selected':''}>${esc(c.title)}</option>`).join('');
   openModal(item?'Edit quiz':'Add quiz',`<div class="field"><label>Quiz title</label><input name="title" required maxlength="150" value="${esc(item?.title||'')}" placeholder="e.g. Business Studies Lesson 01 Quiz"></div><div class="field"><label>Subject</label><select id="quizCourse" name="courseId" required>${courseOptions}</select></div><div class="field"><label>Lesson</label><select id="quizLesson" name="lessonId" required>${lessonOptions}</select></div><div class="field"><label>Opening date & time</label><input type="datetime-local" name="openingTime" required value="${esc(item?.openingTime||'')}"></div><div class="field"><label>Closing date & time</label><input type="datetime-local" name="closingTime" required value="${esc(item?.closingTime||'')}"></div><div class="field"><label>Quiz link (URL)</label><input type="url" name="quizLink" value="${esc(item?.quizLink||'')}" placeholder="https://..." inputmode="url"><p class="small muted">Students with access can open this link while the quiz is open. Use a complete https:// or http:// URL.</p></div><div class="field"><label>Quiz visibility</label><input type="checkbox" id="quizPublishedInput" name="published" ${item?.published===false?'':'checked'} style="display:none"><button type="button" id="quizPublishedToggle" class="btn permission-toggle ${item?.published===false?'permission-off':'permission-on'}" aria-pressed="${item?.published===false?'false':'true'}" style="min-width:90px;font-weight:800">${item?.published===false?'OFF':'ON'}</button><p class="small muted">ON = eligible students can see the quiz schedule. OFF = admin-only. Student access to both subject and lesson is still required.</p></div><p class="small muted">Opening/closing notifications work while the student portal is open. This HTML currently uses browser storage; different devices need a shared Firebase/backend database for live sync.</p>`,item?'Save quiz':'Create quiz',f=>{
     const title=String(f.get('title')||'').trim(),courseId=String(f.get('courseId')||''),lessonId=String(f.get('lessonId')||''),openingTime=String(f.get('openingTime')||''),closingTime=String(f.get('closingTime')||''),quizLink=String(f.get('quizLink')||'').trim();
     const lesson=db.lessons.find(l=>l.id===lessonId);
-    if(!title||!courseId||!lesson||lesson.courseId!==courseId)throw Error('Choose a lesson that belongs to the selected subject.');
+    if(!title||!courseId||!canManageCourse(courseId)||!lesson||lesson.courseId!==courseId)throw Error('Choose a lesson from a subject assigned to your account.');
     if(!openingTime||!closingTime||!Number.isFinite(Date.parse(openingTime))||!Number.isFinite(Date.parse(closingTime))||Date.parse(closingTime)<=Date.parse(openingTime))throw Error('Closing time must be later than opening time.');
     if(quizLink){let parsed;try{parsed=new URL(quizLink)}catch(_){throw Error('Enter a valid quiz URL starting with https:// or http://.')}if(!['http:','https:'].includes(parsed.protocol))throw Error('Quiz link must start with https:// or http://.');}
+    if(!Array.isArray(db.quizzes))db.quizzes=[];
     const v={title,courseId,lessonId,openingTime,closingTime,quizLink,published:f.get('published')==='on',updatedAt:Date.now()};
-    if(item)Object.assign(item,v);else db.quizzes.push({id:id('quiz'),...v});
-    if(!saveDB())throw Error('Could not save quiz in this browser.');
-    closeModal();renderQuizzes();toast(item?'Quiz updated':'Quiz created');
+    const current=item?db.quizzes.find(q=>String(q.id)===String(item.id)):null;
+    if(item&&!current)throw Error('This quiz is no longer in the saved list. Refresh the page and try again.');
+    if(current)Object.assign(current,v);else db.quizzes.push({id:id('quiz'),...v,createdAt:Date.now()});
+    notifyCourseUsers(courseId,current?'Quiz updated':'New quiz added',`${title} · ${formatQuizDate(openingTime)}`);
+    if(!saveDB())throw Error('Quiz was not saved. Browser storage is unavailable or full. Export a backup, free storage, then try again.');
+    closeModal();renderQuizzes();toast(current?'Quiz updated and saved':'Quiz created and saved');
   });
   const course=$('#quizCourse'),lesson=$('#quizLesson');
   const filterLessons=()=>{[...lesson.options].forEach(o=>{o.hidden=o.dataset.course!==course.value;if(o.hidden&&o.selected)o.selected=false});if(!lesson.value||lesson.selectedOptions[0]?.hidden){const first=[...lesson.options].find(o=>!o.hidden);if(first)first.selected=true;}};
@@ -2409,7 +2725,7 @@ function checkQuizTransitions(){
 }
 setInterval(checkQuizTransitions,5000);
 window.addEventListener('storage',e=>{
-  if(e.key===STORE&&e.newValue){try{db=JSON.parse(e.newValue);if(!Array.isArray(db.quizzes))db.quizzes=[];
+  if(e.key===STORE&&e.newValue){try{db=JSON.parse(e.newValue);lastRaw=e.newValue;rebindSession();if(!Array.isArray(db.quizzes))db.quizzes=[];
      if(!Array.isArray(db.exams))db.exams=[];if(!db.studentCourseAccess)db.studentCourseAccess={};if(session&&activePage){renderNav();renderPage();checkQuizTransitions();}}catch(err){console.warn('Could not sync browser storage update',err)}}
 });
 
@@ -2424,15 +2740,15 @@ function renderCalendar(){
   const year=calendarCursor.getFullYear(),month=calendarCursor.getMonth();
   const first=new Date(year,month,1),startDay=first.getDay(),days=new Date(year,month+1,0).getDate();
   const monthLabel=first.toLocaleDateString('en-US',{month:'long',year:'numeric'});
-  const visible=db.calendarEvents.filter(e=>isAdmin()||e.published!==false).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  const generated=[...(db.exams||[]).map(e=>({id:e.id,type:'Exam',title:e.title,date:e.date||e.examDate||'',time:e.time||'',description:e.description||'',courseId:e.courseId,generatedKind:'exam'})),...(db.quizzes||[]).map(q=>({id:q.id,type:'Quiz',title:q.title,date:String(q.openingTime||'').slice(0,10),time:String(q.openingTime||'').slice(11,16),description:'Scheduled quiz',courseId:q.courseId,generatedKind:'quiz'})),...specialClasses().map(x=>({id:x.id,type:x.type==='masterblast'?'Master Blast':'Paper Class',title:x.title,date:x.date||'',time:x.time||'',description:x.description||'',courseId:x.courseId,generatedKind:'special'}))].filter(e=>e.date);const visible=[...db.calendarEvents.filter(e=>isAdmin()||e.published!==false),...generated.filter(e=>(!e.courseId||isAdmin()||canSeeCourse(e.courseId))&&(!e.grades?.length||e.grades.includes(session?.grade)))].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
   const cells=[];
   for(let i=0;i<startDay;i++)cells.push('<div class="calendar-day is-empty"></div>');
   for(let day=1;day<=days;day++){
     const date=year+'-'+String(month+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
     const events=visible.filter(e=>e.date===date);
-    cells.push(`<div class="calendar-day"><div class="calendar-day-number">${day}</div>${events.map(e=>`<button type="button" class="calendar-event" data-calendar-view="${esc(e.id)}" title="${esc(e.title)}"><span>${esc(e.type||'Event')}</span>${esc(e.title)}</button>`).join('')}</div>`);
+    cells.push(`<div class="calendar-day ${date===new Date().toISOString().slice(0,10)?'calendar-today':''}"><div class="calendar-day-number">${day}</div>${events.map(e=>`<button type="button" class="calendar-event" data-calendar-view="${esc(e.id)}" title="${esc(e.title)}"><span>${esc(e.type||'Event')}</span>${esc(e.title)}</button>`).join('')}</div>`);
   }
-  $('#pageContent').innerHTML=`<section class="card calendar-wrap"><div class="calendar-toolbar"><div><h2 style="margin:0">${esc(monthLabel)}</h2><p class="muted small" style="margin:6px 0 0">Exams, events, seminars and important class dates</p></div><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn btn-secondary" id="calendarPrev">‹</button><button class="btn btn-secondary" id="calendarToday">Today</button><button class="btn btn-secondary" id="calendarNext">›</button>${isAdmin()?'<button class="btn btn-primary" id="calendarAdd">＋ Add event</button>':''}</div></div><div class="calendar-grid calendar-weekdays">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(x=>`<div>${x}</div>`).join('')}</div><div class="calendar-grid">${cells.join('')}</div></section><section class="card" style="margin-top:18px"><h2>Upcoming events</h2><div class="calendar-upcoming">${visible.filter(e=>e.date>=new Date().toISOString().slice(0,10)).slice(0,12).map(e=>`<div class="calendar-upcoming-row"><div><span class="pill">${esc(e.type||'Event')}</span><strong>${esc(e.title)}</strong><div class="small muted">${esc(e.date||'Date not set')}${e.time?' · '+esc(e.time):''}</div><p class="muted small">${esc(e.description||'')}</p></div>${isAdmin()?`<div class="row" style="gap:8px"><button class="btn btn-secondary" data-calendar-edit="${esc(e.id)}">Edit</button><button class="btn btn-danger" data-calendar-delete="${esc(e.id)}">Remove</button></div>`:''}</div>`).join('')||'<p class="muted">No upcoming events yet.</p>'}</div></section>`;
+  $('#pageContent').innerHTML=`<section class="card calendar-wrap"><div class="calendar-toolbar"><div><h2 style="margin:0">${esc(monthLabel)}</h2><p class="muted small" style="margin:6px 0 0">Exams, events, seminars and important class dates</p></div><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn btn-secondary" id="calendarPrev">‹</button><button class="btn btn-secondary" id="calendarToday">Today</button><button class="btn btn-secondary" id="calendarNext">›</button>${isAdmin()?'<button class="btn btn-primary" id="calendarAdd">＋ Add event</button>':''}</div></div><div class="calendar-grid calendar-weekdays">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(x=>`<div>${x}</div>`).join('')}</div><div class="calendar-grid">${cells.join('')}</div></section><section class="card" style="margin-top:18px"><h2>Upcoming events</h2><div class="calendar-upcoming">${visible.filter(e=>e.date>=new Date().toISOString().slice(0,10)).slice(0,12).map(e=>`<div class="calendar-upcoming-row"><div><span class="pill">${esc(e.type||'Event')}</span><strong>${esc(e.title)}</strong><div class="small muted">${esc(e.date||'Date not set')}${e.time?' · '+esc(e.time):''}</div><p class="muted small">${esc(e.description||'')}</p></div>${isAdmin()&&!e.generatedKind?`<div class="row" style="gap:8px"><button class="btn btn-secondary" data-calendar-edit="${esc(e.id)}">Edit</button><button class="btn btn-danger" data-calendar-delete="${esc(e.id)}">Remove</button></div>`:''}</div>`).join('')||'<p class="muted">No upcoming events yet.</p>'}</div></section>`;
   $('#calendarPrev').onclick=()=>{calendarCursor=new Date(year,month-1,1);renderCalendar()};
   $('#calendarNext').onclick=()=>{calendarCursor=new Date(year,month+1,1);renderCalendar()};
   $('#calendarToday').onclick=()=>{calendarCursor=new Date();renderCalendar()};
@@ -2603,21 +2919,23 @@ function closeModal(){
 }
 
 function courseModal(c=null){
-  openModal(c?'Edit subject':'Add subject',`<div class="field"><label>Subject name</label><input name="title" required value="${esc(c?.title||'')}" placeholder="e.g. Business Studies"></div><div class="field"><label>Display label</label><input name="subject" value="${esc(c?.subject||'')}" placeholder="e.g. BUSINESS STUDIES"></div><div class="field"><label>Description</label><textarea name="description" rows="3" placeholder="Short description">${esc(c?.description||'')}</textarea></div><div class="field"><label>Subject cover photo (optional)</label><input name="coverPhoto" type="file" accept="image/*"><div class="small muted">Upload JPG/PNG/WebP image up to 1.5 MB. Leave blank to keep current cover.</div>${c?.coverDataUrl?`<img src="${c.coverDataUrl}" alt="Current cover" style="max-width:100%;height:100px;object-fit:cover;border-radius:8px;margin-top:8px">`:''}</div>`,c?'Save changes':'Create subject',async f=>{
+  if(c&&!canManageCourse(c.id)){alert('You can only edit subjects assigned to your account.');return;}
+  openModal(c?'Edit subject':'Add subject',`<input type="hidden" name="level" value="AL"><div class="field"><label>Applicable grades / A/L years (select multiple)</label><div id="courseGradesBox" class="checkbox-group">${gradeChecks('grades',courseGrades(c),courseLevel(c))}</div></div><div class="field"><label>Subject name</label><input name="title" required value="${esc(c?.title||'')}" placeholder="e.g. Business Studies"></div><div class="field"><label>Display label</label><input name="subject" value="${esc(c?.subject||'')}" placeholder="e.g. BUSINESS STUDIES"></div><div class="field"><label>Description</label><textarea name="description" rows="3" placeholder="Short description">${esc(c?.description||'')}</textarea></div><div class="field"><label>Subject cover photo (optional)</label><input name="coverPhoto" type="file" accept="image/*"><div class="small muted">Upload JPG/PNG/WebP image up to 1.5 MB. Leave blank to keep current cover.</div>${c?.coverDataUrl?`<img src="${safeImg(c.coverDataUrl)}" alt="Current cover" style="max-width:100%;height:100px;object-fit:cover;border-radius:8px;margin-top:8px">`:''}</div>`,c?'Save changes':'Create subject',async f=>{
     const title=f.get('title').trim();
     if(!title)throw Error('Please enter a subject name.');
     const coverFile=f.get('coverPhoto');let coverDataUrl=c?.coverDataUrl||'';
-    if(coverFile&&coverFile.size){if(!coverFile.type.startsWith('image/'))throw Error('Choose an image file.');if(coverFile.size>1500000)throw Error('Choose a cover image under 1.5 MB.');coverDataUrl=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(Error('Could not read image.'));r.readAsDataURL(coverFile)});}
+    if(coverFile&&coverFile.size){if(!['image/png','image/jpeg','image/webp'].includes(coverFile.type))throw Error('Choose a PNG, JPG or WebP image.');if(coverFile.size>1500000)throw Error('Choose a cover image under 1.5 MB.');coverDataUrl=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(Error('Could not read image.'));r.readAsDataURL(coverFile)});}
     if(c){
-      Object.assign(c,{title,subject:f.get('subject').trim(),description:f.get('description').trim(),coverDataUrl});
+      Object.assign(c,{title,subject:f.get('subject').trim(),description:f.get('description').trim(),coverDataUrl,level:String(f.get('level')||'AL'),grades:f.getAll('grades')});
     }else{
-      const newCourse={id:id('c'),title,subject:f.get('subject').trim()||title.toUpperCase(),description:f.get('description').trim(),coverDataUrl};db.courses.push(newCourse);if(isTeacher()){db.teacherCourseAccess=db.teacherCourseAccess||{};db.teacherCourseAccess[session.id]=[...(db.teacherCourseAccess[session.id]||[]),newCourse.id];}
+      const newCourse={id:id('c'),title,subject:f.get('subject').trim()||title.toUpperCase(),description:f.get('description').trim(),coverDataUrl,level:String(f.get('level')||'AL'),grades:f.getAll('grades')};db.courses.push(newCourse);if(isTeacher()){db.teacherCourseAccess=db.teacherCourseAccess||{};db.teacherCourseAccess[session.id]=[...(db.teacherCourseAccess[session.id]||[]),newCourse.id];}
     }
-    saveDB();
+    if(!saveDB())throw Error('Could not save subject. The browser storage may be unavailable or full. Try a smaller cover image.');
     closeModal();
     renderPage();
-    toast(c?'Subject updated':'Subject created');
+    toast(c?'Subject and cover updated':'Subject created');
   });
+  $('#courseLevel')?.addEventListener('change',()=>{const lv=$('#courseLevel').value;$('#courseGradesBox').innerHTML=gradeChecks('grades',[],lv);});
 }
 
 function normalizeYouTubeId(value){
@@ -2641,12 +2959,12 @@ function lessonModal(defaultCourseId=null,lesson=null){
   if(!db.courses.length){alert('Add a subject first.');return}
   const options=db.courses.map(c=>`<option value="${c.id}" ${(lesson?.courseId||defaultCourseId)===c.id?'selected':''}>${esc(c.title)}</option>`).join('');
 
-  openModal(lesson?'Edit lesson':'Add lesson',`<div class="field"><label>Subject</label><select name="courseId" required>${options}</select></div><div class="field"><label>Lesson title</label><input name="title" required value="${esc(lesson?.title||'')}" placeholder="e.g. Lesson 01 — Introduction"></div><div class="field"><label>YouTube video ID</label><input name="videoId" value="${esc(lesson?.videoId||'')}" placeholder="e.g. dQw4w9WgXcQ"><div class="small muted">Paste only the video ID, not the full URL. Embedded playback works only when YouTube allows embedding.</div></div><div class="field"><label>Lesson description</label><textarea name="description" rows="3">${esc(lesson?.description||'')}</textarea></div>`,lesson?'Save lesson':'Add lesson',f=>{
+  openModal(lesson?'Edit lesson':'Add lesson',`<div class="field"><label>Subject</label><select name="courseId" required>${options}</select></div><div class="field"><label>Lesson title</label><input name="title" required value="${esc(lesson?.title||'')}" placeholder="e.g. Lesson 01 — Introduction"></div><div class="field"><label>Grades / A/L years this lesson applies to (multiple)</label><div id="lessonGradesBox" class="checkbox-group">${gradeChecks('lessonGrades',lesson?.grades||[],courseLevel(db.courses.find(c=>c.id===(lesson?.courseId||defaultCourseId)))||'AL')}</div></div><div class="field"><label>YouTube video ID</label><input name="videoId" value="${esc(lesson?.videoId||'')}" placeholder="e.g. dQw4w9WgXcQ"><div class="small muted">Paste only the video ID, not the full URL. Embedded playback works only when YouTube allows embedding.</div></div><div class="field"><label>Lesson description</label><textarea name="description" rows="3">${esc(lesson?.description||'')}</textarea></div>`,lesson?'Save lesson':'Add lesson',f=>{
     const rawVideo=String(f.get('videoId')||'').trim();
     const normalizedVideo=normalizeYouTubeId(rawVideo);
     if(rawVideo&&!normalizedVideo)throw Error('Enter a valid YouTube video ID or URL.');
 
-    const vals={courseId:f.get('courseId'),title:String(f.get('title')||'').trim(),videoId:normalizedVideo,description:String(f.get('description')||'').trim()};
+    const vals={courseId:f.get('courseId'),title:String(f.get('title')||'').trim(),videoId:normalizedVideo,description:String(f.get('description')||'').trim(),grades:f.getAll('lessonGrades')};
     if(!vals.title)throw Error('Enter a lesson title.');
 
     if(lesson)Object.assign(lesson,vals);
@@ -2658,6 +2976,7 @@ function lessonModal(defaultCourseId=null,lesson=null){
     else {activeCourse=null;renderPage()}
     toast(lesson?'Lesson updated':'Lesson added');
   });
+  const lessonCourse=$('select[name=courseId]');lessonCourse?.addEventListener('change',()=>{const lv=courseLevel(db.courses.find(c=>c.id===lessonCourse.value));$('#lessonGradesBox').innerHTML=gradeChecks('lessonGrades',[],lv);});
 }
 
 function paperModal(){
@@ -2675,7 +2994,7 @@ function paperModal(){
     if(file&&file.size>1500000)throw Error('For this HTML demo, choose a PDF under 1.5 MB. Use cloud storage for larger files.');
     if(file&&file.size>0&&file.type&&file.type!=='application/pdf'&&!file.name.toLowerCase().endsWith('.pdf'))throw Error('Please choose a PDF file.');
     let dataUrl='';
-    if(file&&file.size>0)dataUrl=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(Error('Could not read file.'));r.readAsDataURL(file)});
+    if(file&&file.size>0)dataUrl=await readPdfDataUrl(file);
     db.papers.push({id:id('p'),title:String(f.get('title')||'').trim(),courseId,lessonId,fileName:file?.name||'',dataUrl,url});
     try{if(!saveDB())throw Error('Browser storage is unavailable or full.');}catch(e){db.papers.pop();throw Error('Could not save PDF. Use a smaller file or cloud storage for larger files.');}
     closeModal();renderPage();toast('PDF uploaded to lesson');
@@ -2688,14 +3007,14 @@ function teacherModal(t=null){
  if(!isOwnerAdmin())return alert('Only the Sio Creations owner account can add or manage teachers.');
  const access=db.teacherCourseAccess?.[t?.id]||[];
  const checks=db.courses.map(c=>`<label class="checkbox-item" style="display:flex;align-items:center;gap:10px;padding:9px 12px"><input type="checkbox" name="access" value="${esc(c.id)}" ${access.includes(c.id)?'checked':''}><span>${esc(c.title)}</span></label>`).join('');
- openModal(t?'Edit teacher':'Add teacher',`<div class="field"><label>Teacher full name</label><input name="name" required value="${esc(t?.name||'')}"></div><div class="field"><label>Username</label><input name="username" required value="${esc(t?.username||'')}"></div><div class="field"><label>Email</label><input name="email" type="email" value="${esc(t?.email||'')}"></div><div class="field"><label>Phone</label><input name="phone" value="${esc(t?.phone||'')}"></div><div class="field"><label>${t?'New password (optional)':'Temporary password'}</label><input name="password" type="password" ${t?'':'required'} minlength="6"></div><div class="field"><label>Assigned subjects (teacher can manage only these)</label><div class="checkbox-group">${checks||'Create a subject first.'}</div></div>`,t?'Save teacher':'Create teacher',f=>{
+ openModal(t?'Edit teacher':'Add teacher',`<div class="field"><label>Teacher full name</label><input name="name" required value="${esc(t?.name||'')}"></div><input type="hidden" name="teachingLevel" value="AL"><div class="field"><label>A/L years this teacher can teach</label><div class="checkbox-group">${gradeChecks('teacherGrades',t?.teachingGrades||[],'AL')}</div></div><div class="field"><label>Username</label><input name="username" required value="${esc(t?.username||'')}"></div><div class="field"><label>Email</label><input name="email" type="email" value="${esc(t?.email||'')}"></div><div class="field"><label>Phone</label><input name="phone" value="${esc(t?.phone||'')}"></div><div class="field"><label>${t?'New password (optional)':'Temporary password'}</label><input name="password" type="password" ${t?'':'required'} minlength="6"></div><div class="field"><label>Assigned subjects (teacher can manage only these)</label><div class="checkbox-group">${checks||'Create a subject first.'}</div></div>`,t?'Save teacher':'Create teacher',async f=>{
  const name=String(f.get('name')||'').trim(),username=String(f.get('username')||'').trim(),password=String(f.get('password')||'');
  if(!name||!username)throw Error('Name and username are required.');
  if(db.users.some(x=>x.username.toLowerCase()===username.toLowerCase()&&x.id!==t?.id))throw Error('That username is already in use.');
  if(!t&&!password)throw Error('Enter a temporary password.');if(password&&password.length<6)throw Error('Password must be at least 6 characters.');
  db.teacherCourseAccess=db.teacherCourseAccess||{};let teacherId;
- if(t){Object.assign(t,{name,username,email:String(f.get('email')||'').trim(),phone:String(f.get('phone')||'').trim()});if(password)t.password=password;teacherId=t.id;}
- else{const nu={id:id('teacher'),name,username,password,email:String(f.get('email')||'').trim(),phone:String(f.get('phone')||'').trim(),role:'teacher'};db.users.push(nu);teacherId=nu.id;}
+ if(t){Object.assign(t,{name,username,email:String(f.get('email')||'').trim(),phone:String(f.get('phone')||'').trim(),teachingLevel:String(f.get('teachingLevel')||'both'),teachingGrades:f.getAll('teacherGrades')});if(password)t.password=await hashPassword(password);teacherId=t.id;}
+ else{const nu={id:id('teacher'),name,username,password:await hashPassword(password),email:String(f.get('email')||'').trim(),phone:String(f.get('phone')||'').trim(),role:'teacher',teachingLevel:String(f.get('teachingLevel')||'both'),teachingGrades:f.getAll('teacherGrades')};db.users.push(nu);teacherId=nu.id;}
  db.teacherCourseAccess[teacherId]=f.getAll('access');if(!saveDB())throw Error('Could not save teacher account.');closeModal();renderStudents();toast(t?'Teacher updated':'Teacher account created');
  });
 }
@@ -2712,12 +3031,12 @@ function renderTeacherStudents(){
  $('#teacherStudentSearch').oninput=()=>{$('#teacherStudentRows').innerHTML=teacherStudentRows(students.filter(u=>(u.name+' '+u.username).toLowerCase().includes($('#teacherStudentSearch').value.toLowerCase())),courses);wireTeacherStudentDetails()};wireTeacherStudentDetails();
 }
 function wireTeacherStudentDetails(){$$('[data-teacher-student]').forEach(b=>b.onclick=()=>{const u=db.users.find(x=>x.id===b.dataset.teacherStudent);if(u)teacherStudentDetails(u)})}
-function teacherStudentRows(students,courses){return students.map(u=>{const cs=courses.filter(c=>(db.studentCourseAccess[u.id]||[]).includes(c.id)),ls=db.lessons.filter(l=>cs.some(c=>c.id===l.courseId)&&(l.allowedStudentIds==null||l.allowedStudentIds.includes(u.id))),done=ls.filter(l=>isLessonComplete(u.id,l.id)).length,ms=(db.marks||[]).filter(m=>m.studentId===u.id&&cs.some(c=>c.id===m.courseId)),avg=ms.length?Math.round(ms.reduce((a,m)=>a+(Number(m.score)||0)/Math.max(1,Number(m.outOf)||100)*100,0)/ms.length):0;return `<tr><td><strong>${esc(u.name)}</strong><div class="small muted">${esc(u.username)}</div></td><td>${cs.map(c=>esc(c.title)).join(', ')||'—'}</td><td>${done}/${ls.length} (${ls.length?Math.round(done/ls.length*100):0}%)</td><td>${ms.length?avg+'%':'—'}</td><td><button class="btn btn-secondary" data-teacher-student="${esc(u.id)}">Student details / marks</button></td></tr>`}).join('')||'<tr><td colspan="5">No students have access to your assigned subjects yet.</td></tr>'}
+function teacherStudentRows(students,courses){return students.map(u=>{const cs=courses.filter(c=>(db.studentCourseAccess[u.id]||[]).includes(c.id)),ls=db.lessons.filter(l=>cs.some(c=>c.id===l.courseId)&&(l.allowedStudentIds==null||l.allowedStudentIds.includes(u.id))),done=ls.filter(l=>isLessonComplete(u.id,l.id)).length,ms=(db.marks||[]).filter(m=>m.studentId===u.id&&cs.some(c=>c.id===m.courseId)),avg=ms.length?Math.round(ms.reduce((a,m)=>a+(Number(m.score)||0)/Math.max(1,Number(m.outOf)||100)*100,0)/ms.length):0;return `<tr><td><strong>${esc(u.name)}</strong><div class="small muted">${esc(u.username)} · ${esc('A/L')} ${esc(u.grade||'')}</div></td><td>${cs.map(c=>esc(c.title)).join(', ')||'—'}</td><td>${done}/${ls.length} (${ls.length?Math.round(done/ls.length*100):0}%)</td><td>${ms.length?avg+'%':'—'}</td><td><button class="btn btn-secondary" data-teacher-student="${esc(u.id)}">Student details / marks</button></td></tr>`}).join('')||'<tr><td colspan="5">No students have access to your assigned subjects yet.</td></tr>'}
 function teacherStudentDetails(u){
  const courses=teacherCourses().filter(c=>(db.studentCourseAccess[u.id]||[]).includes(c.id));const lessons=db.lessons.filter(l=>courses.some(c=>c.id===l.courseId)&&(l.allowedStudentIds==null||l.allowedStudentIds.includes(u.id)));const marks=(db.marks||[]).filter(m=>m.studentId===u.id&&courses.some(c=>c.id===m.courseId));
  const rows=lessons.map(l=>`<tr><td>${esc(courseName(l.courseId))}</td><td>${esc(l.title)}</td><td>${isLessonComplete(u.id,l.id)?'✓ Complete':'In progress'}</td><td><button class="btn btn-secondary" data-toggle-completion="${esc(l.id)}">${isLessonComplete(u.id,l.id)?'Mark incomplete':'Mark complete'}</button></td></tr>`).join('');
  const markRows=marks.map(m=>`<tr><td>${esc(m.title)}</td><td>${esc(courseName(m.courseId))}</td><td>${esc(db.lessons.find(l=>l.id===m.lessonId)?.title||'—')}</td><td>${Number(m.score)||0}/${Number(m.outOf)||100}</td><td><button class="btn btn-danger" data-teacher-delete-mark="${esc(m.id)}">×</button></td></tr>`).join('');
- openModal('Student details',`<p><strong>${esc(u.name)}</strong> · ${esc(u.username)}</p><p class="small muted">Phone: ${esc(u.phone||'—')} · Email: ${esc(u.email||'—')} · Address: ${esc(u.address||'—')} · Tute pack: ${esc(u.tutePackNumber||'—')}</p><h3>Accessible lessons</h3><div class="table-wrap"><table class="table"><thead><tr><th>Subject</th><th>Lesson</th><th>Status</th><th>Update</th></tr></thead><tbody>${rows||'<tr><td colspan="4">No accessible lessons.</td></tr>'}</tbody></table></div><h3 style="margin-top:18px">Add quiz / paper marks</h3><div id="teacherMarkForm"><div class="field"><label>Assessment title</label><input name="title" id="tmTitle" required></div><div class="field"><label>Subject</label><select name="courseId" id="tmCourse">${courses.map(c=>`<option value="${esc(c.id)}">${esc(c.title)}</option>`).join('')}</select></div><div class="field"><label>Lesson</label><select name="lessonId" id="tmLesson"></select></div><div class="field"><label>Type</label><select name="type"><option>Quiz</option><option>Paper</option><option>Assignment</option></select></div><div class="row"><div class="field" style="flex:1"><label>Marks obtained</label><input name="score" type="number" min="0" step="0.5" required></div><div class="field" style="flex:1"><label>Total marks</label><input name="outOf" type="number" min="1" step="0.5" value="100" required></div></div><div class="field"><label>Feedback</label><textarea name="feedback" rows="2"></textarea></div><button class="btn btn-primary" type="button" id="tmSave">Save marks</button></div><h3 style="margin-top:18px">Recorded marks</h3><div class="table-wrap"><table class="table"><thead><tr><th>Assessment</th><th>Subject</th><th>Lesson</th><th>Marks</th><th></th></tr></thead><tbody>${markRows||'<tr><td colspan="5">No marks recorded.</td></tr>'}</tbody></table></div>`, 'Done',()=>closeModal());
+ openModal('Student details',`<p><strong>${esc(u.name)}</strong> · ${esc(u.username)}</p><p class="small muted">Study level: ${esc('A/L')} · ${esc(u.grade||'Grade not set')}<br>Phone: ${esc(u.phone||'—')} · Email: ${esc(u.email||'—')} · Address: ${esc(u.address||'—')} · Tute pack: ${esc(u.tutePackNumber||'—')}</p><h3>Accessible lessons</h3><div class="table-wrap"><table class="table"><thead><tr><th>Subject</th><th>Lesson</th><th>Status</th><th>Update</th></tr></thead><tbody>${rows||'<tr><td colspan="4">No accessible lessons.</td></tr>'}</tbody></table></div><h3 style="margin-top:18px">Add quiz / paper marks</h3><div id="teacherMarkForm"><div class="field"><label>Assessment title</label><input name="title" id="tmTitle" required></div><div class="field"><label>Subject</label><select name="courseId" id="tmCourse">${courses.map(c=>`<option value="${esc(c.id)}">${esc(c.title)}</option>`).join('')}</select></div><div class="field"><label>Lesson</label><select name="lessonId" id="tmLesson"></select></div><div class="field"><label>Type</label><select name="type"><option>Quiz</option><option>Paper</option><option>Assignment</option></select></div><div class="row"><div class="field" style="flex:1"><label>Marks obtained</label><input name="score" type="number" min="0" step="0.5" required></div><div class="field" style="flex:1"><label>Total marks</label><input name="outOf" type="number" min="1" step="0.5" value="100" required></div></div><div class="field"><label>Feedback</label><textarea name="feedback" rows="2"></textarea></div><button class="btn btn-primary" type="button" id="tmSave">Save marks</button></div><h3 style="margin-top:18px">Recorded marks</h3><div class="table-wrap"><table class="table"><thead><tr><th>Assessment</th><th>Subject</th><th>Lesson</th><th>Marks</th><th></th></tr></thead><tbody>${markRows||'<tr><td colspan="5">No marks recorded.</td></tr>'}</tbody></table></div>`, 'Done',()=>closeModal());
  const updateLessons=()=>{$('#tmLesson').innerHTML=lessons.filter(l=>l.courseId===$('#tmCourse').value).map(l=>`<option value="${esc(l.id)}">${esc(l.title)}</option>`).join('')||'<option value="">No lessons</option>'};updateLessons();$('#tmCourse').onchange=updateLessons;
  $$('[data-toggle-completion]').forEach(b=>b.onclick=()=>{const lid=b.dataset.toggleCompletion;db.lessonProgress=db.lessonProgress||{};db.lessonProgress[u.id]=db.lessonProgress[u.id]||{};db.lessonProgress[u.id][lid]=!isLessonComplete(u.id,lid);saveDB();teacherStudentDetails(u)});
  $('#tmSave').onclick=()=>{const title=$('#tmTitle').value.trim(),courseId=$('#tmCourse').value,lessonId=$('#tmLesson').value,form=$('#teacherMarkForm'),score=Number(form.querySelector('[name=score]').value),outOf=Number(form.querySelector('[name=outOf]').value);if(!title)return alert('Enter an assessment title.');if(!canManageCourse(courseId)||!lessons.some(l=>l.id===lessonId&&l.courseId===courseId))return alert('Choose one of your assigned subjects and lessons.');if(score<0||outOf<=0||score>outOf)return alert('Marks must be between 0 and total marks.');db.marks=db.marks||[];db.marks.push({id:id('mark'),studentId:u.id,title,courseId,lessonId,type:form.querySelector('[name=type]').value,score,outOf,feedback:form.querySelector('[name=feedback]').value.trim(),updatedAt:Date.now()});if(!saveDB())return alert('Could not save marks.');teacherStudentDetails(u);toast('Marks saved');};
@@ -2735,25 +3054,26 @@ function teacherPaperModal(){
 function teacherQuizModal(item=null){
  const courses=teacherCourses();if(!courses.length)return alert('Ask admin to assign a subject first.');if(item&&!canManageCourse(item.courseId))return alert('You cannot edit a quiz outside your assigned subjects.');
  const courseId=item?.courseId||courses[0].id;
- openModal(item?'Edit quiz':'Add quiz',`<div class="field"><label>Quiz title</label><input name="title" required value="${esc(item?.title||'')}"></div><div class="field"><label>Subject</label><select name="courseId" id="tqCourse">${courses.map(c=>`<option value="${esc(c.id)}" ${c.id===courseId?'selected':''}>${esc(c.title)}</option>`).join('')}</select></div><div class="field"><label>Lesson</label><select name="lessonId" id="tqLesson"></select></div><div class="field"><label>Opening date & time</label><input type="datetime-local" name="openingTime" required value="${esc(item?.openingTime||'')}"></div><div class="field"><label>Closing date & time</label><input type="datetime-local" name="closingTime" required value="${esc(item?.closingTime||'')}"></div><div class="field"><label>Quiz URL</label><input name="quizLink" type="url" value="${esc(item?.quizLink||'')}" placeholder="https://..."></div><div class="field"><label>Visible to students</label><select name="published"><option value="true" ${item?.published===false?'':'selected'}>ON</option><option value="false" ${item?.published===false?'selected':''}>OFF</option></select></div>`,item?'Save quiz':'Create quiz',f=>{const title=String(f.get('title')||'').trim(),cid=String(f.get('courseId')||''),lid=String(f.get('lessonId')||''),openingTime=String(f.get('openingTime')||''),closingTime=String(f.get('closingTime')||''),quizLink=String(f.get('quizLink')||'').trim(),lesson=db.lessons.find(l=>l.id===lid&&l.courseId===cid);if(!title||!canManageCourse(cid)||!lesson)throw Error('Choose a title and lesson from an assigned subject.');if(!openingTime||!closingTime||Date.parse(closingTime)<=Date.parse(openingTime))throw Error('Closing time must be after opening time.');if(quizLink&&!/^https?:\/\//i.test(quizLink))throw Error('Enter a valid quiz URL.');const v={title,courseId:cid,lessonId:lid,openingTime,closingTime,quizLink,published:f.get('published')==='true',updatedAt:Date.now()};if(item)Object.assign(item,v);else db.quizzes.push({id:id('quiz'),...v});notifyCourseUsers(cid,item?'Quiz updated':'New quiz added',`${title} · ${formatQuizDate(openingTime)}`);if(!saveDB())throw Error('Could not save quiz.');closeModal();renderQuizzes();toast('Quiz saved');});
+ openModal(item?'Edit quiz':'Add quiz',`<div class="field"><label>Quiz title</label><input name="title" required value="${esc(item?.title||'')}"></div><div class="field"><label>Subject</label><select name="courseId" id="tqCourse">${courses.map(c=>`<option value="${esc(c.id)}" ${c.id===courseId?'selected':''}>${esc(c.title)}</option>`).join('')}</select></div><div class="field"><label>Lesson</label><select name="lessonId" id="tqLesson"></select></div><div class="field"><label>Opening date & time</label><input type="datetime-local" name="openingTime" required value="${esc(item?.openingTime||'')}"></div><div class="field"><label>Closing date & time</label><input type="datetime-local" name="closingTime" required value="${esc(item?.closingTime||'')}"></div><div class="field"><label>Quiz URL</label><input name="quizLink" type="url" value="${esc(item?.quizLink||'')}" placeholder="https://..."></div><div class="field"><label>Visible to students</label><select name="published"><option value="true" ${item?.published===false?'':'selected'}>ON</option><option value="false" ${item?.published===false?'selected':''}>OFF</option></select></div>`,item?'Save quiz':'Create quiz',f=>{const title=String(f.get('title')||'').trim(),cid=String(f.get('courseId')||''),lid=String(f.get('lessonId')||''),openingTime=String(f.get('openingTime')||''),closingTime=String(f.get('closingTime')||''),quizLink=String(f.get('quizLink')||'').trim(),lesson=db.lessons.find(l=>l.id===lid&&l.courseId===cid);if(!title||!canManageCourse(cid)||!lesson)throw Error('Choose a title and lesson from an assigned subject.');if(!openingTime||!closingTime||Date.parse(closingTime)<=Date.parse(openingTime))throw Error('Closing time must be after opening time.');if(quizLink&&!/^https?:\/\//i.test(quizLink))throw Error('Enter a valid quiz URL.');const v={title,courseId:cid,lessonId:lid,openingTime,closingTime,quizLink,published:f.get('published')==='true',updatedAt:Date.now()};if(!Array.isArray(db.quizzes))db.quizzes=[];const current=item?db.quizzes.find(q=>String(q.id)===String(item.id)):null;if(item&&!current)throw Error('This quiz is no longer in the saved list. Refresh and try again.');if(current)Object.assign(current,v);else db.quizzes.push({id:id('quiz'),...v,createdAt:Date.now()});notifyCourseUsers(cid,current?'Quiz updated':'New quiz scheduled',`${title} · ${formatQuizDate(openingTime)}`,session?.id);if(!saveDB())throw Error('Quiz was not saved. Browser storage is unavailable or full. Export a backup, free storage, then try again.');closeModal();renderQuizzes();toast(current?'Quiz updated and saved':'Quiz created and saved');});
  const upd=()=>$('#tqLesson').innerHTML=db.lessons.filter(l=>l.courseId===$('#tqCourse').value).map(l=>`<option value="${esc(l.id)}" ${l.id===item?.lessonId?'selected':''}>${esc(l.title)}</option>`).join('')||'<option value="">No lessons</option>';$('#tqCourse').onchange=upd;upd();
 }
 
 function studentModal(u=null){
   const access=db.studentCourseAccess[u?.id]||[];
   const checks=db.courses.map(c=>`<div class="checkbox-item subject-access-row" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px"><input type="checkbox" id="access_${c.id}" name="access" value="${c.id}" ${access.includes(c.id)?'checked':''} style="position:absolute;opacity:0;width:1px;height:1px;pointer-events:none"><label for="access_${c.id}" style="flex:1;cursor:pointer;margin:0"><strong>${esc(c.title)}</strong></label><button type="button" class="btn ${access.includes(c.id)?'btn-primary':'btn-secondary'} subject-access-toggle" data-course="${c.id}" aria-pressed="${access.includes(c.id)}" style="min-width:76px;padding:7px 12px;font-size:12px">${access.includes(c.id)?'ON':'OFF'}</button></div>`).join('')||'<p class="muted">Create a subject first.</p>';
-  openModal(u?'Edit student':'Add student',`<div class="field"><label>Student full name</label><input name="name" required value="${esc(u?.name||'')}" placeholder="Student name"></div><div class="field"><label>Username</label><input name="username" required value="${esc(u?.username||'')}" placeholder="Unique username"></div><div class="field"><label>Phone number</label><input name="phone" value="${esc(u?.phone||'')}" placeholder="+94 7X XXX XXXX"></div><div class="field"><label>Account number / student ID</label><input name="accountNumber" value="${esc(u?.accountNumber||'')}" placeholder="Account number or student ID"></div><div class="field"><label>Home address</label><textarea name="address" rows="2" placeholder="Student delivery address">${esc(u?.address||'')}</textarea></div><div class="field"><label>Tute pack number</label><input name="tutePackNumber" value="${esc(u?.tutePackNumber||'')}" placeholder="e.g. ACC-TP-001"></div><div class="field"><label>Email</label><input name="email" type="email" value="${esc(u?.email||'')}" placeholder="student@example.com"></div><div class="field"><label>${u?'New password (leave blank to keep current)':'Temporary password'}</label><input name="password" type="password" ${u?'':'required'} minlength="6" placeholder="At least 6 characters"></div><div class="field"><div style="display:flex;gap:8px;margin-bottom:12px;align-items:center"><label style="margin:0;flex:1">Subject access</label><button type="button" class="btn btn-secondary" id="selectAllBtn" style="padding:6px 12px;font-size:11px">✓ All ON</button><button type="button" class="btn btn-secondary" id="clearAllBtn" style="padding:6px 12px;font-size:11px">✕ All OFF</button></div><div class="checkbox-group">${checks}</div></div>`,u?'Save student':'Create student',f=>{
+  openModal(u?'Edit student':'Add student',`<div class="field"><label>Student full name</label><input name="name" required value="${esc(u?.name||'')}" placeholder="Student name"></div><input type="hidden" name="level" value="AL"><div class="field"><label>A/L year</label><select name="grade" id="studentGrade">${gradeOptions(u?.level||'AL').map(g=>`<option value="${esc(g)}" ${g===(u?.grade||'')?'selected':''}>${esc(g)}</option>`).join('')}</select></div><div class="field"><label>Username</label><input name="username" required value="${esc(u?.username||'')}" placeholder="Unique username"></div><div class="field"><label>Phone number</label><input name="phone" value="${esc(u?.phone||'')}" placeholder="+94 7X XXX XXXX"></div><div class="field"><label>Account number / student ID</label><input name="accountNumber" value="${esc(u?.accountNumber||'')}" placeholder="Account number or student ID"></div><div class="field"><label>Home address</label><textarea name="address" rows="2" placeholder="Student delivery address">${esc(u?.address||'')}</textarea></div><div class="field"><label>Tute pack number</label><input name="tutePackNumber" value="${esc(u?.tutePackNumber||'')}" placeholder="e.g. ACC-TP-001"></div><div class="field"><label>Email</label><input name="email" type="email" value="${esc(u?.email||'')}" placeholder="student@example.com"></div><div class="field"><label>${u?'New password (leave blank to keep current)':'Temporary password'}</label><input name="password" type="password" ${u?'':'required'} minlength="6" placeholder="At least 6 characters"></div><div class="field"><div style="display:flex;gap:8px;margin-bottom:12px;align-items:center"><label style="margin:0;flex:1">Subject access</label><button type="button" class="btn btn-secondary" id="selectAllBtn" style="padding:6px 12px;font-size:11px">✓ All ON</button><button type="button" class="btn btn-secondary" id="clearAllBtn" style="padding:6px 12px;font-size:11px">✕ All OFF</button></div><div class="checkbox-group">${checks}</div></div>`,u?'Save student':'Create student',async f=>{
     const name=f.get('name').trim(),username=f.get('username').trim(),password=f.get('password');
     if(!name||!username)throw Error('Name and username are required.');
     if(db.users.some(x=>x.username.toLowerCase()===username.toLowerCase()&&x.id!==u?.id))throw Error('That username is already in use.');
     if(!u&&!password)throw Error('Enter a temporary password.');
     if(password&&password.length<6)throw Error('Password must be at least 6 characters.');
     let studentId;
-    if(u){u.name=name;u.username=username;u.phone=String(f.get('phone')||'').trim();u.accountNumber=String(f.get('accountNumber')||'').trim();u.address=String(f.get('address')||'').trim();u.tutePackNumber=String(f.get('tutePackNumber')||'').trim();u.email=String(f.get('email')||'').trim();if(password)u.password=password;studentId=u.id;}
-    else{const nu={id:id('u'),studentId:'',name,username,password,phone:String(f.get('phone')||'').trim(),accountNumber:String(f.get('accountNumber')||'').trim(),address:String(f.get('address')||'').trim(),tutePackNumber:String(f.get('tutePackNumber')||'').trim(),email:String(f.get('email')||'').trim(),role:'student'};db.users.push(nu);ensureStudentIds();studentId=nu.id;db.studentCourseAccess[studentId]=[];}
-    db.studentCourseAccess[studentId]=f.getAll('access');
-    saveDB();closeModal();renderPage();toast(u?'Student updated':'Student account created');
+    if(u){u.name=name;u.username=username;u.level=String(f.get('level')||'AL');u.grade=String(f.get('grade')||'');u.phone=String(f.get('phone')||'').trim();u.accountNumber=String(f.get('accountNumber')||'').trim();u.address=String(f.get('address')||'').trim();u.tutePackNumber=String(f.get('tutePackNumber')||'').trim();u.email=String(f.get('email')||'').trim();if(password)u.password=await hashPassword(password);studentId=u.id;}
+    else{const nu={id:id('u'),studentId:'',name,username,password:await hashPassword(password),level:String(f.get('level')||'AL'),grade:String(f.get('grade')||''),phone:String(f.get('phone')||'').trim(),accountNumber:String(f.get('accountNumber')||'').trim(),address:String(f.get('address')||'').trim(),tutePackNumber:String(f.get('tutePackNumber')||'').trim(),email:String(f.get('email')||'').trim(),role:'student'};db.users.push(nu);ensureStudentIds();studentId=nu.id;db.studentCourseAccess[studentId]=[];}
+    db.studentCourseAccess[studentId]=f.getAll('access').filter(cid=>{const c=db.courses.find(x=>x.id===cid);return c&&courseLevel(c)===(String(f.get('level')||'AL'))&&(!courseGrades(c).filter(Boolean).length||courseGrades(c).includes(String(f.get('grade')||'')))});
+    if(!saveDB())throw Error('Could not save student details. Browser storage may be unavailable or full.');closeModal();renderPage();toast(u?'Student updated':'Student account created');
   });
+  $('#studentLevel')?.addEventListener('change',()=>{const lv=$('#studentLevel').value,sel=$('#studentGrade'),old=sel.value;sel.innerHTML=gradeOptions(lv).map(g=>`<option value="${esc(g)}">${esc(g)}</option>`).join('');if(gradeOptions(lv).includes(old))sel.value=old;});
   setTimeout(()=>{
     const setAccess=(courseId,on)=>{const cb=$(`#access_${courseId}`),btn=$(`.subject-access-toggle[data-course="${courseId}"]`);if(!cb||!btn)return;cb.checked=on;btn.textContent=on?'ON':'OFF';btn.classList.toggle('btn-primary',on);btn.classList.toggle('btn-secondary',!on);btn.setAttribute('aria-pressed',String(on));};
     $$('.subject-access-toggle').forEach(btn=>btn.onclick=e=>{e.preventDefault();e.stopPropagation();const cb=$(`#access_${btn.dataset.course}`);setAccess(btn.dataset.course,!(cb&&cb.checked));});
@@ -2763,55 +3083,69 @@ function studentModal(u=null){
   },20);
 }
 
-$('#loginForm').addEventListener('submit',function(e){
+let loginFails=0,lockUntil=0;
+$('#loginForm').addEventListener('submit',async function(e){
   e.preventDefault();
+  const errorEl=$('#loginError');
+  const showErr=m=>{errorEl.textContent=m;errorEl.style.display='block'};
+  if(Date.now()<lockUntil){const s=Math.ceil((lockUntil-Date.now())/1000);return showErr(`Too many failed attempts. Try again in ${s} seconds.`)}
   const username=String($('#username').value||'').trim().toLowerCase();
   const password=String($('#password').value||'');
-  const errorEl=$('#loginError');
-
-  let user=db.users.find(u=>String(u.username).toLowerCase()===username && u.password===password);
-
+  const selectedRole=String($('#role').value||'');
+  if(!username||!password)return showErr('Enter your username and password.');
+  let user=db.users.find(u=>String(u.username).toLowerCase()===username);
   if(!user){
-    const demo=seed.users.find(u=>u.username.toLowerCase()===username && u.password===password);
+    // Demo accounts are created only when the username does not exist at all; existing accounts are never overwritten.
+    const demo=seed.users.find(u=>u.username.toLowerCase()===username&&u.password===password);
     if(demo){
-      const idx=db.users.findIndex(u=>u.id===demo.id);
-      if(idx>=0) db.users[idx]=JSON.parse(JSON.stringify(demo));
-      else db.users.push(JSON.parse(JSON.stringify(demo)));
-      if(demo.role==='student' && !db.studentCourseAccess[demo.id]) db.studentCourseAccess[demo.id]=[...seed.studentCourseAccess[demo.id]];
+      user={...JSON.parse(JSON.stringify(demo)),password:await hashPassword(demo.password)};
+      db.users.push(user);
+      if(demo.role==='student'&&!db.studentCourseAccess[demo.id])db.studentCourseAccess[demo.id]=[...seed.studentCourseAccess[demo.id]];
       saveDB();
-      user=db.users.find(u=>String(u.username).toLowerCase()===username && u.password===password);
     }
   }
-
-  if(!user){
-    errorEl.textContent='Login failed. Try admin / class123 or student / learn123.';
-    errorEl.style.display='block';
-    return;
-  }
-
-  $('#role').value=user.role;
-  errorEl.textContent='';
-  errorEl.style.display='none';
-
+  const ok=user?await checkPassword(user.password,password):false;
+  if(!ok){loginFails++;if(loginFails>=5){lockUntil=Date.now()+60000;loginFails=0}return showErr('Login failed. Check your username and password.')}
+  loginFails=0;
+  if(selectedRole&&selectedRole!==user.role)$('#role').value=user.role;
+  if(!isHashed(user.password)){user.password=await hashPassword(password);saveDB()}
+  errorEl.textContent='';errorEl.style.display='none';
   try {
     enterApp(user);
     if(user.role!=='admin'){quizLastStates={};const loginNow=Date.now();(db.quizzes||[]).filter(q=>quizEligibleForStudent(q)).forEach(q=>{const st=quizState(q,loginNow);quizLastStates[q.id]=(st==='open'&&loginNow-Date.parse(q.openingTime)<120000)?'upcoming':st;});setTimeout(checkQuizTransitions,500);setTimeout(()=>showPendingCalendarNotifications(user),450);}
   } catch(err) {
     console.error('Dashboard error:',err);
-    errorEl.textContent='Login succeeded, but dashboard failed to load. Refresh this file and try again.';
-    errorEl.style.display='block';
+    showErr('Login succeeded, but dashboard failed to load. Refresh this file and try again.');
   }
 });
 
 $('#logoutBtn').onclick=showLogin;
 $('#menuBtn').onclick=()=>$('#sidebar').classList.toggle('open');
 
-loadDB();
+function applyChristmasTheme(){
+ const enabled=!!db?.settings?.christmasThemeEnabled;
+ document.body.classList.toggle('christmas-theme',enabled);
+ let fx=document.getElementById('christmasFx');
+ if(!enabled){if(fx)fx.remove();return;}
+ if(fx)return;
+ fx=document.createElement('div');fx.id='christmasFx';fx.setAttribute('aria-hidden','true');
+ // Festive snow: visible but soft flakes behind the content, with a few twinkling lights.
+ const flakeChars=['❄','•','✻','•'];
+ for(let i=0;i<30;i++){const flake=document.createElement('span');flake.className='snowflake';flake.textContent=flakeChars[i%flakeChars.length];flake.style.left=(Math.random()*100)+'%';flake.style.fontSize=(7+Math.random()*10)+'px';flake.style.animationDuration=(14+Math.random()*16)+'s';flake.style.animationDelay=(-Math.random()*30)+'s';flake.style.opacity=(.4+Math.random()*.45).toFixed(2);fx.appendChild(flake);}
+ for(let i=0;i<7;i++){const star=document.createElement('span');star.className='twinkle';star.style.left=(Math.random()*100)+'%';star.style.top=(Math.random()*100)+'%';star.style.animationDelay=(-Math.random()*3)+'s';fx.appendChild(star);}
+ document.body.appendChild(fx);
+}
 
+// FIX: db must be loaded BEFORE anything that reads db (e.g. the registration form's subject list).
+loadDB();
+if(archiveOLData())saveDB();
+applyChristmasTheme();
+refreshRegGradeOptions();
 
 let knownMessageIds=new Set(),knownNotificationIds=new Set();
 setInterval(()=>{
  if(!session||!window.localStorage||memoryOnly)return;
+ if(reloadDbFromStorage()){renderNav();if(!isTypingInPage())renderPage();}
  try{const raw=localStorage.getItem(STORE);if(!raw)return;const fresh=JSON.parse(raw);if(!fresh)return;
  const msgs=Array.isArray(fresh.messages)?fresh.messages:[],notices=Array.isArray(fresh.notifications)?fresh.notifications:[];
  const incoming=msgs.filter(m=>m.toId===session.id&&!m.readAt&&!knownMessageIds.has(m.id));
@@ -2820,7 +3154,7 @@ setInterval(()=>{
  if(incoming.length||newNotices.length){db=fresh;incoming.forEach(m=>toast(`New message from ${db.users.find(u=>u.id===m.fromId)?.name||'Account'}: ${m.subject}`));newNotices.forEach(n=>toast(`Update: ${n.title}`));renderNav();if(activePage==='messages')renderMessages();else if(activePage==='marks')renderMarks();else if(activePage==='exams')renderExams();else if(activePage==='quizzes')renderQuizzes();else if(activePage==='calendar')renderCalendar();else if(activePage==='deliver')renderDeliver();else if(activePage==='fees')renderFees();else if(activePage==='reminder')renderPaymentReminders();}
  }catch(err){console.warn('Live notification polling failed',err)}
  },4000);
-window.addEventListener('storage',e=>{if(e.key===STORE&&session){try{const fresh=JSON.parse(e.newValue||'null');if(fresh){db=fresh;if(!Array.isArray(db.messages))db.messages=[];if(!Array.isArray(db.notifications))db.notifications=[];const incoming=db.messages.filter(m=>m.toId===session.id&&!m.readAt&&!knownMessageIds.has(m.id));const notices=db.notifications.filter(n=>n.toId===session.id&&!n.readAt&&!knownNotificationIds.has(n.id));incoming.forEach(m=>{knownMessageIds.add(m.id);toast(`New message: ${m.subject}`)});notices.forEach(n=>{knownNotificationIds.add(n.id);toast(`Update: ${n.title}`)});renderNav();if(activePage==='messages')renderMessages();else if(activePage==='marks')renderMarks();else if(activePage==='exams')renderExams();else if(activePage==='quizzes')renderQuizzes();else if(activePage==='deliver')renderDeliver();else if(activePage==='fees')renderFees();else if(activePage==='reminder')renderPaymentReminders();}}catch(err){console.warn('Live notification refresh failed',err)}}});
+window.addEventListener('storage',e=>{if(e.key===STORE&&session){try{const fresh=JSON.parse(e.newValue||'null');if(fresh){db=fresh;lastRaw=e.newValue;rebindSession();applyChristmasTheme();if(!Array.isArray(db.messages))db.messages=[];if(!Array.isArray(db.notifications))db.notifications=[];const incoming=db.messages.filter(m=>m.toId===session.id&&!m.readAt&&!knownMessageIds.has(m.id));const notices=db.notifications.filter(n=>n.toId===session.id&&!n.readAt&&!knownNotificationIds.has(n.id));incoming.forEach(m=>{knownMessageIds.add(m.id);toast(`New message: ${m.subject}`)});notices.forEach(n=>{knownNotificationIds.add(n.id);toast(`Update: ${n.title}`)});renderNav();if(activePage==='messages')renderMessages();else if(activePage==='marks')renderMarks();else if(activePage==='exams')renderExams();else if(activePage==='quizzes')renderQuizzes();else if(activePage==='deliver')renderDeliver();else if(activePage==='fees')renderFees();else if(activePage==='reminder')renderPaymentReminders();}}catch(err){console.warn('Live notification refresh failed',err)}}});
 
 if(memoryOnly)console.warn('Classroom is running in temporary memory mode. Changes will not persist after refresh; use HTTPS hosting and allow browser storage.');
 </script>
