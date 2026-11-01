@@ -2101,7 +2101,14 @@ function fbShowAuthCleanup(u){
   const login=u.email||(u.username?fbEmail(u.username):'');
   const consoleUrl='https://console.firebase.google.com/project/'+FB_CONFIG.projectId+'/authentication/users';
   const isAuthUid=/^[A-Za-z0-9]{20,40}$/.test(uid);
-  openModal('Account removed from the app',`<p>The app no longer lets <strong>${esc(u.name||u.username||'this user')}</strong> sign in. Their Firebase login still exists, so the username or email stays taken.</p>${isAuthUid?`<p class="small">To free it completely, open Firebase Console → Authentication → Users, find <strong>${esc(login)}</strong> and delete it.</p><div class="field"><label>Auth UID</label><input id="authUidBox" value="${esc(uid)}" readonly></div><p><a class="btn btn-secondary" href="${esc(consoleUrl)}" target="_blank" rel="noopener">Open Firebase Console</a></p>`:`<p class="small">This older record has no Firebase login. Nothing else to delete.</p>`}`,'Done',()=>closeModal());
+  openModal('Account removed from the app',`<p>The app no longer lets <strong>${esc(u.name||u.username||'this user')}</strong> sign in. Their Firebase login (<strong>${esc(login)}</strong>) is deleted automatically the next time they try to sign in, which frees the username or email.</p>${isAuthUid?`<p class="small">To delete it right now instead, open Firebase Console → Authentication → Users and delete it.</p><div class="field"><label>Auth UID</label><input id="authUidBox" value="${esc(uid)}" readonly></div><p><a class="btn btn-secondary" href="${esc(consoleUrl)}" target="_blank" rel="noopener">Open Firebase Console</a></p>`:`<p class="small">This older record has no Firebase login. Nothing else to delete.</p>`}`,'Done',()=>closeModal());
+}
+// Marks a removed account's login for deletion; it is deleted the next time that user signs in.
+function fbQueueAuthCleanup(u){
+  const uid=String(u?.id||'');
+  if(!/^[A-Za-z0-9]{20,40}$/.test(uid))return;
+  db.authCleanup=Array.isArray(db.authCleanup)?db.authCleanup:[];
+  if(!db.authCleanup.some(x=>x.id===uid))db.authCleanup.push({id:uid,name:u.name||u.username||'',removedAt:Date.now()});
 }
 function renderAdminAccounts(){
  if(!(isOwnerAdmin()||isTeacher())){activePage='overview';renderNav();return renderOverview();}
@@ -2114,7 +2121,7 @@ function renderAdminAccounts(){
  wireSubjectSelection($('#adminAccountForm'));
  $('#adminAccountForm').onsubmit=async e=>{e.preventDefault();if(!isOwnerAdmin())return alert('Only the owner can add admin accounts.');const f=new FormData(e.currentTarget),name=String(f.get('name')||'').trim(),username=String(f.get('username')||'').trim(),password=String(f.get('password')||''),access=f.getAll('access'),email=String(f.get('email')||'').trim();if(email&&!/^\S+@\S+\.\S+$/.test(email))return alert('Enter a valid email or leave it empty.');if(!name||!username||password.length<6)return alert('Enter a name, username and password of at least 6 characters.');if(!access.length)return alert('Please tick at least one subject using the checkboxes.');if(db.users.some(u=>String(u.username).toLowerCase()===username.toLowerCase()))return alert('Username already exists.');let uid;try{uid=await fbCreateAccount(email||username,password)}catch(err){return alert(err.message)}db.users.push({id:uid,name,username,email,role:'admin',createdBy:session.id,active:true});db.adminCourseAccess=db.adminCourseAccess||{};db.adminCourseAccess[uid]=access;if(!saveDB())return alert('Could not save account.');renderAdminAccounts();toast('Admin account added with selected subject access');};
  $$('[data-edit-admin-access]').forEach(b=>b.onclick=()=>{const u=db.users.find(x=>x.id===b.dataset.editAdminAccess);if(!u)return;const current=db.adminCourseAccess?.[u.id]||[];openModal(`Select subjects for ${esc(u.name)}`,`<p class="muted">Tick every subject this admin is allowed to manage. Unticked subjects will not be accessible to this admin.</p>${subjectChecks(current)}`,'Save selected subjects',f=>{const access=f.getAll('access');if(!access.length)throw new Error('Select at least one subject before saving.');db.adminCourseAccess=db.adminCourseAccess||{};db.adminCourseAccess[u.id]=access;if(!saveDB())throw new Error('Could not save subject access.');closeModal();renderAdminAccounts();toast('Admin subject access updated');});wireSubjectSelection($('#modalForm'));});
- $$('[data-remove-admin]').forEach(b=>b.onclick=()=>{const u=db.users.find(x=>x.id===b.dataset.removeAdmin);if(!u||u.isOwner)return alert('Owner account cannot be removed here.');if(confirm(`Remove admin account ${u.name}?`)){db.users=db.users.filter(x=>x.id!==u.id);if(db.adminCourseAccess)delete db.adminCourseAccess[u.id];if(!saveDB())return alert('Could not save changes.');renderAdminAccounts();toast('Admin account removed');fbShowAuthCleanup(u);}});
+ $$('[data-remove-admin]').forEach(b=>b.onclick=()=>{const u=db.users.find(x=>x.id===b.dataset.removeAdmin);if(!u||u.isOwner)return alert('Owner account cannot be removed here.');if(confirm(`Remove admin account ${u.name}?`)){fbQueueAuthCleanup(u);db.users=db.users.filter(x=>x.id!==u.id);if(db.adminCourseAccess)delete db.adminCourseAccess[u.id];if(!saveDB())return alert('Could not save changes.');renderAdminAccounts();toast('Admin account removed');fbShowAuthCleanup(u);}});
 $$('[data-create-admin-login]').forEach(b=>b.onclick=()=>{const u=db.users.find(x=>x.id===b.dataset.createAdminLogin);if(!u)return;openModal(`Create login for ${esc(u.name)}`,`<p class="muted">Creates a Firebase login for <strong>${esc(u.username)}</strong>. Enter the admin's email if you have it (they then log in with email); otherwise the username is used. Set a temporary password and share it with the admin.</p><div class="field"><label>Login email (optional)</label><input name="email" type="email" value="${esc(u.email||'')}" placeholder="admin@example.com"></div><div class="field"><label>Temporary password</label><input name="password" type="password" minlength="6" required></div>`,'Create login',async f=>{const email=String(f.get('email')||'').trim(),password=String(f.get('password')||'');if(email&&!/^\S+@\S+\.\S+$/.test(email))throw new Error('Enter a valid email or leave it empty.');if(password.length<6)throw new Error('Password must be at least 6 characters.');const oldId=u.id;if(!db.users.some(x=>x.id===oldId))throw new Error('Admin account not found.');const uid=await fbCreateAccount(email||u.username,password);const idx=db.users.findIndex(x=>x.id===oldId);db.users[idx]={...db.users[idx],id:uid,email:email||db.users[idx].email||''};db.adminCourseAccess=db.adminCourseAccess||{};db.adminCourseAccess[uid]=db.adminCourseAccess[oldId]||[];delete db.adminCourseAccess[oldId];if(!saveDB())throw new Error('Login created, but saving failed. Refresh the page before trying again.');closeModal();renderAdminAccounts();toast('Admin login created');});});
 }
 function renderSupportFooter(){
@@ -2559,7 +2566,7 @@ function renderStudents(){
   $('#addStudent').onclick=()=>studentModal();
   if(isOwnerAdmin())$('#addTeacher').onclick=()=>teacherModal();
   $$('[data-edit-teacher]').forEach(b=>b.onclick=()=>teacherModal(db.users.find(u=>u.id===b.dataset.editTeacher)));
-  $$('[data-remove-teacher]').forEach(b=>b.onclick=()=>{const t=db.users.find(u=>u.id===b.dataset.removeTeacher);if(!t||t.role!=='teacher')return;if(confirm(`Remove teacher ${t.name} and revoke access?`)){db.users=db.users.filter(u=>u.id!==t.id);delete db.teacherCourseAccess[t.id];if(!saveDB())return alert('Could not save changes.');renderStudents();toast('Teacher removed and access revoked');fbShowAuthCleanup(t);}});
+  $$('[data-remove-teacher]').forEach(b=>b.onclick=()=>{const t=db.users.find(u=>u.id===b.dataset.removeTeacher);if(!t||t.role!=='teacher')return;if(confirm(`Remove teacher ${t.name} and revoke access?`)){fbQueueAuthCleanup(t);db.users=db.users.filter(u=>u.id!==t.id);delete db.teacherCourseAccess[t.id];if(!saveDB())return alert('Could not save changes.');renderStudents();toast('Teacher removed and access revoked');fbShowAuthCleanup(t);}});
   $('#studentSearch').oninput=()=>{
     $('#studentRows').innerHTML=students.filter(u=>(u.name+' '+u.username+' '+(u.studentId||'')).toLowerCase().includes($('#studentSearch').value.toLowerCase())).map(studentRow).join('')||'<tr><td colspan="4">No matching students.</td></tr>';
     wireStudentButtons();
@@ -2579,6 +2586,7 @@ function wireStudentButtons(){
     const u=db.users.find(x=>x.id===b.dataset.deleteStudent);
     if(!u)return;
     if(confirm(`Remove student ${u.name}?`)){
+      fbQueueAuthCleanup(u);
       db.users=db.users.filter(x=>x.id!==u.id);
       delete db.studentCourseAccess[u.id];
       saveDB();
@@ -3298,7 +3306,12 @@ async function fbOnAuth(user){
       await FB.setDoc(ref,{id:user.uid,name:'Sio Creations',username:'dasun',email:FB_OWNER_EMAIL,role:'admin',isOwner:true,active:true,createdAt:Date.now()});
       snap=await FB.getDoc(ref);
     }
-    if(!snap.exists()){await fbFailSignOut('This account is not approved yet. Please wait for admin approval.');return}
+    if(!snap.exists()){
+      // Removed by the owner: the user has just proved their password, so they delete their own login.
+      let removed=false;
+      try{const tomb=await FB.getDoc(FB.doc(fbDb,'c_authCleanup',user.uid));if(tomb.exists()){removed=true;await FB.deleteUser(user)}}catch(err){console.error(err)}
+      await fbFailSignOut(removed?'This account was removed by the admin.':'This account is not approved yet. Please wait for admin approval.');return
+    }
     if(snap.data().active===false){await fbFailSignOut('This account is disabled. Contact the owner.');return}
     await fbStartSync();
     const me=(db.users||[]).find(u=>u.id===user.uid);
