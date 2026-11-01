@@ -1776,7 +1776,18 @@ function loadDB(){
 }
 
 function saveDB(){
- try{fbQueuePush();return true}catch(e){console.error(e);return false}
+ db.fees=Array.isArray(db.fees)?db.fees:[];db.deliveries=Array.isArray(db.deliveries)?db.deliveries:[];db.adminCourseAccess=db.adminCourseAccess&&typeof db.adminCourseAccess==='object'?db.adminCourseAccess:{};db.teacherCourseAccess=db.teacherCourseAccess&&typeof db.teacherCourseAccess==='object'?db.teacherCourseAccess:{};db.messages=Array.isArray(db.messages)?db.messages:[];db.marks=Array.isArray(db.marks)?db.marks:[];db.lessonProgress=db.lessonProgress&&typeof db.lessonProgress==='object'?db.lessonProgress:{};
+ try {
+   if(!memoryOnly && window.localStorage){
+     const raw=JSON.stringify(db);localStorage.setItem(STORE,raw);lastRaw=raw;
+     return true;
+   }
+   return false;
+ } catch(e){
+   console.error('DB save error:',e);
+   memoryOnly=true;
+   return false;
+ }
 }
 
 
@@ -1803,7 +1814,7 @@ function rebindSession(){
   session=latest;
 }
 function reloadDbFromStorage(){
-  return false;
+  if(memoryOnly||!window.localStorage)return false;
   let raw=null;try{raw=localStorage.getItem(STORE)}catch(_){return false}
   if(!raw||raw===lastRaw)return false;
   let fresh;try{fresh=JSON.parse(raw)}catch(_){return false}
@@ -2086,7 +2097,7 @@ function renderAdminAccounts(){
  if(!isOwnerAdmin()){$('#adminAccountForm')?.closest('section')?.remove();$$('[data-edit-admin-access],[data-remove-admin]').forEach(b=>b.remove());return;}
  const wireSubjectSelection=(root)=>{root.querySelector('[data-select-all-subjects]')?.addEventListener('click',()=>root.querySelectorAll('input[name="access"]').forEach(x=>x.checked=true));root.querySelector('[data-clear-subjects]')?.addEventListener('click',()=>root.querySelectorAll('input[name="access"]').forEach(x=>x.checked=false));};
  wireSubjectSelection($('#adminAccountForm'));
- $('#adminAccountForm').onsubmit=async e=>{e.preventDefault();if(!isOwnerAdmin())return alert('Only the owner can add admin accounts.');const f=new FormData(e.currentTarget),name=String(f.get('name')||'').trim(),username=String(f.get('username')||'').trim(),password=String(f.get('password')||''),access=f.getAll('access');if(!name||!username||password.length<6)return alert('Enter a name, username and password of at least 6 characters.');if(!access.length)return alert('Please tick at least one subject using the checkboxes.');if(db.users.some(u=>String(u.username).toLowerCase()===username.toLowerCase()))return alert('Username already exists.');let uid;try{uid=await fbCreateAccount(username,password)}catch(err){return alert(err.message)}db.users.push({id:uid,name,username,role:'admin',createdBy:session.id,active:true});db.adminCourseAccess=db.adminCourseAccess||{};db.adminCourseAccess[uid]=access;if(!saveDB())return alert('Could not save account.');renderAdminAccounts();toast('Admin account added with selected subject access');};
+ $('#adminAccountForm').onsubmit=async e=>{e.preventDefault();if(!isOwnerAdmin())return alert('Only the owner can add admin accounts.');const f=new FormData(e.currentTarget),name=String(f.get('name')||'').trim(),username=String(f.get('username')||'').trim(),password=String(f.get('password')||''),access=f.getAll('access');if(!name||!username||password.length<6)return alert('Enter a name, username and password of at least 6 characters.');if(!access.length)return alert('Please tick at least one subject using the checkboxes.');if(db.users.some(u=>String(u.username).toLowerCase()===username.toLowerCase()))return alert('Username already exists.');const uid=id('admin');db.users.push({id:uid,name,username,password:await hashPassword(password),role:'admin',createdBy:session.id});db.adminCourseAccess=db.adminCourseAccess||{};db.adminCourseAccess[uid]=access;if(!saveDB())return alert('Could not save account.');renderAdminAccounts();toast('Admin account added with selected subject access');};
  $$('[data-edit-admin-access]').forEach(b=>b.onclick=()=>{const u=db.users.find(x=>x.id===b.dataset.editAdminAccess);if(!u)return;const current=db.adminCourseAccess?.[u.id]||[];openModal(`Select subjects for ${esc(u.name)}`,`<p class="muted">Tick every subject this admin is allowed to manage. Unticked subjects will not be accessible to this admin.</p>${subjectChecks(current)}`,'Save selected subjects',f=>{const access=f.getAll('access');if(!access.length)throw new Error('Select at least one subject before saving.');db.adminCourseAccess=db.adminCourseAccess||{};db.adminCourseAccess[u.id]=access;if(!saveDB())throw new Error('Could not save subject access.');closeModal();renderAdminAccounts();toast('Admin subject access updated');});wireSubjectSelection($('#modalForm'));});
  $$('[data-remove-admin]').forEach(b=>b.onclick=()=>{const u=db.users.find(x=>x.id===b.dataset.removeAdmin);if(!u||u.isOwner)return alert('Owner account cannot be removed here.');if(confirm(`Remove admin account ${u.name}?`)){db.users=db.users.filter(x=>x.id!==u.id);if(db.adminCourseAccess)delete db.adminCourseAccess[u.id];if(!saveDB())return alert('Could not save changes.');renderAdminAccounts();toast('Admin account removed');}});
 }
@@ -2108,7 +2119,7 @@ function renderSettings(){
  const lcf=$('#loginContactsForm');if(lcf)lcf.onsubmit=e=>{e.preventDefault();db.settings=db.settings||{};db.settings.joinNumber=$('#lcJoin').value.trim();db.settings.teacherWhatsapp=$('#lcTeacher').value.trim();if(!saveDB())return alert('Could not save contacts.');applyLoginContacts();toast('Login contacts updated');};
  if(isOwnerAdmin()){
   $('#christmasThemeToggle').onchange=e=>{db.settings=db.settings||{};db.settings.christmasThemeEnabled=!!e.target.checked;if(!saveDB()){e.target.checked=!e.target.checked;db.settings.christmasThemeEnabled=!!e.target.checked;return alert('Could not save the theme setting in this browser.');}applyChristmasTheme();renderSettings();toast(db.settings.christmasThemeEnabled?'Christmas theme enabled for the LMS':'Christmas theme turned off');};
-  $('#ownerAccountForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.currentTarget),name=String(f.get('name')||'').trim(),username=String(f.get('username')||'').trim(),password=String(f.get('password')||'');if(!name||!username)return alert('Name and username are required.');if(db.users.some(u=>u.id!==session.id&&String(u.username).toLowerCase()===username.toLowerCase()))return alert('That username is already in use.');if(password&&password.length<4)return alert('Password must be at least 4 characters.');const u=db.users.find(x=>x.id===session.id);Object.assign(u,{name,username,isOwner:true,role:'admin'});if(password)fbNoPwChange();session=u;if(!saveDB())return alert('Could not save account settings.');$('#sideName').textContent=u.name;renderNav();renderPage();toast('Owner account updated');};
+  $('#ownerAccountForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.currentTarget),name=String(f.get('name')||'').trim(),username=String(f.get('username')||'').trim(),password=String(f.get('password')||'');if(!name||!username)return alert('Name and username are required.');if(db.users.some(u=>u.id!==session.id&&String(u.username).toLowerCase()===username.toLowerCase()))return alert('That username is already in use.');if(password&&password.length<4)return alert('Password must be at least 4 characters.');const u=db.users.find(x=>x.id===session.id);Object.assign(u,{name,username,isOwner:true,role:'admin'});if(password)u.password=await hashPassword(password);session=u;if(!saveDB())return alert('Could not save account settings.');$('#sideName').textContent=u.name;renderNav();renderPage();toast('Owner account updated');};
   $('#backupDataBtn').onclick=()=>{try{const payload={app:'Classroom LMS',formatVersion:1,createdAt:new Date().toISOString(),data:db};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='classroom-lms-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Backup downloaded');}catch(err){console.error(err);alert('Backup failed. Please try again.');}};
   $('#restoreDataBtn').onclick=()=>$('#restoreDataFile').click();
   $('#restoreDataFile').onchange=async e=>{const file=e.target.files?.[0];if(!file)return;try{const parsed=JSON.parse(await file.text());const incoming=parsed?.data||parsed;if(!incoming||!Array.isArray(incoming.users)||!Array.isArray(incoming.courses)||!Array.isArray(incoming.lessons)||!Array.isArray(incoming.papers))throw new Error('This does not look like a valid Classroom LMS backup.');if(!confirm('Restore this backup? Current classroom data will be replaced. Download a backup of current data first if you may need it.')){e.target.value='';return;}const owner=db.users.find(u=>u.id===session.id)||db.users.find(isOwnerAdminUser);if(!owner)throw new Error('Could not find the current owner account.');incoming.users=incoming.users.filter(u=>u.id!==owner.id&&String(u.username||'').toLowerCase()!==String(owner.username||'').toLowerCase()&&!u.isOwner);incoming.users.push(owner);incoming.settings={...(incoming.settings||{}),whatsappNumber:incoming.settings?.whatsappNumber||db.settings?.whatsappNumber||'+94 75 510 3772'};db=incoming;if(!saveDB())throw new Error('Could not save restored data in this browser. Check browser storage and try again.');alert('Backup restored successfully. The current Dasun owner account was kept. The page will reload now.');window.location.reload();}catch(err){console.error(err);alert('Restore failed: '+(err?.message||'Invalid backup file.'));}finally{e.target.value='';}};
@@ -2441,7 +2452,7 @@ function wireRegistrationButtons(){
     const r=db.registrationRequests.find(x=>x.id===b.dataset.approveRegistration);
     if(!r||r.status!=='pending')return;
     if(db.users.some(u=>u.username.toLowerCase()===r.username.toLowerCase())){alert('That username already exists. Remove or resolve the duplicate before approving.');return}
-    const user={id:r.authUid||r.id,studentId:'',name:r.name,username:r.username,role:'student',active:true,email:r.email,phone:r.phone,institution:r.institution,level:r.level||'AL',grades:(r.grades&&r.grades.length?r.grades:[r.grade].filter(Boolean)),grade:(r.grades?.[0]||r.grade||'')};
+    const user={id:id('u'),studentId:'',name:r.name,username:r.username,password:r.password,role:'student',email:r.email,phone:r.phone,institution:r.institution,level:r.level||'AL',grades:(r.grades&&r.grades.length?r.grades:[r.grade].filter(Boolean)),grade:(r.grades?.[0]||r.grade||'')};
     db.users.push(user);ensureStudentIds(); db.studentCourseAccess[user.id]=Array.isArray(r.requestedCourseIds)?r.requestedCourseIds.filter(cid=>db.courses.some(c=>c.id===cid&&courseLevel(c)===(r.level||'AL')&&(!courseGrades(c).filter(Boolean).length||(r.grades||[r.grade]).some(g=>courseGrades(c).includes(g))))):[];
     r.status='approved'; r.reviewedAt=new Date().toISOString();
     if(!saveDB()){db.users=db.users.filter(u=>u.id!==user.id);delete db.studentCourseAccess[user.id];r.status='pending';alert('Could not save. Browser storage may be full or blocked.');return}
@@ -2492,8 +2503,9 @@ $('#registerForm').addEventListener('submit',async function(e){
   if(!Array.isArray(db.registrationRequests))db.registrationRequests=[];
      if(!db.users.some(u=>u.username&&u.username.toLowerCase()==='dasun'&&u.role==='admin'))db.users.unshift({id:'u-sio',name:'Sio Creations',username:'dasun',password:'dasun',role:'admin',isOwner:true});
      const sio=db.users.find(u=>u.username&&u.username.toLowerCase()==='dasun'&&u.role==='admin');if(sio){sio.name='Sio Creations';sio.isOwner=true;}
-  const grades=Array.from(document.querySelectorAll('[name=regGrades]:checked')).map(x=>x.value);if(!grades.length)return fail('Select at least one A/L year.');const level=$('#regLevel')?.value||'AL',subjects=Array.from(document.querySelectorAll('[name=regSubjects]:checked')).map(x=>x.value);const request={id:id('reg'),name,email,username,password:'',phone,institution,level,grade:grades[0]||'',grades,requestedCourseIds:subjects,status:'pending',createdAt:new Date().toISOString()};
-  try{await fbSubmitRegistration(request,password)}catch(err){return fail(err.message)}
+  const grades=Array.from(document.querySelectorAll('[name=regGrades]:checked')).map(x=>x.value);if(!grades.length)return fail('Select at least one A/L year.');const level=$('#regLevel')?.value||'AL',subjects=Array.from(document.querySelectorAll('[name=regSubjects]:checked')).map(x=>x.value);const request={id:id('reg'),name,email,username,password:await hashPassword(password),phone,institution,level,grade:grades[0]||'',grades,requestedCourseIds:subjects,status:'pending',createdAt:new Date().toISOString()};
+  db.registrationRequests.push(request);
+  if(!saveDB()){db.registrationRequests.pop();return fail('Could not save registration. Please allow browser storage or open the site through HTTPS hosting and try again.');}
   this.reset();
   success.textContent='Registration submitted successfully. Please wait for admin approval before signing in.';
   success.style.display='block';
@@ -2521,7 +2533,7 @@ function adminProgressDashboard(){
  const donePct=assignedTotal?Math.round(completed/assignedTotal*100):0;
  return `<section class="card" style="padding:20px;margin:20px 0"><div class="section-head"><div><h2 style="margin:0">Student progress overview</h2><p class="muted small">Class-wide completion, assessment performance and subject trends.</p></div><button class="btn btn-secondary" id="goStudents">Manage students →</button></div><div class="stats"><div class="stat"><div class="num">${students.length}</div><div class="label">Students</div></div><div class="stat"><div class="num">${completed}</div><div class="label">Completed lessons</div></div><div class="stat"><div class="num">${marks.length}</div><div class="label">Marks recorded</div></div><div class="stat"><div class="num">${avg}%</div><div class="label">Class average</div></div></div><div class="dash-chart-grid"><article class="dash-chart"><h3>Overall lesson completion</h3><div class="dash-chart-sub">Assigned lesson completions across all students</div><div class="dash-donut-wrap"><div class="dash-donut" style="--pct:${donePct}"><div class="dash-donut-center"><strong>${donePct}%</strong><span>complete</span></div></div><div class="dash-legend"><div class="dash-legend-item"><i class="dash-dot done"></i><span>Completed <strong>${completed}</strong></span></div><div class="dash-legend-item"><i class="dash-dot left"></i><span>Not complete <strong>${remaining}</strong></span></div><div class="dash-legend-item"><i class="dash-dot marks"></i><span>Marks entered <strong>${marks.length}</strong></span></div></div></div><div class="dash-mini-note">Completion percentage uses total assigned student-lesson pairs, not the number of unique lessons.</div></article><article class="dash-chart"><h3>Student progress comparison</h3><div class="dash-chart-sub">Top ${Math.min(7,students.length)} students by completed lesson percentage</div><div class="dash-bars">${studentBars||'<div class="empty">Add students and assign lessons to see progress charts.</div>'}</div></article><article class="dash-chart"><h3>Subject completion</h3><div class="dash-chart-sub">Completion rate for assigned lessons within each subject</div><div class="dash-bars">${subjectBars||'<div class="empty">No assigned subject lessons to chart yet.</div>'}</div></article><article class="dash-chart"><h3>Assessment snapshot</h3><div class="dash-highlight"><div class="emoji">📊</div><div><strong>${avg}% class average</strong><span>${marks.length} recorded assessments across ${new Set(marks.map(m=>m.studentId)).size} students</span></div></div><div class="dash-highlight"><div class="emoji">🎯</div><div><strong>${studentStats.filter(x=>x.ms.length===0).length} students without marks</strong><span>Use Student details to add quiz or paper results.</span></div></div><div class="dash-highlight"><div class="emoji">📚</div><div><strong>${students.filter(u=>progressStats(u.id).pct===100&&progressStats(u.id).assigned.length>0).length} students completed all assigned lessons</strong><span>Based on each student's current lesson access.</span></div></div></article></div><div class="section-head" style="margin-top:20px"><h2>Student-by-student summary</h2></div><div class="table-wrap"><table class="table"><thead><tr><th>Student</th><th>Lessons</th><th>Progress</th><th>Marks</th><th>Average</th></tr></thead><tbody>${rows||'<tr><td colspan="5">No students yet.</td></tr>'}</tbody></table></div></section>`
 }
-function renderStudentProfile(){const u=db.users.find(x=>x.id===session.id)||session;setTitle('My profile','Update your contact details and account information');$('#pageContent').innerHTML=`<section class="card" style="padding:22px;max-width:680px"><h2>Account details</h2><p class="muted">Changes saved here will be visible in the admin Students tab when using the same shared data store/browser.</p><form id="studentProfileForm"><div class="field"><label>Full name (locked)</label><input value="${esc(u.name||'')}" readonly aria-readonly="true"><p class="small muted">Your registered full name is locked. Contact the admin if it needs correction.</p></div><div class="field"><label>Phone number</label><input name="phone" value="${esc(u.phone||'')}" placeholder="+94 7X XXX XXXX"></div><div class="field"><label>Student ID</label><input value="${esc(u.studentId||'Will be assigned automatically')}" readonly></div><div class="field"><label>Account number (optional)</label><input name="accountNumber" value="${esc(u.accountNumber||'')}"></div><div class="field"><label>Email</label><input type="email" name="email" value="${esc(u.email||'')}"></div><div class="field"><label>Home address</label><textarea name="address" rows="2">${esc(u.address||'')}</textarea></div><div class="field"><label>Tute pack number</label><input value="${esc(u.tutePackNumber||'Not assigned')}" disabled></div><div class="field"><label>New password (optional)</label><input type="password" name="password" minlength="6" placeholder="Leave blank to keep current password"></div><button class="btn btn-primary" type="submit">Save my details</button></form></section>`;$('#studentProfileForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.currentTarget),password=String(f.get('password')||'');if(password&&password.length<6)return alert('Password must be at least 6 characters.');u.phone=String(f.get('phone')||'').trim();u.accountNumber=String(f.get('accountNumber')||'').trim();u.address=String(f.get('address')||'').trim();u.tutePackNumber=String(f.get('tutePackNumber')||'').trim();u.email=String(f.get('email')||'').trim();if(password)fbNoPwChange();session=u;saveDB();$('#sideName').textContent=u.name;$('#sideAvatar').textContent=u.name[0].toUpperCase();$('#topAvatar').textContent=u.name[0].toUpperCase();renderNav();renderPage();toast('Profile updated');};}
+function renderStudentProfile(){const u=db.users.find(x=>x.id===session.id)||session;setTitle('My profile','Update your contact details and account information');$('#pageContent').innerHTML=`<section class="card" style="padding:22px;max-width:680px"><h2>Account details</h2><p class="muted">Changes saved here will be visible in the admin Students tab when using the same shared data store/browser.</p><form id="studentProfileForm"><div class="field"><label>Full name (locked)</label><input value="${esc(u.name||'')}" readonly aria-readonly="true"><p class="small muted">Your registered full name is locked. Contact the admin if it needs correction.</p></div><div class="field"><label>Phone number</label><input name="phone" value="${esc(u.phone||'')}" placeholder="+94 7X XXX XXXX"></div><div class="field"><label>Student ID</label><input value="${esc(u.studentId||'Will be assigned automatically')}" readonly></div><div class="field"><label>Account number (optional)</label><input name="accountNumber" value="${esc(u.accountNumber||'')}"></div><div class="field"><label>Email</label><input type="email" name="email" value="${esc(u.email||'')}"></div><div class="field"><label>Home address</label><textarea name="address" rows="2">${esc(u.address||'')}</textarea></div><div class="field"><label>Tute pack number</label><input value="${esc(u.tutePackNumber||'Not assigned')}" disabled></div><div class="field"><label>New password (optional)</label><input type="password" name="password" minlength="6" placeholder="Leave blank to keep current password"></div><button class="btn btn-primary" type="submit">Save my details</button></form></section>`;$('#studentProfileForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.currentTarget),password=String(f.get('password')||'');if(password&&password.length<6)return alert('Password must be at least 6 characters.');u.phone=String(f.get('phone')||'').trim();u.accountNumber=String(f.get('accountNumber')||'').trim();u.address=String(f.get('address')||'').trim();u.tutePackNumber=String(f.get('tutePackNumber')||'').trim();u.email=String(f.get('email')||'').trim();if(password)u.password=await hashPassword(password);session=u;saveDB();$('#sideName').textContent=u.name;$('#sideAvatar').textContent=u.name[0].toUpperCase();$('#topAvatar').textContent=u.name[0].toUpperCase();renderNav();renderPage();toast('Profile updated');};}
 function studentDetailsModal(u){if(!u)return;const access=db.studentCourseAccess[u.id]||[],lessons=db.lessons.filter(l=>access.includes(l.courseId)&&(l.allowedStudentIds==null||l.allowedStudentIds.includes(u.id))),marks=studentMarks(u.id);const lessonRows=lessons.map(l=>`<tr><td>${esc(courseName(l.courseId))}</td><td>${esc(l.title)}</td><td>${isLessonComplete(u.id,l.id)?'<span class="pill">✓ Complete</span>':'<span class="pill">In progress</span>'}</td></tr>`).join('');const markRows=marks.map(m=>`<tr><td>${esc(m.title)}</td><td>${esc(courseName(m.courseId))}</td><td>${esc(db.lessons.find(l=>l.id===m.lessonId)?.title||'—')}</td><td>${Number(m.score)||0}/${Number(m.outOf)||100}</td><td><button type="button" class="btn btn-danger" data-delete-mark="${esc(m.id)}">×</button></td></tr>`).join('');openModal('Student details',`<div class="card" style="padding:14px;margin-bottom:14px"><h3 style="margin:0 0 8px">${esc(u.name)}</h3><div class="small">Username: ${esc(u.username)}</div><div class="small">Phone: ${esc(u.phone||'Not provided')}</div><div class="small"><strong>Student ID: ${esc(u.studentId||'Pending')}</strong></div><div class="small">Account number: ${esc(u.accountNumber||'Not provided')}</div><div class="small">Email: ${esc(u.email||'Not provided')}</div></div><h3>Accessible lessons & completion</h3><div class="table-wrap"><table class="table"><thead><tr><th>Subject</th><th>Lesson</th><th>Progress</th></tr></thead><tbody>${lessonRows||'<tr><td colspan="3">No assigned lessons.</td></tr>'}</tbody></table></div><h3 style="margin-top:18px">Add quiz / paper marks</h3><div id="studentMarkForm"><div class="field"><label>Assessment title</label><input id="markTitle" name="title" required placeholder="e.g. Lesson 03 Quiz"></div><div class="field"><label>Subject</label><select name="courseId" id="markCourse" required>${db.courses.filter(c=>access.includes(c.id)).map(c=>`<option value="${c.id}">${esc(c.title)}</option>`).join('')}</select></div><div class="field"><label>Lesson</label><select name="lessonId" id="markLesson" required></select></div><div class="field"><label>Type</label><select name="type"><option>Quiz</option><option>Paper</option><option>Assignment</option><option>Other</option></select></div><div class="row"><div class="field" style="flex:1"><label>Marks obtained</label><input type="number" name="score" min="0" step="0.5" required></div><div class="field" style="flex:1"><label>Total marks</label><input type="number" name="outOf" min="1" step="0.5" value="100" required></div></div><div class="field"><label>Feedback (optional)</label><textarea name="feedback" rows="2"></textarea></div><button class="btn btn-primary" type="button" id="saveStudentMark">Save marks</button></div><h3 style="margin-top:20px">Recorded marks</h3><div class="table-wrap"><table class="table"><thead><tr><th>Assessment</th><th>Subject</th><th>Lesson</th><th>Marks</th><th></th></tr></thead><tbody>${markRows||'<tr><td colspan="5">No marks recorded.</td></tr>'}</tbody></table></div>`, 'Done',()=>closeModal());const updateLessons=()=>{const cid=$('#markCourse')?.value,el=$('#markLesson');if(el)el.innerHTML=lessons.filter(l=>l.courseId===cid).map(l=>`<option value="${l.id}">${esc(l.title)}</option>`).join('')||'<option value="">No lessons</option>';};updateLessons();$('#markCourse')?.addEventListener('change',updateLessons);$('#saveStudentMark').onclick=()=>{const title=$('#markTitle').value.trim(),courseId=$('#markCourse').value,lessonId=$('#markLesson').value,type=$('#studentMarkForm select[name=type]').value,score=Number($('#studentMarkForm input[name=score]').value),outOf=Number($('#studentMarkForm input[name=outOf]').value),feedback=$('#studentMarkForm textarea[name=feedback]').value.trim();if(!title)return alert('Enter an assessment title.');if(score<0||outOf<=0||score>outOf)return alert('Marks must be between 0 and total marks.');if(!lessonId)return alert('Select a lesson.');db.marks=db.marks||[];db.marks.push({id:id('mark'),studentId:u.id,title,courseId,lessonId,type,score,outOf,feedback,updatedAt:Date.now()});if(!saveDB())return alert('Could not save marks.');closeModal();studentDetailsModal(u);toast('Marks saved and progress updated');};$$('[data-delete-mark]').forEach(b=>b.onclick=()=>{db.marks=db.marks.filter(m=>m.id!==b.dataset.deleteMark);saveDB();closeModal();studentDetailsModal(u);});}
 
 function renderStudents(){
@@ -3050,7 +3062,7 @@ function paperModal(){
     if(!lesson)throw Error('Choose a lesson belonging to the selected subject.');
     if((!file||file.size===0)&&!url)throw Error('Upload a PDF file or enter a PDF URL.');
     if(url&&!/^https?:\/\//i.test(url))throw Error('Enter a valid URL beginning with http:// or https://');
-    if(file&&file.size>0)throw Error('PDF file upload is not available yet. Paste a PDF link instead.');
+    if(file&&file.size>1500000)throw Error('For this HTML demo, choose a PDF under 1.5 MB. Use cloud storage for larger files.');
     if(file&&file.size>0&&file.type&&file.type!=='application/pdf'&&!file.name.toLowerCase().endsWith('.pdf'))throw Error('Please choose a PDF file.');
     let dataUrl='';
     if(file&&file.size>0)dataUrl=await readPdfDataUrl(file);
@@ -3072,8 +3084,8 @@ function teacherModal(t=null){
  if(db.users.some(x=>x.username.toLowerCase()===username.toLowerCase()&&x.id!==t?.id))throw Error('That username is already in use.');
  if(!t&&!password)throw Error('Enter a temporary password.');if(password&&password.length<6)throw Error('Password must be at least 6 characters.');
  db.teacherCourseAccess=db.teacherCourseAccess||{};let teacherId;
- if(t){Object.assign(t,{name,username,email:String(f.get('email')||'').trim(),phone:String(f.get('phone')||'').trim(),teachingLevel:String(f.get('teachingLevel')||'both'),teachingGrades:f.getAll('teacherGrades')});if(password)fbNoPwChange();teacherId=t.id;}
- else{const nu={id:await fbCreateAccount(username,password),name,username,email:String(f.get('email')||'').trim(),phone:String(f.get('phone')||'').trim(),role:'teacher',teachingLevel:String(f.get('teachingLevel')||'both'),teachingGrades:f.getAll('teacherGrades')};db.users.push(nu);teacherId=nu.id;}
+ if(t){Object.assign(t,{name,username,email:String(f.get('email')||'').trim(),phone:String(f.get('phone')||'').trim(),teachingLevel:String(f.get('teachingLevel')||'both'),teachingGrades:f.getAll('teacherGrades')});if(password)t.password=await hashPassword(password);teacherId=t.id;}
+ else{const nu={id:id('teacher'),name,username,password:await hashPassword(password),email:String(f.get('email')||'').trim(),phone:String(f.get('phone')||'').trim(),role:'teacher',teachingLevel:String(f.get('teachingLevel')||'both'),teachingGrades:f.getAll('teacherGrades')};db.users.push(nu);teacherId=nu.id;}
  db.teacherCourseAccess[teacherId]=f.getAll('access');if(!saveDB())throw Error('Could not save teacher account.');closeModal();renderStudents();toast(t?'Teacher updated':'Teacher account created');
  });
 }
@@ -3127,8 +3139,8 @@ function studentModal(u=null){
     if(!u&&!password)throw Error('Enter a temporary password.');
     if(password&&password.length<6)throw Error('Password must be at least 6 characters.');
     let studentId;
-    if(u){u.name=name;u.username=username;u.level=String(f.get('level')||'AL');u.grades=f.getAll('studentGrades');u.grade=u.grades[0]||'';u.phone=String(f.get('phone')||'').trim();u.accountNumber=String(f.get('accountNumber')||'').trim();u.address=String(f.get('address')||'').trim();u.tutePackNumber=String(f.get('tutePackNumber')||'').trim();u.email=String(f.get('email')||'').trim();if(password)fbNoPwChange();studentId=u.id;}
-    else{const nu={id:await fbCreateAccount(username,password),studentId:'',name,username,level:String(f.get('level')||'AL'),grades:f.getAll('studentGrades'),grade:(f.getAll('studentGrades')[0]||''),phone:String(f.get('phone')||'').trim(),accountNumber:String(f.get('accountNumber')||'').trim(),address:String(f.get('address')||'').trim(),tutePackNumber:String(f.get('tutePackNumber')||'').trim(),email:String(f.get('email')||'').trim(),role:'student'};db.users.push(nu);ensureStudentIds();studentId=nu.id;db.studentCourseAccess[studentId]=[];}
+    if(u){u.name=name;u.username=username;u.level=String(f.get('level')||'AL');u.grades=f.getAll('studentGrades');u.grade=u.grades[0]||'';u.phone=String(f.get('phone')||'').trim();u.accountNumber=String(f.get('accountNumber')||'').trim();u.address=String(f.get('address')||'').trim();u.tutePackNumber=String(f.get('tutePackNumber')||'').trim();u.email=String(f.get('email')||'').trim();if(password)u.password=await hashPassword(password);studentId=u.id;}
+    else{const nu={id:id('u'),studentId:'',name,username,password:await hashPassword(password),level:String(f.get('level')||'AL'),grades:f.getAll('studentGrades'),grade:(f.getAll('studentGrades')[0]||''),phone:String(f.get('phone')||'').trim(),accountNumber:String(f.get('accountNumber')||'').trim(),address:String(f.get('address')||'').trim(),tutePackNumber:String(f.get('tutePackNumber')||'').trim(),email:String(f.get('email')||'').trim(),role:'student'};db.users.push(nu);ensureStudentIds();studentId=nu.id;db.studentCourseAccess[studentId]=[];}
     db.studentCourseAccess[studentId]=f.getAll('access').filter(cid=>{const c=db.courses.find(x=>x.id===cid);return c&&courseLevel(c)===(String(f.get('level')||'AL'))&&(!courseGrades(c).filter(Boolean).length||f.getAll('studentGrades').some(g=>courseGrades(c).includes(g)))});
     if(!saveDB())throw Error('Could not save student details. Browser storage may be unavailable or full.');closeModal();renderPage();toast(u?'Student updated':'Student account created');
   });
@@ -3159,7 +3171,7 @@ function applyLoginContacts(){
 applyLoginContacts();
 window.addEventListener('load',applyLoginContacts);
 let loginFails=0,lockUntil=0;
-const legacyLoginHandler=async function(e){
+$('#loginForm').addEventListener('submit',async function(e){
   e.preventDefault();
   const errorEl=$('#loginError');
   const showErr=m=>{errorEl.textContent=m;errorEl.style.display='block'};
@@ -3192,10 +3204,9 @@ const legacyLoginHandler=async function(e){
     console.error('Dashboard error:',err);
     showErr('Login succeeded, but dashboard failed to load. Refresh this file and try again.');
   }
-};
+});
 
-$('#loginForm').addEventListener('submit',fbLoginSubmit);
-$('#logoutBtn').onclick=fbLogout;
+$('#logoutBtn').onclick=showLogin;
 $('#menuBtn').onclick=()=>$('#sidebar').classList.toggle('open');
 
 function applyChristmasTheme(){
@@ -3212,176 +3223,8 @@ function applyChristmasTheme(){
  document.body.appendChild(fx);
 }
 
-
-// ===== Firebase layer (Firestore data + Firebase Auth login) =====
-const FB_CONFIG={apiKey:"AIzaSyCbEOXp2YP3yU1fw6zVZQogcsQ3cSPl_8w",authDomain:"classroom-5af10.firebaseapp.com",projectId:"classroom-5af10",storageBucket:"classroom-5af10.firebasestorage.app",messagingSenderId:"649216716192",appId:"1:649216716192:web:da8d355191a68b9a1bc8c5"};
-const FB_OWNER_EMAIL='dasun1730@gmail.com';
-const FB_LOGIN_DOMAIN='classroom.local';
-const FB_ARRAY_KEYS=['users','courses','lessons','papers','quizzes','exams','marks','extras','calendarEvents','notifications','messages','fees','deliveries','registrationRequests','specialClasses'];
-const FB_MAP_KEYS=['studentCourseAccess','teacherCourseAccess','adminCourseAccess','lessonProgress'];
-let FB=null,fbAuth=null,fbDb=null,fbSecondary=null,fbPullReady=false,fbUnsubs=[],fbSynced={},fbPushTimer=null,fbRenderTimer=null;
-const fbColName=k=>k==='users'?'users':'c_'+k;
-const fbEmail=v=>{v=String(v||'').trim().toLowerCase();return v.includes('@')?v:v+'@'+FB_LOGIN_DOMAIN};
-function fbFriendly(e){const c=String(e?.code||'');if(c.includes('invalid-credential')||c.includes('wrong-password')||c.includes('user-not-found'))return 'Wrong username or password.';if(c.includes('email-already-in-use'))return 'That username already has a login account.';if(c.includes('weak-password'))return 'Password must be at least 6 characters.';if(c.includes('too-many-requests'))return 'Too many attempts. Wait a few minutes and try again.';if(c.includes('permission-denied'))return 'Permission denied. Check the Firestore rules.';if(c.includes('invalid-email'))return 'Username can only use letters, numbers, dot, underscore or dash.';return e?.message||'Something went wrong.'}
-function emptyDb(){return {users:[],courses:[],lessons:[],papers:[],quizzes:[],exams:[],marks:[],extras:[],calendarEvents:[],notifications:[],messages:[],fees:[],deliveries:[],registrationRequests:[],specialClasses:[],studentCourseAccess:{},teacherCourseAccess:{},adminCourseAccess:{},lessonProgress:{},settings:{}}}
-function fbLoginMsg(m){const el=$('#loginError');if(el){el.textContent=m;el.style.display='block'}}
-function fbNoPwChange(){toast('Password change is not available yet. The password is unchanged.')}
-function fbBoot(){
-  db=emptyDb();
-  fbInit().catch(e=>{console.error(e);fbLoginMsg('Could not reach Firebase: '+fbFriendly(e)+' Check the internet connection and refresh.')});
-}
-async function fbInit(){
-  const [a,b,c]=await Promise.all([
-    import('https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js'),
-    import('https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js'),
-    import('https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js')]);
-  FB=Object.assign({},a,b,c);
-  const app=FB.initializeApp(FB_CONFIG);
-  fbAuth=FB.getAuth(app);
-  fbDb=FB.getFirestore(app);
-  FB.onAuthStateChanged(fbAuth,fbOnAuth);
-}
-async function fbOnAuth(user){
-  if(!user){fbStop();session=null;db=emptyDb();showLogin();return}
-  try{
-    const ref=FB.doc(fbDb,'users',user.uid);
-    let snap=await FB.getDoc(ref);
-    // First owner sign-in creates the owner profile (the rules allow this only for the owner email).
-    if(!snap.exists()&&String(user.email||'').toLowerCase()===FB_OWNER_EMAIL){
-      await FB.setDoc(ref,{id:user.uid,name:'Sio Creations',username:'dasun',email:FB_OWNER_EMAIL,role:'admin',isOwner:true,active:true,createdAt:Date.now()});
-      snap=await FB.getDoc(ref);
-    }
-    if(!snap.exists()){await FB.signOut(fbAuth);fbLoginMsg('This account is not approved yet. Please wait for admin approval.');return}
-    if(snap.data().active===false){await FB.signOut(fbAuth);fbLoginMsg('This account is disabled. Contact the owner.');return}
-    await fbStartSync();
-    const me=(db.users||[]).find(u=>u.id===user.uid);
-    if(!me){await FB.signOut(fbAuth);fbLoginMsg('Your profile could not be loaded. Try again.');return}
-    session=me;
-    enterApp(me);
-  }catch(e){console.error(e);fbLoginMsg('Firebase error: '+fbFriendly(e))}
-}
-async function fbLoginSubmit(e){
-  e.preventDefault();
-  const el=$('#loginError');if(el){el.style.display='none';el.textContent=''}
-  const login=String($('#username').value||'').trim();
-  const pw=String($('#password').value||'');
-  if(!login||!pw){fbLoginMsg('Enter your username or email and password.');return}
-  if(!FB){fbLoginMsg('Still connecting to Firebase. Try again in a moment.');return}
-  try{await FB.signInWithEmailAndPassword(fbAuth,fbEmail(login),pw);$('#password').value=''}
-  catch(err){fbLoginMsg(fbFriendly(err))}
-}
-async function fbLogout(){if(FB&&fbAuth)await FB.signOut(fbAuth);else showLogin()}
-function fbStop(){fbUnsubs.forEach(u=>{try{u()}catch(_){}});fbUnsubs=[];fbPullReady=false;clearTimeout(fbPushTimer)}
-function fbWatch(col,apply){
-  return new Promise(resolve=>{
-    let first=true;
-    const un=FB.onSnapshot(FB.collection(fbDb,col),snap=>{
-      const local=snap.metadata.hasPendingWrites;
-      if(first||!local)apply(snap);
-      if(first){first=false;resolve()}
-      else if(fbPullReady&&!local)fbAfterRemote();
-    },err=>{console.error(col,err);if(first){first=false;resolve()}});
-    fbUnsubs.push(un);
-  });
-}
-async function fbStartSync(){
-  fbStop();fbSynced={};
-  const jobs=[];
-  FB_ARRAY_KEYS.forEach(k=>jobs.push(fbWatch(fbColName(k),snap=>{
-    const items=[],syn=new Map();
-    snap.forEach(d=>{const v=d.data();if(v.id===undefined)v.id=d.id;items.push(v);syn.set(String(v.id),JSON.stringify(v))});
-    db[k]=items;fbSynced[k]=syn;
-  })));
-  FB_MAP_KEYS.forEach(k=>jobs.push(fbWatch('m_'+k,snap=>{
-    const obj={},syn=new Map();
-    snap.forEach(d=>{const v=d.data().v;obj[d.id]=v;syn.set(d.id,JSON.stringify(v??null))});
-    db[k]=obj;fbSynced[k]=syn;
-  })));
-  jobs.push(fbWatch('kv',snap=>{snap.forEach(d=>{const v=d.data().v;db[d.id]=v;fbSynced[d.id]=JSON.stringify(v??null)})}));
-  await Promise.race([Promise.all(jobs),new Promise(r=>setTimeout(r,10000))]);
-  db=Object.assign(emptyDb(),db);
-  fbPullReady=true;
-}
-function fbAfterRemote(){
-  if(!session)return;
-  clearTimeout(fbRenderTimer);
-  fbRenderTimer=setTimeout(()=>{
-    const latest=(db.users||[]).find(u=>u.id===session.id);
-    if(!latest||latest.active===false){
-      fbStop();alert('Your account was removed or disabled. You have been signed out.');
-      if(FB&&fbAuth)FB.signOut(fbAuth);else showLogin();
-      return;
-    }
-    session=latest;
-    try{renderNav();if(!document.getElementById('modalBackdrop'))renderPage()}catch(err){console.error(err)}
-  },250);
-}
-function fbQueuePush(){
-  if(!FB||!fbPullReady||!fbAuth?.currentUser)return;
-  clearTimeout(fbPushTimer);
-  fbPushTimer=setTimeout(fbPush,150);
-}
-async function fbPush(){
-  const ops=[];
-  for(const k of Object.keys(db)){
-    const val=db[k];
-    if(Array.isArray(val)){
-      const prev=fbSynced[k]||new Map(),cur=new Map(),col=fbColName(k);
-      val.forEach(it=>{
-        if(!it||typeof it!=='object')return;
-        if(!it.id)it.id=id(k.slice(0,3));
-        if(k==='users'&&it.active===undefined)it.active=true;
-        cur.set(String(it.id),JSON.stringify(it));
-      });
-      for(const [key,js] of cur){if(prev.get(key)!==js)ops.push({op:'set',col,key,data:JSON.parse(js)})}
-      for(const key of prev.keys()){if(!cur.has(key))ops.push({op:'del',col,key})}
-      fbSynced[k]=cur;
-    }else if(FB_MAP_KEYS.includes(k)){
-      const prev=fbSynced[k]||new Map(),cur=new Map(),col='m_'+k;
-      Object.keys(val||{}).forEach(sub=>cur.set(sub,JSON.stringify(val[sub]??null)));
-      for(const [sub,js] of cur){if(prev.get(sub)!==js)ops.push({op:'set',col,key:sub,data:{v:JSON.parse(js)}})}
-      for(const sub of prev.keys()){if(!cur.has(sub))ops.push({op:'del',col,key:sub})}
-      fbSynced[k]=cur;
-    }else{
-      const js=JSON.stringify(val??null);
-      if(fbSynced[k]!==js){ops.push({op:'set',col:'kv',key:k,data:{v:JSON.parse(js)}});fbSynced[k]=js}
-    }
-  }
-  const todo=ops.filter(o=>o.key);
-  for(let i=0;i<todo.length;i+=400){
-    const batch=FB.writeBatch(fbDb);
-    todo.slice(i,i+400).forEach(o=>{const ref=FB.doc(fbDb,o.col,String(o.key));o.op==='set'?batch.set(ref,o.data):batch.delete(ref)});
-    try{await batch.commit()}catch(e){console.error(e);toast('Not saved: '+fbFriendly(e))}
-  }
-}
-// Creates a Firebase Auth login without signing out the owner (uses a second app instance).
-async function fbCreateAccount(login,password){
-  if(!FB)throw new Error('Firebase is still connecting. Try again in a moment.');
-  if(!fbSecondary)fbSecondary=FB.initializeApp(FB_CONFIG,'secondary');
-  const sAuth=FB.getAuth(fbSecondary);
-  try{const cred=await FB.createUserWithEmailAndPassword(sAuth,fbEmail(login),password);return cred.user.uid}
-  catch(e){throw new Error(fbFriendly(e))}
-  finally{try{await FB.signOut(sAuth)}catch(_){}}
-}
-// Public registration: creates the login and the pending request, written as the new user.
-async function fbSubmitRegistration(request,password){
-  if(!FB)throw new Error('Firebase is still connecting. Try again in a moment.');
-  if(!fbSecondary)fbSecondary=FB.initializeApp(FB_CONFIG,'secondary');
-  const sAuth=FB.getAuth(fbSecondary),sDb=FB.getFirestore(fbSecondary);
-  let cred;
-  try{cred=await FB.createUserWithEmailAndPassword(sAuth,fbEmail(request.username),password)}
-  catch(e){throw new Error(fbFriendly(e))}
-  const rid=cred.user.uid;
-  try{
-    const clean=JSON.parse(JSON.stringify(request));delete clean.password;
-    await FB.setDoc(FB.doc(sDb,'c_registrationRequests',rid),{...clean,id:rid,authUid:rid,status:'pending'});
-  }catch(e){throw new Error(fbFriendly(e))}
-  finally{try{await FB.signOut(sAuth)}catch(_){}}
-  return rid;
-}
-
 // FIX: db must be loaded BEFORE anything that reads db (e.g. the registration form's subject list).
-fbBoot();
+loadDB();
 if(archiveOLData())saveDB();
 applyChristmasTheme();
 refreshRegGradeOptions();
