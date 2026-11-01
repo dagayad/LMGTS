@@ -3226,7 +3226,7 @@ const FB_ARRAY_KEYS=['users','courses','lessons','papers','quizzes','exams','mar
 const FB_MAP_KEYS=['studentCourseAccess','teacherCourseAccess','adminCourseAccess','lessonProgress'];
 let FB=null,fbAuth=null,fbDb=null,fbSecondary=null,fbPullReady=false,fbUnsubs=[],fbSynced={},fbPushTimer=null,fbRenderTimer=null;
 const fbColName=k=>k==='users'?'users':'c_'+k;
-const fbEmail=v=>{v=String(v||'').trim().toLowerCase();return v.includes('@')?v:v+'@'+FB_LOGIN_DOMAIN};
+const fbEmail=v=>{v=String(v||'').trim().toLowerCase();if(v==='dasun')return FB_OWNER_EMAIL;return v.includes('@')?v:v+'@'+FB_LOGIN_DOMAIN};
 function fbFriendly(e){const c=String(e?.code||'');if(c.includes('invalid-credential')||c.includes('wrong-password')||c.includes('user-not-found'))return 'Wrong username or password.';if(c.includes('email-already-in-use'))return 'That username already has a login account.';if(c.includes('weak-password'))return 'Password must be at least 6 characters.';if(c.includes('too-many-requests'))return 'Too many attempts. Wait a few minutes and try again.';if(c.includes('permission-denied'))return 'Permission denied. Check the Firestore rules.';if(c.includes('invalid-email'))return 'Username can only use letters, numbers, dot, underscore or dash.';return e?.message||'Something went wrong.'}
 function emptyDb(){return {users:[],courses:[],lessons:[],papers:[],quizzes:[],exams:[],marks:[],extras:[],calendarEvents:[],notifications:[],messages:[],fees:[],deliveries:[],registrationRequests:[],specialClasses:[],studentCourseAccess:{},teacherCourseAccess:{},adminCourseAccess:{},lessonProgress:{},settings:{}}}
 function fbLoginMsg(m){const el=$('#loginError');if(el){el.textContent=m;el.style.display='block'}}
@@ -3260,7 +3260,7 @@ async function fbOnAuth(user){
     if(snap.data().active===false){await FB.signOut(fbAuth);fbLoginMsg('This account is disabled. Contact the owner.');return}
     await fbStartSync();
     const me=(db.users||[]).find(u=>u.id===user.uid);
-    if(!me){await FB.signOut(fbAuth);fbLoginMsg('Your profile could not be loaded. Try again.');return}
+    if(!me){await FB.signOut(fbAuth);fbLoginMsg('Your profile could not be loaded. '+(window.fbLastError?'Database: '+window.fbLastError:'Try again.'));return}
     session=me;
     enterApp(me);
   }catch(e){console.error(e);fbLoginMsg('Firebase error: '+fbFriendly(e))}
@@ -3285,7 +3285,7 @@ function fbWatch(col,apply){
       if(first||!local)apply(snap);
       if(first){first=false;resolve()}
       else if(fbPullReady&&!local)fbAfterRemote();
-    },err=>{console.error(col,err);if(first){first=false;resolve()}});
+    },err=>{console.error(col,err);window.fbLastError=fbFriendly(err)+' ['+col+']';if(first){first=false;resolve()}});
     fbUnsubs.push(un);
   });
 }
