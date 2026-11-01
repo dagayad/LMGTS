@@ -1691,7 +1691,8 @@ body.yt-lock{overflow:hidden}
     <div><div class="side-label">LEARNING SPACE</div><nav id="nav" class="nav" aria-label="Main navigation"></nav></div>
     <div class="sidebar-bottom">
       <div class="student-chip"><div class="avatar" id="sideAvatar">S</div><div><strong id="sideName">Student</strong><div class="small muted" id="sideRole">Student account</div></div></div>
-      <button id="logoutBtn" class="btn btn-secondary full" style="margin-top:15px">↪ Sign out</button>
+      <button id="changePwBtn" class="btn btn-secondary full" style="margin-top:15px">🔑 Change password</button>
+      <button id="logoutBtn" class="btn btn-secondary full" style="margin-top:8px">↪ Sign out</button>
     </div>
   </aside>
   <main class="main" role="main">
@@ -3201,6 +3202,7 @@ const legacyLoginHandler=async function(e){
 
 $('#loginForm').addEventListener('submit',fbLoginSubmit);
 $('#logoutBtn').onclick=fbLogout;
+$('#changePwBtn').onclick=fbChangeOwnPassword;
 $('#menuBtn').onclick=()=>$('#sidebar').classList.toggle('open');
 
 function applyChristmasTheme(){
@@ -3274,6 +3276,28 @@ async function fbLoginSubmit(e){
   if(!FB){fbLoginMsg('Still connecting to Firebase. Try again in a moment.');return}
   try{await FB.signInWithEmailAndPassword(fbAuth,fbEmail(login),pw);$('#password').value=''}
   catch(err){fbLoginMsg(fbFriendly(err))}
+}
+// Each signed-in user changes their own password (Firebase allows this without Admin tools).
+function fbChangeOwnPassword(){
+  if(!FB||!fbAuth?.currentUser){toast('Sign in first.');return}
+  openModal('Change password','<div class="field"><label>Current password</label><input name="oldPw" type="password" required autocomplete="current-password"></div><div class="field"><label>New password</label><input name="newPw" type="password" minlength="6" required autocomplete="new-password"></div><div class="field"><label>Confirm new password</label><input name="newPw2" type="password" minlength="6" required autocomplete="new-password"></div>','Change password',async f=>{
+    const oldPw=String(f.get('oldPw')||''),newPw=String(f.get('newPw')||''),newPw2=String(f.get('newPw2')||'');
+    if(newPw!==newPw2)throw Error('The new passwords do not match.');
+    if(newPw.length<6)throw Error('The new password must be at least 6 characters.');
+    if(newPw===oldPw)throw Error('Choose a password different from the current one.');
+    const user=fbAuth.currentUser;
+    if(!user)throw Error('Please sign in again.');
+    try{
+      await FB.reauthenticateWithCredential(user,FB.EmailAuthProvider.credential(user.email,oldPw));
+      await FB.updatePassword(user,newPw);
+    }catch(e){
+      const c=String(e?.code||'');
+      if(c.includes('invalid-credential')||c.includes('wrong-password'))throw Error('The current password is wrong.');
+      throw Error(fbFriendly(e));
+    }
+    closeModal();
+    toast('Password changed. Use the new password next time you sign in.');
+  });
 }
 async function fbLogout(){if(FB&&fbAuth)await FB.signOut(fbAuth);else showLogin()}
 function fbStop(){fbUnsubs.forEach(u=>{try{u()}catch(_){}});fbUnsubs=[];fbPullReady=false;clearTimeout(fbPushTimer)}
