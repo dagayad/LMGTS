@@ -1644,6 +1644,17 @@ body.yt-lock{overflow:hidden}
 .checkbox-item input[type="checkbox"]{appearance:auto;-webkit-appearance:checkbox;border-radius:5px;accent-color:#2563eb;width:22px;height:22px}
 .checkbox-item:has(input[type="checkbox"]:checked){border-color:#2563eb!important;background:rgba(37,99,235,.2)!important}
 .checkbox-item:has(input[type="checkbox"]:checked) label{color:#ffffff}
+
+/* Overview stat cards (teacher/admin dashboards) and responsive layout */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:8px 0 4px;max-width:100%}
+.stat-card{background:#131a2e;border:1px solid #2a3b58;border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:6px;min-width:0;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.stat-card span{color:#9eb0ce;font-size:13px;font-weight:600}
+.stat-card strong{font-size:30px;line-height:1.1;color:#e9efff}
+.stat-card small{color:#9eb0ce;font-size:12px;line-height:1.4}
+[style*="repeat(2,minmax(0,1fr))"]{grid-template-columns:minmax(0,1fr)!important}
+@media(min-width:900px){[style*="repeat(2,minmax(0,1fr))"]{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+.dash-chart-grid{max-width:100%}
+.dash-chart-grid>*{min-width:0}
 </style>
 </head>
 <body>
