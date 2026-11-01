@@ -3249,8 +3249,14 @@ async function fbInit(){
   fbDb=FB.getFirestore(app);
   FB.onAuthStateChanged(fbAuth,fbOnAuth);
 }
+let fbExpectSignOut=false;
+function fbSetBusy(on){const btn=document.querySelector('#loginForm button[type=submit]');if(!btn)return;btn.disabled=on;btn.dataset.label=btn.dataset.label||btn.innerHTML;btn.innerHTML=on?'Signing in…':btn.dataset.label}
+async function fbFailSignOut(msg){fbExpectSignOut=true;setTimeout(()=>{fbExpectSignOut=false},1500);fbSetBusy(false);fbLoginMsg(msg);try{await FB.signOut(fbAuth)}catch(_){fbExpectSignOut=false}}
 async function fbOnAuth(user){
-  if(!user){fbStop();session=null;db=emptyDb();showLogin();return}
+  if(!user){
+    if(fbExpectSignOut){fbExpectSignOut=false;return}
+    fbStop();session=null;db=emptyDb();showLogin();return
+  }
   try{
     const ref=FB.doc(fbDb,'users',user.uid);
     let snap=await FB.getDoc(ref);
@@ -3259,15 +3265,18 @@ async function fbOnAuth(user){
       await FB.setDoc(ref,{id:user.uid,name:'Sio Creations',username:'dasun',email:FB_OWNER_EMAIL,role:'admin',isOwner:true,active:true,createdAt:Date.now()});
       snap=await FB.getDoc(ref);
     }
-    if(!snap.exists()){await FB.signOut(fbAuth);fbLoginMsg('This account is not approved yet. Please wait for admin approval.');return}
-    if(snap.data().active===false){await FB.signOut(fbAuth);fbLoginMsg('This account is disabled. Contact the owner.');return}
+    if(!snap.exists()){await fbFailSignOut('This account is not approved yet. Please wait for admin approval.');return}
+    if(snap.data().active===false){await fbFailSignOut('This account is disabled. Contact the owner.');return}
     await fbStartSync();
     const me=(db.users||[]).find(u=>u.id===user.uid);
-    if(!me){await FB.signOut(fbAuth);fbLoginMsg('Your profile could not be loaded. '+(window.fbLastError?'Database: '+window.fbLastError:'Try again.'));return}
+    if(!me){await fbFailSignOut('Your profile could not be loaded. '+(window.fbLastError?'Database: '+window.fbLastError:'Please try again.'));return}
     session=me;
+    fbSetBusy(false);
+    $('#password').value='';
     enterApp(me);
-  }catch(e){console.error(e);fbLoginMsg('Firebase error: '+fbFriendly(e))}
+  }catch(e){console.error(e);await fbFailSignOut('Sign-in problem: '+fbFriendly(e))}
 }
+let fbBusyLogin=false;
 async function fbLoginSubmit(e){
   e.preventDefault();
   const el=$('#loginError');if(el){el.style.display='none';el.textContent=''}
@@ -3275,8 +3284,11 @@ async function fbLoginSubmit(e){
   const pw=String($('#password').value||'');
   if(!login||!pw){fbLoginMsg('Enter your username or email and password.');return}
   if(!FB){fbLoginMsg('Still connecting to Firebase. Try again in a moment.');return}
-  try{await FB.signInWithEmailAndPassword(fbAuth,fbEmail(login),pw);$('#password').value=''}
-  catch(err){fbLoginMsg(fbFriendly(err))}
+  if(fbBusyLogin)return;
+  fbBusyLogin=true;fbSetBusy(true);
+  try{await FB.signInWithEmailAndPassword(fbAuth,fbEmail(login),pw)}
+  catch(err){fbSetBusy(false);fbLoginMsg(fbFriendly(err))}
+  finally{fbBusyLogin=false}
 }
 // Each signed-in user changes their own password (Firebase allows this without Admin tools).
 function fbChangeOwnPassword(){
