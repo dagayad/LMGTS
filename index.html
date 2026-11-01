@@ -1709,9 +1709,9 @@ body.yt-lock{overflow:hidden}
 const STORE='classroom_demo_v1';
 const seed={
  users:[
-  {id:'u-sio',name:'Sio Creations',username:'dasun',password:'dasun',role:'admin',isOwner:true},
-  {id:'u-admin',name:'Class Admin',username:'admin',password:'class123',role:'admin'},
-  {id:'u-student',name:'Demo Student',username:'student',password:'learn123',role:'student'}
+  {id:'u-sio',name:'Sio Creations',username:'dasun',password:'',role:'admin',isOwner:true},
+  {id:'u-admin',name:'Class Admin',username:'admin',password:'',role:'admin'},
+  {id:'u-student',name:'Demo Student',username:'student',password:'',role:'student'}
  ],
  courses:[
   {id:'c-bs',title:'Business Studies',subject:'BUSINESS STUDIES',description:'Lessons, revision and papers'},
@@ -1761,7 +1761,7 @@ function loadDB(){
      if(!db.lessonProgress||typeof db.lessonProgress!=='object')db.lessonProgress={};
      db.users.forEach(u=>{if(!u.phone)u.phone='';if(!u.accountNumber)u.accountNumber='';if(!u.email)u.email='';});
       if(!Array.isArray(db.registrationRequests))db.registrationRequests=[];
-     if(!db.users.some(u=>u.username&&u.username.toLowerCase()==='dasun'&&u.role==='admin'))db.users.unshift({id:'u-sio',name:'Sio Creations',username:'dasun',password:'dasun',role:'admin',isOwner:true});
+     
      const sio=db.users.find(u=>u.username&&u.username.toLowerCase()==='dasun'&&u.role==='admin');if(sio){sio.name='Sio Creations';sio.isOwner=true;}
      if(!db.settings||typeof db.settings!=='object')db.settings={whatsappNumber:'+94 75 510 3772'};
      if(!db.settings.whatsappNumber||db.settings.whatsappNumber==='+94 xx xxx xxxx')db.settings.whatsappNumber='+94 75 510 3772';
@@ -2428,7 +2428,7 @@ function wirePaperDeletes(){
 function renderRegistrations(){
   setTitle('Registration Requests','Review new student account requests');
   if(!Array.isArray(db.registrationRequests))db.registrationRequests=[];
-     if(!db.users.some(u=>u.username&&u.username.toLowerCase()==='dasun'&&u.role==='admin'))db.users.unshift({id:'u-sio',name:'Sio Creations',username:'dasun',password:'dasun',role:'admin',isOwner:true});
+     
      const sio=db.users.find(u=>u.username&&u.username.toLowerCase()==='dasun'&&u.role==='admin');if(sio){sio.name='Sio Creations';sio.isOwner=true;}
   const requests=db.registrationRequests;
   $('#pageContent').innerHTML=`<div class="toolbar"><input id="registrationSearch" placeholder="Search name, username or email..."><span class="pill">${requests.filter(r=>r.status==='pending').length} pending</span></div><div class="table-wrap"><table class="table"><thead><tr><th>Student</th><th>Contact / institution</th><th>Status</th><th>Actions</th></tr></thead><tbody id="registrationRows">${requests.map(registrationRow).join('')||'<tr><td colspan="4">No registration requests yet.</td></tr>'}</tbody></table></div>`;
@@ -2496,7 +2496,7 @@ $('#registerForm').addEventListener('submit',async function(e){
      (db.registrationRequests||[]).some(r=>String(r.username).toLowerCase()===username.toLowerCase()&&r.status!=='rejected'))
     return fail('That username is already registered or awaiting approval.');
   if(!Array.isArray(db.registrationRequests))db.registrationRequests=[];
-     if(!db.users.some(u=>u.username&&u.username.toLowerCase()==='dasun'&&u.role==='admin'))db.users.unshift({id:'u-sio',name:'Sio Creations',username:'dasun',password:'dasun',role:'admin',isOwner:true});
+     
      const sio=db.users.find(u=>u.username&&u.username.toLowerCase()==='dasun'&&u.role==='admin');if(sio){sio.name='Sio Creations';sio.isOwner=true;}
   const grades=Array.from(document.querySelectorAll('[name=regGrades]:checked')).map(x=>x.value);if(!grades.length)return fail('Select at least one A/L year.');const level=$('#regLevel')?.value||'AL',subjects=Array.from(document.querySelectorAll('[name=regSubjects]:checked')).map(x=>x.value);const request={id:id('reg'),name,email,username,password:'',phone,institution,level,grade:grades[0]||'',grades,requestedCourseIds:subjects,status:'pending',createdAt:new Date().toISOString()};
   try{await fbSubmitRegistration(request,password)}catch(err){return fail(err.message)}
@@ -2799,6 +2799,7 @@ function calendarDateKey(value){
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 }
 function renderCalendar(){
+  setTitle('Calendar','Class, exam and fee dates');
   if(!Array.isArray(db.calendarEvents))db.calendarEvents=[];
   const year=calendarCursor.getFullYear(),month=calendarCursor.getMonth();
   const first=new Date(year,month,1),startDay=first.getDay(),days=new Date(year,month+1,0).getDate();
