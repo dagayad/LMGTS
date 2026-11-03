@@ -1672,6 +1672,7 @@ body.yt-lock{overflow:hidden}
         <div class="field"><label for="role">Login as</label><select id="role" required><option value="student">Student</option><option value="teacher">Teacher</option><option value="admin">Admin</option></select></div>
         <div class="field"><label for="username">Username</label><input id="username" type="text" autocomplete="username" placeholder="Enter username" required></div>
         <div class="field"><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" placeholder="Enter password" required></div>
+        <label class="small" style="display:flex;gap:8px;align-items:center;margin:4px 0 14px;cursor:pointer"><input type="checkbox" id="rememberMe" checked style="width:auto"> Remember me on this device</label>
         <button class="btn btn-primary full" type="submit">Sign in <span>→</span></button>
         <p id="loginError" class="small" style="color:var(--danger);margin:12px 0 0;display:none"></p>
       </form>
@@ -3287,7 +3288,7 @@ async function fbInit(){
   FB=Object.assign({},a,b,c);
   const app=FB.initializeApp(FB_CONFIG);
   fbAuth=FB.getAuth(app);
-  fbDb=FB.getFirestore(app);
+  try{fbDb=FB.initializeFirestore(app,{localCache:FB.persistentLocalCache({tabManager:FB.persistentMultipleTabManager()})})}catch(_){fbDb=FB.getFirestore(app)}
   FB.onAuthStateChanged(fbAuth,fbOnAuth);
 }
 let fbExpectSignOut=false;
@@ -3323,6 +3324,10 @@ async function fbOnAuth(user){
   }catch(e){console.error(e);await fbFailSignOut('Sign-in problem: '+fbFriendly(e))}
 }
 let fbBusyLogin=false;
+function fbPrefillLogin(){
+  try{const saved=localStorage.getItem('lmgts.login');if(saved&&$('#username')){$('#username').value=saved}}catch(_){}
+}
+window.addEventListener('load',fbPrefillLogin);
 async function fbLoginSubmit(e){
   e.preventDefault();
   const el=$('#loginError');if(el){el.style.display='none';el.textContent=''}
@@ -3332,7 +3337,12 @@ async function fbLoginSubmit(e){
   if(!FB){fbLoginMsg('Still connecting to Firebase. Try again in a moment.');return}
   if(fbBusyLogin)return;
   fbBusyLogin=true;fbSetBusy(true);
-  try{await FB.signInWithEmailAndPassword(fbAuth,fbEmail(login),pw)}
+  const remember=!!$('#rememberMe')?.checked;
+  try{
+    await FB.setPersistence(fbAuth,remember?FB.browserLocalPersistence:FB.browserSessionPersistence);
+    await FB.signInWithEmailAndPassword(fbAuth,fbEmail(login),pw);
+    try{remember?localStorage.setItem('lmgts.login',login):localStorage.removeItem('lmgts.login')}catch(_){}
+  }
   catch(err){fbSetBusy(false);fbLoginMsg(fbFriendly(err))}
   finally{fbBusyLogin=false}
 }
@@ -3386,7 +3396,7 @@ async function fbStartSync(){
     db[k]=obj;fbSynced[k]=syn;
   })));
   jobs.push(fbWatch('kv',snap=>{snap.forEach(d=>{const v=d.data().v;db[d.id]=v;fbSynced[d.id]=JSON.stringify(v??null)})}));
-  await Promise.race([Promise.all(jobs),new Promise(r=>setTimeout(r,10000))]);
+  await Promise.race([Promise.all(jobs),new Promise(r=>setTimeout(r,2500))]);
   db=Object.assign(emptyDb(),db);
   fbPullReady=true;
 }
