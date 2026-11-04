@@ -3210,15 +3210,29 @@ function showPendingCalendarNotifications(user){
   $('#cancelModal').onclick=markRead;
 }
 
+// Students see an item only if it is published and either open to all or explicitly allowed for them.
+function canSeeExtra(x){
+  if(isAdmin()||isTeacher())return isAdmin()||x.published!==false;
+  if(x.published===false)return false;
+  return !Array.isArray(x.allowedStudentIds)||x.allowedStudentIds.includes(session?.id);
+}
+function extraLinks(x){
+  const v=x.videoUrl?safeUrl(x.videoUrl):'#',p=x.pdfUrl?safeUrl(x.pdfUrl):'#';
+  let h='';
+  if(v!=='#')h+=`<a class="btn btn-primary" href="${v}" target="_blank" rel="noopener noreferrer">▶ Watch video</a>`;
+  if(p!=='#')h+=`<a class="btn btn-secondary" href="${p}" target="_blank" rel="noopener noreferrer">📄 Open PDF</a>`;
+  return h?`<div class="row" style="margin-top:12px;flex-wrap:wrap;gap:8px">${h}</div>`:'';
+}
 function renderExtras(){
   setTitle('Exams & programs','Keep exams, revision programs and special learning events organized.');
-  const items=(db.extras||[]).filter(x=>isAdmin()||x.published!==false);
+  const items=(db.extras||[]).filter(canSeeExtra);
 
-  $('#pageContent').innerHTML=`<div class="toolbar"><input id="extraSearch" placeholder="Search exams and programs...">${isAdmin()?'<button class="btn btn-primary" id="addExtra">＋ Add exam / program</button>':''}</div><div class="content-type-grid">${items.map(x=>`<article class="content-type-card"><div class="type-icon">${x.type==='Exam'?'📝':x.type==='Program'?'🚀':'📚'}</div><span class="pill">${esc(x.type||'Program')}</span><h3>${esc(x.title)}</h3><p class="muted">${esc(x.description||'')}</p><div class="small muted">${esc(x.date||'Date not set')} · ${x.published===false?'Draft':'Published'}</div>${isAdmin()?`<div class="row" style="margin-top:14px"><button class="btn btn-secondary" data-edit-extra="${x.id}">Edit</button><button class="btn btn-danger" data-delete-extra="${x.id}">Remove</button></div>`:''}</article>`).join('')||'<div class="empty">No exams or programs added yet.</div>'}</div>`;
+  $('#pageContent').innerHTML=`<div class="toolbar"><input id="extraSearch" placeholder="Search exams and programs...">${isAdmin()?'<button class="btn btn-primary" id="addExtra">＋ Add exam / program</button>':''}</div><div class="content-type-grid">${items.map(x=>`<article class="content-type-card"><div class="type-icon">${x.type==='Exam'?'📝':x.type==='Program'?'🚀':'📚'}</div><span class="pill">${esc(x.type||'Program')}</span><h3>${esc(x.title)}</h3><p class="muted">${esc(x.description||'')}</p><div class="small muted">${esc(x.date||'Date not set')} · ${x.published===false?'Draft':'Published'}${isAdmin()&&Array.isArray(x.allowedStudentIds)?` · ${x.allowedStudentIds.length} student(s) allowed`:''}</div>${extraLinks(x)}${isAdmin()?`<div class="row" style="margin-top:14px;flex-wrap:wrap;gap:8px"><button class="btn btn-secondary" data-extra-access="${x.id}">Student access</button><button class="btn btn-secondary" data-edit-extra="${x.id}">Edit</button><button class="btn btn-danger" data-delete-extra="${x.id}">Remove</button></div>`:''}</article>`).join('')||'<div class="empty">No exams or programs added yet.</div>'}</div>`;
 
   if(isAdmin()){
     $('#addExtra').onclick=()=>extraModal();
     $$('[data-edit-extra]').forEach(b=>b.onclick=()=>extraModal(db.extras.find(x=>x.id===b.dataset.editExtra)));
+    $$('[data-extra-access]').forEach(b=>b.onclick=()=>{const x=db.extras.find(e=>e.id===b.dataset.extraAccess);if(x)lessonPermissionModal(x,{title:'Exam / program access',note:'Turn access ON or OFF for each student. Only students marked ON can see this item.',allLabel:'Allow all students',toast:'Access saved',after:()=>renderExtras()})});
     $$('[data-delete-extra]').forEach(b=>b.onclick=()=>{
       if(confirm('Remove this item?')){
         db.extras=db.extras.filter(x=>x.id!==b.dataset.deleteExtra);
@@ -3235,9 +3249,13 @@ function renderExtras(){
 }
 
 function extraModal(item=null){
-  openModal(item?'Edit exam / program':'Add exam / program',`<div class="field"><label>Type</label><select name="type" required><option ${item?.type==='Exam'?'selected':''}>Exam</option><option ${item?.type==='Program'?'selected':''}>Program</option><option ${item?.type==='Event'?'selected':''}>Event</option></select></div><div class="field"><label>Title</label><input name="title" required value="${esc(item?.title||'')}" placeholder="e.g. 2027 Target Paper Program"></div><div class="field"><label>Date / schedule</label><input name="date" value="${esc(item?.date||'')}" placeholder="e.g. Every Sunday 8 AM"></div><div class="field"><label>Description</label><textarea name="description" rows="3">${esc(item?.description||'')}</textarea></div><div class="field"><label>Student visibility</label><input type="checkbox" id="published_item" name="published" ${item?.published===false?'':'checked'} style="display:none"><button type="button" id="extraPublishedToggle" class="btn permission-toggle ${(item?.published===false)?'permission-off':'permission-on'}" aria-pressed="${item?.published===false?'false':'true'}" style="min-width:90px;font-weight:800">${item?.published===false?'OFF':'ON'}</button><p class="small muted">ON = students can see this exam/program. OFF = admin-only draft.</p></div>`,item?'Save item':'Create item',f=>{
+  openModal(item?'Edit exam / program':'Add exam / program',`<div class="field"><label>Type</label><select name="type" required><option ${item?.type==='Exam'?'selected':''}>Exam</option><option ${item?.type==='Program'?'selected':''}>Program</option><option ${item?.type==='Event'?'selected':''}>Event</option></select></div><div class="field"><label>Title</label><input name="title" required value="${esc(item?.title||'')}" placeholder="e.g. 2027 Target Paper Program"></div><div class="field"><label>Date / schedule</label><input name="date" value="${esc(item?.date||'')}" placeholder="e.g. Every Sunday 8 AM"></div><div class="field"><label>Description</label><textarea name="description" rows="3">${esc(item?.description||'')}</textarea></div><div class="field"><label>Video link (optional)</label><input name="videoUrl" value="${esc(item?.videoUrl||'')}" placeholder="https://www.youtube.com/..."></div><div class="field"><label>PDF link (optional)</label><input name="pdfUrl" value="${esc(item?.pdfUrl||'')}" placeholder="https://drive.google.com/..."></div><div class="field"><label>Student visibility</label><input type="checkbox" id="published_item" name="published" ${item?.published===false?'':'checked'} style="display:none"><button type="button" id="extraPublishedToggle" class="btn permission-toggle ${(item?.published===false)?'permission-off':'permission-on'}" aria-pressed="${item?.published===false?'false':'true'}" style="min-width:90px;font-weight:800">${item?.published===false?'OFF':'ON'}</button><p class="small muted">ON = students can see this exam/program. OFF = admin-only draft.</p></div>`,item?'Save item':'Create item',f=>{
     const v={type:f.get('type'),title:String(f.get('title')||'').trim(),date:String(f.get('date')||'').trim(),description:String(f.get('description')||'').trim(),published:f.get('published')==='on'};
     if(!v.title)throw Error('Enter a title.');
+    v.videoUrl=String(f.get('videoUrl')||'').trim();
+    v.pdfUrl=String(f.get('pdfUrl')||'').trim();
+    if(v.videoUrl&&!/^https:\/\/[^\s"'<>]+$/.test(v.videoUrl))throw Error('The video link must start with https:// and contain no spaces.');
+    if(v.pdfUrl&&!/^https:\/\/[^\s"'<>]+$/.test(v.pdfUrl))throw Error('The PDF link must start with https:// and contain no spaces.');
     if(item)Object.assign(item,v);
     else db.extras.push({id:id('x'),...v});
     saveDB();
@@ -3249,7 +3267,7 @@ function extraModal(item=null){
   if(pubInput&&pubBtn)pubBtn.onclick=()=>{pubInput.checked=!pubInput.checked;const on=pubInput.checked;pubBtn.textContent=on?'ON':'OFF';pubBtn.setAttribute('aria-pressed',String(on));pubBtn.classList.toggle('permission-on',on);pubBtn.classList.toggle('permission-off',!on);};
 }
 
-function lessonPermissionModal(lesson){
+function lessonPermissionModal(lesson,opts={}){
   if(!lesson){toast('Lesson not found');return;}
   const students=db.users.filter(u=>u.role!=='admin');
   // null/undefined means all students who have subject access; an array means explicit selection.
@@ -3262,8 +3280,8 @@ function lessonPermissionModal(lesson){
     </div>`;
   }).join('')||'<p class="muted">No students created yet.</p>';
 
-  openModal('Lesson Permissions',`<p class="muted small">${esc(lesson.title)} — Turn access ON or OFF for each student. Students must also have access to the subject.</p>
-    <div class="field"><div class="checkbox-item" style="gap:10px"><input type="checkbox" id="all_students" name="allStudents" ${current===null?'checked':''}><label for="all_students"><strong>Allow all students with subject access</strong></label></div></div>
+  openModal(opts.title||'Lesson Permissions',`<p class="muted small">${esc(lesson.title)} — ${opts.note?esc(opts.note):'Turn access ON or OFF for each student. Students must also have access to the subject.'}</p>
+    <div class="field"><div class="checkbox-item" style="gap:10px"><input type="checkbox" id="all_students" name="allStudents" ${current===null?'checked':''}><label for="all_students"><strong>${esc(opts.allLabel||'Allow all students with subject access')}</strong></label></div></div>
     <div class="field"><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px"><label style="margin:0;flex:1">Student permissions</label><button type="button" class="btn btn-secondary" id="selectStudentsBtn" style="padding:6px 12px;font-size:11px">All ON</button><button type="button" class="btn btn-secondary" id="clearStudentsBtn" style="padding:6px 12px;font-size:11px">All OFF</button></div>
     <input type="search" id="permissionStudentSearch" placeholder="Search students by name or username…" autocomplete="off" style="width:100%;margin-bottom:12px">
     <div class="checkbox-group" id="permissionStudentList" style="max-height:260px;overflow:auto;padding-right:3px;gap:8px">${checks}</div><p class="small muted" id="permissionStudentCount">${students.length} student${students.length===1?'':'s'}</p></div>
@@ -3272,9 +3290,10 @@ function lessonPermissionModal(lesson){
     lesson.allowedStudentIds=allowAll?null:$$('[data-student-toggle]').filter(b=>b.dataset.state==='on').map(b=>b.dataset.studentToggle);
     if(!saveDB())throw Error('Could not save permissions. Browser storage may be full or unavailable.');
     closeModal();
-    if(activeCourse)renderCourseDetail();
+    if(opts.after)opts.after();
+    else if(activeCourse)renderCourseDetail();
     else renderPage();
-    toast('Lesson permissions saved');
+    toast(opts.toast||'Lesson permissions saved');
   });
 
   const allToggle=$('#all_students');
