@@ -3210,11 +3210,28 @@ function showPendingCalendarNotifications(user){
   $('#cancelModal').onclick=markRead;
 }
 
-// Students see an item only if it is published and either open to all or explicitly allowed for them.
+// Students see an item only if it is published and they match its audience:
+// all students, students registered to chosen subjects, or chosen students.
+function extraMode(x){return x.audienceMode||(Array.isArray(x.allowedStudentIds)?'students':'all')}
 function canSeeExtra(x){
   if(isAdmin()||isTeacher())return isAdmin()||x.published!==false;
   if(x.published===false)return false;
-  return !Array.isArray(x.allowedStudentIds)||x.allowedStudentIds.includes(session?.id);
+  const mode=extraMode(x);
+  if(mode==='subjects'){const mine=db.studentCourseAccess?.[session?.id]||[];return (x.courseIds||[]).some(c=>mine.includes(c))}
+  if(mode==='students')return Array.isArray(x.allowedStudentIds)&&x.allowedStudentIds.includes(session?.id);
+  return true;
+}
+function extraAudienceText(x){
+  const m=extraMode(x);
+  if(m==='subjects')return 'Subjects: '+((x.courseIds||[]).map(courseName).join(', ')||'none');
+  if(m==='students')return (x.allowedStudentIds||[]).length+' student(s) selected';
+  return 'All students';
+}
+function extraCover(x){
+  const c=x.coverImage||'';
+  const src=c.startsWith('data:')?safeImg(c):(c?safeUrl(c):'');
+  if(!src||src==='#')return '';
+  return `<img src="${src}" alt="" loading="lazy" style="width:100%;height:150px;object-fit:cover;border-radius:12px;margin-bottom:12px;display:block">`;
 }
 function extraLinks(x){
   const v=x.videoUrl?safeUrl(x.videoUrl):'#',p=x.pdfUrl?safeUrl(x.pdfUrl):'#';
@@ -3227,12 +3244,11 @@ function renderExtras(){
   setTitle('Exams & programs','Keep exams, revision programs and special learning events organized.');
   const items=(db.extras||[]).filter(canSeeExtra);
 
-  $('#pageContent').innerHTML=`<div class="toolbar"><input id="extraSearch" placeholder="Search exams and programs...">${isAdmin()?'<button class="btn btn-primary" id="addExtra">＋ Add exam / program</button>':''}</div><div class="content-type-grid">${items.map(x=>`<article class="content-type-card"><div class="type-icon">${x.type==='Exam'?'📝':x.type==='Program'?'🚀':'📚'}</div><span class="pill">${esc(x.type||'Program')}</span><h3>${esc(x.title)}</h3><p class="muted">${esc(x.description||'')}</p><div class="small muted">${esc(x.date||'Date not set')} · ${x.published===false?'Draft':'Published'}${isAdmin()&&Array.isArray(x.allowedStudentIds)?` · ${x.allowedStudentIds.length} student(s) allowed`:''}</div>${extraLinks(x)}${isAdmin()?`<div class="row" style="margin-top:14px;flex-wrap:wrap;gap:8px"><button class="btn btn-secondary" data-extra-access="${x.id}">Student access</button><button class="btn btn-secondary" data-edit-extra="${x.id}">Edit</button><button class="btn btn-danger" data-delete-extra="${x.id}">Remove</button></div>`:''}</article>`).join('')||'<div class="empty">No exams or programs added yet.</div>'}</div>`;
+  $('#pageContent').innerHTML=`<div class="toolbar"><input id="extraSearch" placeholder="Search exams and programs...">${isAdmin()?'<button class="btn btn-primary" id="addExtra">＋ Add exam / program</button>':''}</div><div class="content-type-grid">${items.map(x=>`<article class="content-type-card">${extraCover(x)}<div class="type-icon">${x.type==='Exam'?'📝':x.type==='Program'?'🚀':'📚'}</div><span class="pill">${esc(x.type||'Program')}</span><h3>${esc(x.title)}</h3><p class="muted">${esc(x.description||'')}</p><div class="small muted">${esc(x.date||'Date not set')} · ${x.published===false?'Draft':'Published'}${isAdmin()?` · ${extraAudienceText(x)}`:''}</div>${extraLinks(x)}${isAdmin()?`<div class="row" style="margin-top:14px;flex-wrap:wrap;gap:8px"><button class="btn btn-secondary" data-edit-extra="${x.id}">Edit</button><button class="btn btn-danger" data-delete-extra="${x.id}">Remove</button></div>`:''}</article>`).join('')||'<div class="empty">No exams or programs added yet.</div>'}</div>`;
 
   if(isAdmin()){
     $('#addExtra').onclick=()=>extraModal();
     $$('[data-edit-extra]').forEach(b=>b.onclick=()=>extraModal(db.extras.find(x=>x.id===b.dataset.editExtra)));
-    $$('[data-extra-access]').forEach(b=>b.onclick=()=>{const x=db.extras.find(e=>e.id===b.dataset.extraAccess);if(x)lessonPermissionModal(x,{title:'Exam / program access',note:'Turn access ON or OFF for each student. Only students marked ON can see this item.',allLabel:'Allow all students',toast:'Access saved',after:()=>renderExtras()})});
     $$('[data-delete-extra]').forEach(b=>b.onclick=()=>{
       if(confirm('Remove this item?')){
         db.extras=db.extras.filter(x=>x.id!==b.dataset.deleteExtra);
@@ -3248,10 +3264,34 @@ function renderExtras(){
   };
 }
 
+function extraAudienceHtml(item){
+  const mode=extraMode(item||{});
+  const selC=item?.courseIds||[];
+  const selS=Array.isArray(item?.allowedStudentIds)?item.allowedStudentIds:[];
+  const courses=db.courses.map(c=>`<label style="display:flex;gap:10px;align-items:center"><input type="checkbox" name="courseIds" value="${esc(c.id)}" ${selC.includes(c.id)?'checked':''}><span>${esc(c.title)}</span></label>`).join('')||'<p class="muted">No subjects yet.</p>';
+  const students=db.users.filter(u=>u.role==='student').map(u=>`<label class="aud-stu" data-s="${esc((u.name+' '+u.username).toLowerCase())}" style="display:flex;gap:10px;align-items:center;padding:6px 4px"><input type="checkbox" name="studentIds" value="${esc(u.id)}" ${selS.includes(u.id)?'checked':''}><span><strong>${esc(u.name)}</strong> <span class="muted">@${esc(u.username)}</span></span></label>`).join('')||'<p class="muted">No students yet.</p>';
+  return `<div class="field"><label>Who can see this?</label><select name="audienceMode" id="audienceMode"><option value="all" ${mode==='all'?'selected':''}>All students</option><option value="subjects" ${mode==='subjects'?'selected':''}>Students registered to selected subjects</option><option value="students" ${mode==='students'?'selected':''}>Selected students only (ON/OFF)</option></select></div>
+  <div class="field" id="audSubjects"><label>Subjects (students registered to these get access)</label><div class="checkbox-group" style="max-height:200px;overflow:auto;gap:8px">${courses}</div></div>
+  <div class="field" id="audStudents"><label>Students</label><div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 8px"><input type="search" id="audSearch" placeholder="Search by name or username…" style="flex:1;min-width:160px"><button type="button" class="btn btn-secondary" id="audAll" style="padding:6px 10px;font-size:11px">All ON</button><button type="button" class="btn btn-secondary" id="audNone" style="padding:6px 10px;font-size:11px">All OFF</button></div><div class="checkbox-group" style="max-height:240px;overflow:auto;gap:6px">${students}</div></div>`;
+}
 function extraModal(item=null){
-  openModal(item?'Edit exam / program':'Add exam / program',`<div class="field"><label>Type</label><select name="type" required><option ${item?.type==='Exam'?'selected':''}>Exam</option><option ${item?.type==='Program'?'selected':''}>Program</option><option ${item?.type==='Event'?'selected':''}>Event</option></select></div><div class="field"><label>Title</label><input name="title" required value="${esc(item?.title||'')}" placeholder="e.g. 2027 Target Paper Program"></div><div class="field"><label>Date / schedule</label><input name="date" value="${esc(item?.date||'')}" placeholder="e.g. Every Sunday 8 AM"></div><div class="field"><label>Description</label><textarea name="description" rows="3">${esc(item?.description||'')}</textarea></div><div class="field"><label>Video link (optional)</label><input name="videoUrl" value="${esc(item?.videoUrl||'')}" placeholder="https://www.youtube.com/..."></div><div class="field"><label>PDF link (optional)</label><input name="pdfUrl" value="${esc(item?.pdfUrl||'')}" placeholder="https://drive.google.com/..."></div><div class="field"><label>Student visibility</label><input type="checkbox" id="published_item" name="published" ${item?.published===false?'':'checked'} style="display:none"><button type="button" id="extraPublishedToggle" class="btn permission-toggle ${(item?.published===false)?'permission-off':'permission-on'}" aria-pressed="${item?.published===false?'false':'true'}" style="min-width:90px;font-weight:800">${item?.published===false?'OFF':'ON'}</button><p class="small muted">ON = students can see this exam/program. OFF = admin-only draft.</p></div>`,item?'Save item':'Create item',f=>{
-    const v={type:f.get('type'),title:String(f.get('title')||'').trim(),date:String(f.get('date')||'').trim(),description:String(f.get('description')||'').trim(),published:f.get('published')==='on'};
+  const aud=extraAudienceHtml(item);
+  openModal(item?'Edit exam / program':'Add exam / program',`<div class="field"><label>Type</label><select name="type" required><option ${item?.type==='Exam'?'selected':''}>Exam</option><option ${item?.type==='Program'?'selected':''}>Program</option><option ${item?.type==='Event'?'selected':''}>Event</option></select></div><div class="field"><label>Title</label><input name="title" required value="${esc(item?.title||'')}" placeholder="e.g. 2027 Target Paper Program"></div><div class="field"><label>Date / schedule</label><input name="date" value="${esc(item?.date||'')}" placeholder="e.g. Every Sunday 8 AM"></div><div class="field"><label>Description</label><textarea name="description" rows="3">${esc(item?.description||'')}</textarea></div><div class="field"><label>Video link (optional)</label><input name="videoUrl" value="${esc(item?.videoUrl||'')}" placeholder="https://www.youtube.com/..."></div><div class="field"><label>PDF link (optional)</label><input name="pdfUrl" value="${esc(item?.pdfUrl||'')}" placeholder="https://drive.google.com/..."></div><div class="field"><label>Cover image (optional)</label><input type="file" name="coverFile" accept="image/*"></div><div class="field"><label>Or cover link (https://)</label><input name="coverUrl" type="url" value="${item?.coverImage&&!item.coverImage.startsWith('data:')?esc(item.coverImage):''}" placeholder="https://..."></div>${item?.coverImage?'<label class="checkbox-item" style="gap:8px;margin-bottom:12px"><input type="checkbox" name="removeCover"> <span>Remove current cover</span></label>':''}${aud}<div class="field"><label>Student visibility</label><input type="checkbox" id="published_item" name="published" ${item?.published===false?'':'checked'} style="display:none"><button type="button" id="extraPublishedToggle" class="btn permission-toggle ${(item?.published===false)?'permission-off':'permission-on'}" aria-pressed="${item?.published===false?'false':'true'}" style="min-width:90px;font-weight:800">${item?.published===false?'OFF':'ON'}</button><p class="small muted">ON = students can see this exam/program. OFF = admin-only draft.</p></div>`,item?'Save item':'Create item',async f=>{
+    let coverImage=item?.coverImage||'';
+    if(f.get('removeCover')==='on'){coverImage=''}
+    else{
+      const coverLink=String(f.get('coverUrl')||'').trim();
+      if(coverLink){if(!/^https:\/\/[^\s"'<>]+$/.test(coverLink))throw Error('The cover link must start with https:// and contain no spaces.');coverImage=coverLink}
+      const coverFile=f.get('coverFile');
+      if(coverFile&&coverFile.size>0)coverImage=await compressReceipt(coverFile);
+    }
+    const v={coverImage,type:f.get('type'),title:String(f.get('title')||'').trim(),date:String(f.get('date')||'').trim(),description:String(f.get('description')||'').trim(),published:f.get('published')==='on'};
     if(!v.title)throw Error('Enter a title.');
+    v.audienceMode=f.get('audienceMode')||'all';
+    v.courseIds=v.audienceMode==='subjects'?f.getAll('courseIds'):[];
+    v.allowedStudentIds=v.audienceMode==='students'?f.getAll('studentIds'):null;
+    if(v.audienceMode==='subjects'&&!v.courseIds.length)throw Error('Select at least one subject.');
+    if(v.audienceMode==='students'&&!v.allowedStudentIds.length)throw Error('Select at least one student.');
     v.videoUrl=String(f.get('videoUrl')||'').trim();
     v.pdfUrl=String(f.get('pdfUrl')||'').trim();
     if(v.videoUrl&&!/^https:\/\/[^\s"'<>]+$/.test(v.videoUrl))throw Error('The video link must start with https:// and contain no spaces.');
@@ -3263,6 +3303,12 @@ function extraModal(item=null){
     renderExtras();
     toast(item?'Item updated':'Item added');
   });
+  const audSel=$('#audienceMode');
+  const audSync=()=>{$('#audSubjects').style.display=audSel.value==='subjects'?'':'none';$('#audStudents').style.display=audSel.value==='students'?'':'none'};
+  audSel.onchange=audSync;audSync();
+  $('#audSearch').oninput=()=>{const q=$('#audSearch').value.trim().toLowerCase();$$('.aud-stu').forEach(l=>l.style.display=!q||l.dataset.s.includes(q)?'':'none')};
+  const audSet=on=>$$('.aud-stu').forEach(l=>{if(l.style.display!=='none')l.querySelector('input').checked=on});
+  $('#audAll').onclick=()=>audSet(true);$('#audNone').onclick=()=>audSet(false);
   const pubInput=$('#published_item'),pubBtn=$('#extraPublishedToggle');
   if(pubInput&&pubBtn)pubBtn.onclick=()=>{pubInput.checked=!pubInput.checked;const on=pubInput.checked;pubBtn.textContent=on?'ON':'OFF';pubBtn.setAttribute('aria-pressed',String(on));pubBtn.classList.toggle('permission-on',on);pubBtn.classList.toggle('permission-off',!on);};
 }
