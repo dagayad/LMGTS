@@ -1739,40 +1739,6 @@ body.yt-lock{overflow:hidden}
   .login-hero p{font-size:16px;max-width:520px}
   .login-mini{display:none}
 }
-
-/* ---- Feed: premium look ---- */
-.nw-count{font-size:12px;font-weight:700;padding:4px 11px;border-radius:999px;background:linear-gradient(90deg,#6d8dff,#42d6c7);color:#0b1020;letter-spacing:.2px}
-.nw-tab{transition:all .2s ease}
-.nw-tab:hover{border-color:var(--blue);color:#fff}
-.nw-tab.on{box-shadow:0 6px 18px rgba(109,141,255,.35)}
-.nw-card{position:relative;border-radius:18px;border:1px solid rgba(255,255,255,.07);background:linear-gradient(180deg,rgba(22,34,58,.92),rgba(12,19,36,.96));box-shadow:0 10px 30px rgba(0,0,0,.25);transition:transform .25s ease,box-shadow .25s ease}
-.nw-card::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--acc,#6d8dff);z-index:4}
-.nw-card:hover{transform:translateY(-4px);box-shadow:0 20px 44px rgba(0,0,0,.4)}
-.nw-card:hover .nw-media img{transform:scale(1.06)}
-.nw-media img,.nw-slide img,.nw-thumb img{transition:transform .6s ease}
-.nw-card .nw-title{font-size:17px}
-.nw-row{position:relative;transition:background .2s ease;border-radius:14px;padding:16px 12px;margin:0 -12px;border-bottom:1px solid transparent;border-image:linear-gradient(90deg,var(--line),transparent) 1}
-.nw-row:hover{background:rgba(109,141,255,.08)}
-.nw-row:hover .nw-thumb img{transform:scale(1.05)}
-.nw-thumb{box-shadow:0 10px 24px rgba(0,0,0,.35);border-left:3px solid var(--acc,#6d8dff)}
-.nw-slide{border:1px solid rgba(255,255,255,.08);box-shadow:0 22px 48px rgba(0,0,0,.4);transition:transform .3s ease}
-.nw-slide::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:var(--acc,#6d8dff);z-index:4}
-.nw-slide::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 0%,rgba(66,214,199,.18),transparent 55%);pointer-events:none;z-index:1}
-.nw-slide:hover img{transform:scale(1.05)}
-.nw-slide .nw-txt h3{font-size:25px;max-width:90%}
-.nw-slide .nw-noimg{place-items:start center;padding-top:36px;font-size:56px}
-.nw-cta{display:inline-block;margin-top:12px;font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:.2px}
-.nw-slide .nw-cta{color:#fff;padding:7px 14px;border-radius:999px;background:rgba(255,255,255,.14);backdrop-filter:blur(6px)}
-.nw-grid>*,.nw-list>*{animation:nwIn .55s ease backwards}
-.nw-grid>*:nth-child(2),.nw-list>*:nth-child(2){animation-delay:.05s}
-.nw-grid>*:nth-child(3),.nw-list>*:nth-child(3){animation-delay:.1s}
-.nw-grid>*:nth-child(4),.nw-list>*:nth-child(4){animation-delay:.15s}
-.nw-grid>*:nth-child(5),.nw-list>*:nth-child(5){animation-delay:.2s}
-.nw-grid>*:nth-child(n+6),.nw-list>*:nth-child(n+6){animation-delay:.25s}
-@keyframes nwIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){.nw-grid>*,.nw-list>*{animation:none}.nw-card,.nw-slide,.nw-media img,.nw-slide img,.nw-thumb img{transition:none}}
-
-.nw-plat{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#fff;padding:3px 9px;border-radius:999px;margin-left:6px;letter-spacing:.3px;vertical-align:middle}
 </style>
 </head>
 <body>
@@ -2206,19 +2172,6 @@ function compressReceipt(file){
 }
 // ---- Announcements / news (posts) ----
 const NW_CATS={announcement:'Announcement',exam:'Exam',lesson:'New lesson',holiday:'Holiday',general:'General'};
-const NW_ACC={announcement:'#6d8dff',exam:'#ff7386',lesson:'#42d6c7',holiday:'#facc15',general:'#94a3b8'};
-function nwAcc(p){return `--acc:${NW_ACC[NW_CATS[p.category]?p.category:'general']}`}
-function nwPlatform(url){
-  let h='';try{h=new URL(url).hostname.replace(/^www\./,'').toLowerCase()}catch(_){}
-  if(/(^|\.)youtube\.com$|^youtu\.be$/.test(h))return {name:'YouTube',color:'#ff0000',icon:'▶'};
-  if(/(^|\.)facebook\.com$|^fb\.watch$|^fb\.com$/.test(h))return {name:'Facebook',color:'#1877f2',icon:'f'};
-  if(/(^|\.)tiktok\.com$/.test(h))return {name:'TikTok',color:'#111111',icon:'♪'};
-  if(/(^|\.)instagram\.com$/.test(h))return {name:'Instagram',color:'#d62976',icon:'◎'};
-  if(/^x\.com$|^twitter\.com$/.test(h))return {name:'X',color:'#111111',icon:'𝕏'};
-  return {name:h||'Website',color:'#475569',icon:'🔗'};
-}
-function nwLinkChip(p){if(!p.link)return '';const pl=nwPlatform(p.link);return `<span class="nw-plat" style="background:${pl.color}">${pl.icon} ${esc(pl.name)}</span>`}
-function nwCtaTxt(p,plainLabel){if(p.link)return `Open on ${esc(nwPlatform(p.link).name)} ↗`;return plainLabel||'Read now →'}
 function nwLayout(){const l=db.settings?.newsLayout;return ['hero','slider','magazine'].includes(l)?l:'hero'}
 function nwPosts(){return (db.posts||[]).slice().sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(b.createdAt||0)-(a.createdAt||0))}
 function nwCover(p){return p.imageUrl?`<img src="${esc(p.imageUrl)}" alt="" loading="lazy">`:`<div class="nw-noimg">📢</div>`}
@@ -2226,9 +2179,9 @@ function nwCat(p){const c=NW_CATS[p.category]?p.category:'general';return `<span
 function nwMeta(p){return `${new Date(p.createdAt||Date.now()).toLocaleDateString()}${p.authorName?' · '+esc(p.authorName):''}`}
 function nwActs(p){return isAdmin()?`<div class="nw-acts"><button class="btn btn-secondary" data-news-edit="${esc(p.id)}">Edit</button><button class="btn btn-danger" data-news-del="${esc(p.id)}">×</button></div>`:''}
 function nwBig(p){return `<article class="nw-big">${nwActs(p)}${nwCover(p)}<div class="nw-scrim"></div><div class="nw-txt">${nwCat(p)}${p.pinned?' <span class="nw-pin">📌 Pinned</span>':''}<h3>${esc(p.title)}</h3><div class="nw-meta">${nwMeta(p)}</div>${p.body?`<p>${esc(p.body).slice(0,180)}</p>`:''}</div></article>`}
-function nwSlide(p){return `<article class="nw-slide" data-news-open="${esc(p.id)}" style="${nwAcc(p)}">${nwActs(p)}${nwCover(p)}<div class="nw-scrim"></div><div class="nw-txt">${nwCat(p)}${nwLinkChip(p)}<h3>${esc(p.title)}</h3><div class="nw-meta">${nwMeta(p)}</div><span class="nw-cta">${nwCtaTxt(p)}</span></div></article>`}
-function nwCard(p){return `<article class="card nw-card" data-news-open="${esc(p.id)}" style="${nwAcc(p)}">${nwActs(p)}<div class="nw-media">${nwCover(p)}</div><div class="nw-body">${nwCat(p)}${nwLinkChip(p)}${p.pinned?' <span class="nw-pin">📌</span>':''}<strong class="nw-title">${esc(p.title)}</strong><div class="nw-meta">${nwMeta(p)}</div>${p.body?`<p class="nw-clamp">${esc(p.body)}</p>`:''}<span class="nw-cta">${nwCtaTxt(p,'Read more →')}</span></div></article>`}
-function nwRow(p){return `<article class="nw-row" data-news-open="${esc(p.id)}" style="${nwAcc(p)}"><div class="nw-thumb">${nwCover(p)}</div><div class="nw-rowtxt">${nwCat(p)}${nwLinkChip(p)}<strong class="nw-title">${esc(p.title)}</strong><div class="nw-meta">${nwMeta(p)}</div>${p.body?`<p class="nw-clamp">${esc(p.body)}</p>`:''}${nwActs(p)}</div></article>`}
+function nwSlide(p){return `<article class="nw-slide" data-news-open="${esc(p.id)}">${nwActs(p)}${nwCover(p)}<div class="nw-scrim"></div><div class="nw-txt">${nwCat(p)}<h3>${esc(p.title)}</h3><div class="nw-meta">${nwMeta(p)}</div></div></article>`}
+function nwCard(p){return `<article class="card nw-card" data-news-open="${esc(p.id)}">${nwActs(p)}<div class="nw-media">${nwCover(p)}</div><div class="nw-body">${nwCat(p)}${p.pinned?' <span class="nw-pin">📌</span>':''}<strong class="nw-title">${esc(p.title)}</strong><div class="nw-meta">${nwMeta(p)}</div>${p.body?`<p class="nw-clamp">${esc(p.body)}</p>`:''}</div></article>`}
+function nwRow(p){return `<article class="nw-row" data-news-open="${esc(p.id)}"><div class="nw-thumb">${nwCover(p)}</div><div class="nw-rowtxt">${nwCat(p)}<strong class="nw-title">${esc(p.title)}</strong><div class="nw-meta">${nwMeta(p)}</div>${p.body?`<p class="nw-clamp">${esc(p.body)}</p>`:''}${nwActs(p)}</div></article>`}
 let nwTab='all',nwIdx=0,nwPaused=false;
 function newsHtml(){
   nwPaused=false;
@@ -2247,11 +2200,10 @@ function newsHtml(){
     else if(layout==='magazine'){
       const cats=Object.keys(NW_CATS).map(k=>({k,n:all.filter(p=>cat(p)===k).length})).filter(x=>x.n);
       const pinned=all.filter(p=>p.pinned).slice(0,3);
-      const showStrip=posts.length>5,list=showStrip?rest:posts;
-      body=(showStrip?strip:'')+`<div class="nw-mag" style="margin-top:18px"><div class="nw-list">${list.map(nwRow).join('')}</div><aside class="nw-panel"><h4>📌 Pinned</h4>${pinned.map(p=>`<div class="nw-pinitem">${esc(p.title)}<span>${nwMeta(p)}</span></div>`).join('')||'<div class="small muted">Nothing pinned.</div>'}<h4>Categories</h4>${cats.map(c=>`<div class="nw-catrow"><span class="nw-cat nw-${c.k}">${NW_CATS[c.k]}</span><strong>${c.n}</strong></div>`).join('')}</aside></div>`;
+      body=strip+`<div class="nw-mag" style="margin-top:18px"><div class="nw-list">${rest.map(nwRow).join('')||'<div class="small muted">More posts will appear here.</div>'}</div><aside class="nw-panel"><h4>📌 Pinned</h4>${pinned.map(p=>`<div class="nw-pinitem">${esc(p.title)}<span>${nwMeta(p)}</span></div>`).join('')||'<div class="small muted">Nothing pinned.</div>'}<h4>Categories</h4>${cats.map(c=>`<div class="nw-catrow"><span class="nw-cat nw-${c.k}">${NW_CATS[c.k]}</span><strong>${c.n}</strong></div>`).join('')}</aside></div>`;
     }else body=strip+(rest.length?`<div class="nw-grid" style="margin-top:18px">${rest.map(nwCard).join('')}</div>`:'');
   }
-  return `<section class="card" data-news-section="1" style="padding:20px;margin:20px 0"><div class="nw-head"><div><h2 style="margin:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap">Announcements &amp; news <span class="nw-count">${all.length} ${all.length===1?'update':'updates'}</span></h2><p class="muted small">Latest updates from your admin and teachers.</p></div><div class="row" style="gap:8px;flex-wrap:wrap">${picker}${isAdmin()?'<button class="btn btn-primary" data-news-new="1">＋ New post</button>':''}</div></div>${tabBar}${body}</section>`;
+  return `<section class="card" data-news-section="1" style="padding:20px;margin:20px 0"><div class="nw-head"><div><h2 style="margin:0">Announcements & news</h2><p class="muted small">Latest updates from your admin and teachers.</p></div><div class="row" style="gap:8px;flex-wrap:wrap">${picker}${isAdmin()?'<button class="btn btn-primary" data-news-new="1">＋ New post</button>':''}</div></div>${tabBar}${body}</section>`;
 }
 function refreshNews(){const sec=document.querySelector('[data-news-section]');if(sec)sec.outerHTML=newsHtml()}
 function nwGo(i){
@@ -2270,17 +2222,15 @@ document.addEventListener('mouseover',e=>{if(e.target.closest&&e.target.closest(
 document.addEventListener('mouseout',e=>{if(e.target.closest&&e.target.closest('.nw-slider')&&!(e.relatedTarget&&e.relatedTarget.closest&&e.relatedTarget.closest('.nw-slider')))nwPaused=false});
 document.addEventListener('scroll',e=>{if(e.target.id!=='nwTrack')return;const tr=e.target;if(tr.children.length<2)return;const step=tr.children[1].offsetLeft-tr.children[0].offsetLeft;if(step>0)nwIdx=Math.round(tr.scrollLeft/step)},true);
 function postModal(p=null){
-  openModal(p?'Edit post':'New post',`<div class="field"><label>Title</label><input name="title" required maxlength="140" value="${esc(p?.title||'')}"></div><div class="field"><label>Category</label><select name="category">${Object.keys(NW_CATS).map(k=>`<option value="${k}" ${(p?.category||'general')===k?'selected':''}>${NW_CATS[k]}</option>`).join('')}</select></div><div class="field"><label>Message</label><textarea name="body" rows="4" maxlength="2000">${esc(p?.body||'')}</textarea></div><div class="field"><label>Photo (optional)</label><input type="file" name="postImage" accept="image/*"></div><div class="field"><label>Or image link (https://)</label><input name="imageUrl" type="url" value="${p?.imageUrl&&!p.imageUrl.startsWith('data:')?esc(p.imageUrl):''}" placeholder="https://..."></div><div class="field"><label>Video / post link (optional, https://). Clicking the post opens this link</label><input name="postLink" type="url" value="${esc(p?.link||'')}" placeholder="YouTube, Facebook, TikTok or any https link"></div>${p?.imageUrl?'<label style="display:flex;gap:8px;align-items:center;margin:4px 0"><input type="checkbox" name="removeImage"> Remove current photo</label>':''}<label style="display:flex;gap:8px;align-items:center;margin:8px 0"><input type="checkbox" name="pinned" ${p?.pinned?'checked':''}> Pin to top</label>`,p?'Save post':'Publish',async f=>{
+  openModal(p?'Edit post':'New post',`<div class="field"><label>Title</label><input name="title" required maxlength="140" value="${esc(p?.title||'')}"></div><div class="field"><label>Category</label><select name="category">${Object.keys(NW_CATS).map(k=>`<option value="${k}" ${(p?.category||'general')===k?'selected':''}>${NW_CATS[k]}</option>`).join('')}</select></div><div class="field"><label>Message</label><textarea name="body" rows="4" maxlength="2000">${esc(p?.body||'')}</textarea></div><div class="field"><label>Photo (optional)</label><input type="file" name="postImage" accept="image/*"></div><div class="field"><label>Or image link (https://)</label><input name="imageUrl" type="url" value="${p?.imageUrl&&!p.imageUrl.startsWith('data:')?esc(p.imageUrl):''}" placeholder="https://..."></div>${p?.imageUrl?'<label style="display:flex;gap:8px;align-items:center;margin:4px 0"><input type="checkbox" name="removeImage"> Remove current photo</label>':''}<label style="display:flex;gap:8px;align-items:center;margin:8px 0"><input type="checkbox" name="pinned" ${p?.pinned?'checked':''}> Pin to top</label>`,p?'Save post':'Publish',async f=>{
     const file=document.querySelector('#modalForm input[name=postImage]')?.files?.[0];
     const title=String(f.get('title')||'').trim(),body=String(f.get('body')||'').trim(),link=String(f.get('imageUrl')||'').trim(),category=String(f.get('category')||'general'),pinned=!!f.get('pinned'),remove=!!f.get('removeImage');
     if(!title)throw Error('Enter a title.');
     if(link&&!/^https:\/\/[^\s"'()<>\\]+$/.test(link))throw Error('Image link must start with https:// and contain no spaces or quotes.');
-    const postLink=String(f.get('postLink')||'').trim();
-    if(postLink&&!/^https:\/\/[^\s"'<>]+$/.test(postLink))throw Error('The post link must start with https://');
     let imageUrl=file?await compressReceipt(file):(link||(!remove&&p?p.imageUrl:'')||'');
     db.posts=Array.isArray(db.posts)?db.posts:[];
-    if(p)Object.assign(p,{title,body,imageUrl,pinned,category,link:postLink});
-    else db.posts.push({id:id('post'),title,body,imageUrl,pinned,category,link:postLink,createdAt:Date.now(),authorName:session?.name||''});
+    if(p)Object.assign(p,{title,body,imageUrl,pinned,category});
+    else db.posts.push({id:id('post'),title,body,imageUrl,pinned,category,createdAt:Date.now(),authorName:session?.name||''});
     if(!saveDB())throw Error('Could not save post.');
     closeModal();renderPage();toast(p?'Post updated':'Post published');
   });
@@ -2300,8 +2250,7 @@ document.addEventListener('click',e=>{
     if(p&&confirm('Delete this announcement?')){db.posts=db.posts.filter(x=>x.id!==p.id);saveDB();renderPage();toast('Announcement deleted')}
     return;
   }
-  const op=e.target.closest('[data-news-open]');
-  if(op){const pp=(db.posts||[]).find(x=>x.id===op.dataset.newsOpen);if(pp?.link){window.open(pp.link,'_blank','noopener,noreferrer');return}nwOpen(op.dataset.newsOpen)}
+  const op=e.target.closest('[data-news-open]');if(op)nwOpen(op.dataset.newsOpen);
 });
 document.addEventListener('change',e=>{
   if(e.target.id!=='nwLayoutSel'||!isAdmin())return;
