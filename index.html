@@ -1655,13 +1655,107 @@ body.yt-lock{overflow:hidden}
 @media(min-width:900px){[style*="repeat(2,minmax(0,1fr))"]{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 .dash-chart-grid{max-width:100%}
 .dash-chart-grid>*{min-width:0}
+/* ---- News layouts ---- */
+.nw-head{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+.nw-cat{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:4px 9px;border-radius:999px;background:rgba(109,141,255,.22);color:#d6dfff}
+.nw-exam{background:rgba(255,115,134,.22);color:#ffd0d7}
+.nw-lesson{background:rgba(66,214,199,.2);color:#c2f7ef}
+.nw-holiday{background:rgba(250,204,21,.2);color:#fde68a}
+.nw-general{background:rgba(148,163,184,.2);color:#e2e8f0}
+.nw-pin{font-size:12px;color:#fde68a;margin-left:4px}
+.nw-title{display:block;font-size:16px;line-height:1.3;margin:8px 0 4px}
+.nw-meta{font-size:12px;opacity:.7}
+.nw-clamp{font-size:13px;margin:8px 0 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;opacity:.85}
+.nw-acts{position:absolute;top:10px;right:10px;display:flex;gap:6px;z-index:3}
+.nw-card .nw-acts,.nw-big .nw-acts,.nw-slide .nw-acts{position:absolute}
+.nw-noimg{position:absolute;inset:0;display:grid;place-items:center;font-size:44px;background:linear-gradient(135deg,#1e3a8a,#0f766e);opacity:.9}
+.nw-media,.nw-thumb,.nw-big,.nw-slide{position:relative;overflow:hidden;background:#0f172a}
+.nw-media img,.nw-thumb img,.nw-big img,.nw-slide img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.nw-media{height:170px}
+.nw-body{padding:14px 16px 16px}
+.nw-scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,8,20,0) 25%,rgba(5,8,20,.92))}
+.nw-txt{position:absolute;left:0;right:0;bottom:0;padding:22px;color:#fff;z-index:2}
+.nw-txt h3{margin:10px 0 6px;font-size:22px;line-height:1.25}
+.nw-txt p{margin:6px 0 0;font-size:14px;opacity:.9}
+.nw-card{position:relative;padding:0;overflow:hidden}
+/* Hero + grid */
+.nw-hero{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:14px}
+.nw-big{min-height:360px;border-radius:16px}
+.nw-sidelist{display:flex;flex-direction:column;gap:12px}
+.nw-sidelist .nw-row{flex:1}
+.nw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin-top:14px}
+/* Slider */
+.nw-slider{position:relative}
+.nw-track{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(260px,calc(50% - 7px));gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding-bottom:4px}
+.nw-track::-webkit-scrollbar{display:none}
+.nw-slide{height:300px;border-radius:16px;scroll-snap-align:start}
+.nw-arrow{position:absolute;top:42%;z-index:4;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:rgba(11,16,32,.8);color:#fff;font-size:24px;line-height:1;cursor:pointer}
+.nw-prev{left:-8px}.nw-next{right:-8px}
+/* Magazine */
+.nw-mag{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:20px}
+.nw-row{position:relative;display:grid;grid-template-columns:150px minmax(0,1fr);gap:14px;padding:14px 0;border-bottom:1px solid var(--line)}
+.nw-thumb{height:96px;border-radius:12px}
+.nw-rowtxt{min-width:0}
+.nw-row .nw-acts{position:static;margin-top:10px;justify-content:flex-start}
+#nwLayoutSel{width:auto;padding:8px 10px;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:10px}
+.nw-panel{border-left:1px solid var(--line);padding-left:18px}
+.nw-panel h4{margin:6px 0 10px;font-size:13px;letter-spacing:.5px;text-transform:uppercase;opacity:.75}
+.nw-pinitem{padding:10px 0;border-bottom:1px solid var(--line);font-size:14px;font-weight:600}
+.nw-pinitem span{display:block;font-size:12px;font-weight:400;opacity:.7;margin-top:3px}
+.nw-catrow{display:flex;justify-content:space-between;align-items:center;padding:8px 0}
+@media(max-width:900px){.nw-hero,.nw-mag{grid-template-columns:1fr}.nw-panel{border-left:none;padding-left:0;border-top:1px solid var(--line);padding-top:14px}.nw-big{min-height:300px}}
+@media(max-width:520px){.nw-track{grid-auto-columns:86%}.nw-slide{height:240px}.nw-row{grid-template-columns:1fr}.nw-thumb{height:170px}.nw-arrow{display:none}}
+
+.nw-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.nw-tab{border:1px solid var(--line);background:transparent;color:var(--muted);padding:7px 14px;border-radius:999px;cursor:pointer;font-size:13px;font-weight:600}
+.nw-tab.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.nw-dots{display:flex;justify-content:center;gap:8px;margin-top:12px}
+.nw-dot{width:9px;height:9px;border-radius:50%;border:none;background:var(--line);cursor:pointer;padding:0;transition:all .3s}
+.nw-dot.on{background:var(--cyan);width:24px;border-radius:9px}
+[data-news-open]{cursor:pointer;transition:transform .15s}
+[data-news-open]:hover{transform:translateY(-2px)}
+#nwLayoutSel{width:auto;padding:8px 10px;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:10px}
+
+/* ---- UI polish ---- */
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;border-radius:8px}
+.nav button.active{box-shadow:inset 3px 0 0 var(--cyan)}
+.nav button{transition:background .2s,color .2s,transform .15s}
+.nav button:hover{transform:translateX(2px)}
+.stat{transition:transform .2s,border-color .2s}
+.stat:hover{transform:translateY(-2px);border-color:#3b5a8f}
+.course-grid .card{transition:transform .2s,border-color .2s}
+.course-grid .card:hover{transform:translateY(-3px);border-color:#3b5a8f}
+.login-hero{display:none}
+.eyebrow{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--cyan)}
+.feature-list{list-style:none;padding:0;margin:28px 0 0;display:grid;gap:14px}
+.feature-list li{display:flex;gap:14px;align-items:flex-start;padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:rgba(17,26,46,.6)}
+.feature-list span{font-size:22px;line-height:1.2}
+.feature-list strong{display:block;margin-bottom:2px}
+.feature-list small{color:var(--muted)}
+@media (min-width:900px){
+  .login-wrap{grid-template-columns:minmax(0,1fr) minmax(0,460px);gap:56px;max-width:1120px;margin:0 auto;padding:48px 32px}
+  .login-hero{display:block}
+  .login-hero h1{font-size:42px;line-height:1.12;letter-spacing:-.02em;margin:14px 0 14px}
+  .login-hero p{font-size:16px;max-width:520px}
+  .login-mini{display:none}
+}
 </style>
 </head>
 <body>
 <div id="loginScreen" class="screen login-wrap">
+  <aside class="login-hero" aria-label="About DS Academy">
+    <span class="eyebrow">DS ACADEMY · BY LMGTS</span>
+    <h1>Commerce, taught in a clear, step-by-step path.</h1>
+    <p class="muted">Video lessons, past papers, quizzes and announcements for A/L Commerce students, all in one private portal.</p>
+    <ul class="feature-list">
+      <li><span>🎬</span><div><strong>Video lessons</strong><small>Organised by subject and A/L year</small></div></li>
+      <li><span>📄</span><div><strong>Papers &amp; quizzes</strong><small>Download papers and attempt quizzes</small></div></li>
+      <li><span>📢</span><div><strong>Announcements</strong><small>Exams, new lessons and holidays in one feed</small></div></li>
+    </ul>
+  </aside>
   <div class="login-card">
     <div class="brand"><div class="brandmark">DS</div><span style="white-space:nowrap">DS Academy<small class="muted" style="display:block;font-size:12px;font-weight:500;margin-top:2px">by LMGTS</small></span></div>
-    <div style="margin:4px 0 18px;padding:14px 16px;border-radius:14px;background:linear-gradient(135deg,rgba(109,141,255,.18),rgba(66,214,199,.12));border:1px solid var(--line)"><div class="pill" style="margin-bottom:8px">COMMERCE STREAM</div><strong style="font-size:17px;display:block">Learn Commerce online, one lesson at a time.</strong><span class="small muted">Video lessons, papers, quizzes and announcements for your A/L classes.</span></div>
+    <div class="login-mini" style="margin:4px 0 18px;padding:14px 16px;border-radius:14px;background:linear-gradient(135deg,rgba(109,141,255,.18),rgba(66,214,199,.12));border:1px solid var(--line)"><div class="pill" style="margin-bottom:8px">COMMERCE STREAM</div><strong style="font-size:17px;display:block">Learn Commerce online, one lesson at a time.</strong><span class="small muted">Video lessons, papers, quizzes and announcements for your A/L classes.</span></div>
     <div style="display:flex;gap:10px;margin-bottom:20px;border-bottom:1px solid var(--line);padding-bottom:16px">
       <button type="button" id="loginTabBtn" class="btn btn-secondary" style="flex:1;border:none;background:transparent;color:#e9efff;border-bottom:2px solid var(--blue);padding:8px 0;border-radius:0">Login</button>
       <button type="button" id="registerTabBtn" class="btn btn-secondary" style="flex:1;border:none;background:transparent;color:#9eb0ce;padding:8px 0;border-radius:0">Register</button>
@@ -2077,32 +2171,92 @@ function compressReceipt(file){
   });
 }
 // ---- Announcements / news (posts) ----
+const NW_CATS={announcement:'Announcement',exam:'Exam',lesson:'New lesson',holiday:'Holiday',general:'General'};
+function nwLayout(){const l=db.settings?.newsLayout;return ['hero','slider','magazine'].includes(l)?l:'hero'}
+function nwPosts(){return (db.posts||[]).slice().sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(b.createdAt||0)-(a.createdAt||0))}
+function nwCover(p){return p.imageUrl?`<img src="${esc(p.imageUrl)}" alt="" loading="lazy">`:`<div class="nw-noimg">📢</div>`}
+function nwCat(p){const c=NW_CATS[p.category]?p.category:'general';return `<span class="nw-cat nw-${c}">${NW_CATS[c]}</span>`}
+function nwMeta(p){return `${new Date(p.createdAt||Date.now()).toLocaleDateString()}${p.authorName?' · '+esc(p.authorName):''}`}
+function nwActs(p){return isAdmin()?`<div class="nw-acts"><button class="btn btn-secondary" data-news-edit="${esc(p.id)}">Edit</button><button class="btn btn-danger" data-news-del="${esc(p.id)}">×</button></div>`:''}
+function nwBig(p){return `<article class="nw-big">${nwActs(p)}${nwCover(p)}<div class="nw-scrim"></div><div class="nw-txt">${nwCat(p)}${p.pinned?' <span class="nw-pin">📌 Pinned</span>':''}<h3>${esc(p.title)}</h3><div class="nw-meta">${nwMeta(p)}</div>${p.body?`<p>${esc(p.body).slice(0,180)}</p>`:''}</div></article>`}
+function nwSlide(p){return `<article class="nw-slide" data-news-open="${esc(p.id)}">${nwActs(p)}${nwCover(p)}<div class="nw-scrim"></div><div class="nw-txt">${nwCat(p)}<h3>${esc(p.title)}</h3><div class="nw-meta">${nwMeta(p)}</div></div></article>`}
+function nwCard(p){return `<article class="card nw-card" data-news-open="${esc(p.id)}">${nwActs(p)}<div class="nw-media">${nwCover(p)}</div><div class="nw-body">${nwCat(p)}${p.pinned?' <span class="nw-pin">📌</span>':''}<strong class="nw-title">${esc(p.title)}</strong><div class="nw-meta">${nwMeta(p)}</div>${p.body?`<p class="nw-clamp">${esc(p.body)}</p>`:''}</div></article>`}
+function nwRow(p){return `<article class="nw-row" data-news-open="${esc(p.id)}"><div class="nw-thumb">${nwCover(p)}</div><div class="nw-rowtxt">${nwCat(p)}<strong class="nw-title">${esc(p.title)}</strong><div class="nw-meta">${nwMeta(p)}</div>${p.body?`<p class="nw-clamp">${esc(p.body)}</p>`:''}${nwActs(p)}</div></article>`}
+let nwTab='all',nwIdx=0,nwPaused=false;
 function newsHtml(){
-  const canPost=isAdmin();
-  const posts=(db.posts||[]).slice().sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(b.createdAt||0)-(a.createdAt||0)).slice(0,6);
-  const cards=posts.map(p=>`<article class="card" style="padding:16px;margin-bottom:12px">${p.imageUrl?`<img src="${esc(p.imageUrl)}" alt="" style="width:100%;max-height:260px;object-fit:cover;border-radius:10px;margin-bottom:12px" loading="lazy">`:''}<div class="row" style="justify-content:space-between;gap:8px;align-items:flex-start"><div><strong style="font-size:17px">${esc(p.title)}</strong>${p.pinned?' <span class="pill">📌 Pinned</span>':''}<div class="small muted">${new Date(p.createdAt||Date.now()).toLocaleDateString()} · ${esc(p.authorName||'')}</div></div>${canPost?`<div class="row" style="gap:6px"><button class="btn btn-secondary" data-news-edit="${esc(p.id)}">Edit</button><button class="btn btn-danger" data-news-del="${esc(p.id)}">×</button></div>`:''}</div>${p.body?`<p style="white-space:pre-wrap;margin:10px 0 0">${esc(p.body)}</p>`:''}</article>`).join('');
-  return `<section class="card" style="padding:20px;margin:20px 0"><div class="section-head"><div><h2 style="margin:0">Announcements & news</h2><p class="muted small">Latest updates from your admin and teachers.</p></div>${canPost?'<button class="btn btn-primary" data-news-new="1">＋ New post</button>':''}</div>${cards||'<div class="empty">No announcements yet.</div>'}</section>`;
+  nwPaused=false;
+  const layout=nwLayout(),all=nwPosts();
+  const cat=p=>NW_CATS[p.category]?p.category:'general';
+  const posts=(nwTab==='all'?all:all.filter(p=>cat(p)===nwTab)).slice(0,30);
+  const tabs=['all',...Object.keys(NW_CATS).filter(k=>all.some(p=>cat(p)===k))];
+  const tabBar=`<div class="nw-tabs">${tabs.map(k=>`<button class="nw-tab ${nwTab===k?'on':''}" data-nw-tab="${k}">${k==='all'?'All':NW_CATS[k]}</button>`).join('')}</div>`;
+  const picker=isAdmin()?`<select id="nwLayoutSel" aria-label="News layout"><option value="hero" ${layout==='hero'?'selected':''}>Featured + grid</option><option value="slider" ${layout==='slider'?'selected':''}>Slider</option><option value="magazine" ${layout==='magazine'?'selected':''}>Magazine list</option></select>`:'';
+  let body='';
+  if(!posts.length)body='<div class="empty">No announcements in this tab yet.</div>';
+  else{
+    const featured=layout==='slider'?posts:posts.slice(0,5),rest=posts.slice(featured.length);
+    const strip=`<div class="nw-slider"><button class="nw-arrow nw-prev" data-nw-slide="prev" aria-label="Previous">‹</button><div class="nw-track" id="nwTrack">${featured.map(nwSlide).join('')}</div><button class="nw-arrow nw-next" data-nw-slide="next" aria-label="Next">›</button></div><div class="nw-dots">${featured.map((p,i)=>`<button class="nw-dot ${i===0?'on':''}" data-nw-dot="${i}" aria-label="Slide ${i+1}"></button>`).join('')}</div>`;
+    if(layout==='slider')body=strip;
+    else if(layout==='magazine'){
+      const cats=Object.keys(NW_CATS).map(k=>({k,n:all.filter(p=>cat(p)===k).length})).filter(x=>x.n);
+      const pinned=all.filter(p=>p.pinned).slice(0,3);
+      body=strip+`<div class="nw-mag" style="margin-top:18px"><div class="nw-list">${rest.map(nwRow).join('')||'<div class="small muted">More posts will appear here.</div>'}</div><aside class="nw-panel"><h4>📌 Pinned</h4>${pinned.map(p=>`<div class="nw-pinitem">${esc(p.title)}<span>${nwMeta(p)}</span></div>`).join('')||'<div class="small muted">Nothing pinned.</div>'}<h4>Categories</h4>${cats.map(c=>`<div class="nw-catrow"><span class="nw-cat nw-${c.k}">${NW_CATS[c.k]}</span><strong>${c.n}</strong></div>`).join('')}</aside></div>`;
+    }else body=strip+(rest.length?`<div class="nw-grid" style="margin-top:18px">${rest.map(nwCard).join('')}</div>`:'');
+  }
+  return `<section class="card" data-news-section="1" style="padding:20px;margin:20px 0"><div class="nw-head"><div><h2 style="margin:0">Announcements & news</h2><p class="muted small">Latest updates from your admin and teachers.</p></div><div class="row" style="gap:8px;flex-wrap:wrap">${picker}${isAdmin()?'<button class="btn btn-primary" data-news-new="1">＋ New post</button>':''}</div></div>${tabBar}${body}</section>`;
 }
+function refreshNews(){const sec=document.querySelector('[data-news-section]');if(sec)sec.outerHTML=newsHtml()}
+function nwGo(i){
+  const tr=document.getElementById('nwTrack');if(!tr||!tr.children.length)return;
+  const n=tr.children.length;i=((i%n)+n)%n;const c=tr.children[i];
+  tr.scrollTo({left:c.offsetLeft-tr.offsetLeft,behavior:'smooth'});nwIdx=i;
+  document.querySelectorAll('[data-nw-dot]').forEach((d,k)=>d.classList.toggle('on',k===i));
+}
+function nwOpen(pid){
+  const p=(db.posts||[]).find(x=>x.id===pid);if(!p)return;
+  openModal(esc(p.title),`${p.imageUrl?`<img src="${esc(p.imageUrl)}" alt="" style="width:100%;max-height:360px;object-fit:cover;border-radius:12px;margin-bottom:14px">`:''}<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">${nwCat(p)}${p.pinned?'<span class="nw-pin">📌 Pinned</span>':''}<span class="small muted">${nwMeta(p)}</span></div><p style="white-space:pre-wrap;line-height:1.75;margin:14px 0 0">${esc(p.body||'No details added.')}</p>`,'Close',()=>closeModal());
+}
+// Featured strip rotates by itself; it pauses while the mouse is over it.
+setInterval(()=>{if(nwPaused)return;const tr=document.getElementById('nwTrack');if(tr&&tr.children.length>1)nwGo(nwIdx+1)},5000);
+document.addEventListener('mouseover',e=>{if(e.target.closest&&e.target.closest('.nw-slider'))nwPaused=true});
+document.addEventListener('mouseout',e=>{if(e.target.closest&&e.target.closest('.nw-slider')&&!(e.relatedTarget&&e.relatedTarget.closest&&e.relatedTarget.closest('.nw-slider')))nwPaused=false});
+document.addEventListener('scroll',e=>{if(e.target.id!=='nwTrack')return;const tr=e.target;if(tr.children.length<2)return;const step=tr.children[1].offsetLeft-tr.children[0].offsetLeft;if(step>0)nwIdx=Math.round(tr.scrollLeft/step)},true);
 function postModal(p=null){
-  openModal(p?'Edit post':'New post',`<div class="field"><label>Title</label><input name="title" required maxlength="140" value="${esc(p?.title||'')}"></div><div class="field"><label>Message</label><textarea name="body" rows="5" maxlength="2000">${esc(p?.body||'')}</textarea></div><div class="field"><label>Image link (optional, must start with https://)</label><input name="imageUrl" type="url" value="${esc(p?.imageUrl||'')}" placeholder="https://..."></div><label style="display:flex;gap:8px;align-items:center;margin:8px 0"><input type="checkbox" name="pinned" ${p?.pinned?'checked':''}> Pin to top</label>`,p?'Save post':'Publish',f=>{
-    const title=String(f.get('title')||'').trim(),body=String(f.get('body')||'').trim(),imageUrl=String(f.get('imageUrl')||'').trim(),pinned=!!f.get('pinned');
+  openModal(p?'Edit post':'New post',`<div class="field"><label>Title</label><input name="title" required maxlength="140" value="${esc(p?.title||'')}"></div><div class="field"><label>Category</label><select name="category">${Object.keys(NW_CATS).map(k=>`<option value="${k}" ${(p?.category||'general')===k?'selected':''}>${NW_CATS[k]}</option>`).join('')}</select></div><div class="field"><label>Message</label><textarea name="body" rows="4" maxlength="2000">${esc(p?.body||'')}</textarea></div><div class="field"><label>Photo (optional)</label><input type="file" name="postImage" accept="image/*"></div><div class="field"><label>Or image link (https://)</label><input name="imageUrl" type="url" value="${p?.imageUrl&&!p.imageUrl.startsWith('data:')?esc(p.imageUrl):''}" placeholder="https://..."></div>${p?.imageUrl?'<label style="display:flex;gap:8px;align-items:center;margin:4px 0"><input type="checkbox" name="removeImage"> Remove current photo</label>':''}<label style="display:flex;gap:8px;align-items:center;margin:8px 0"><input type="checkbox" name="pinned" ${p?.pinned?'checked':''}> Pin to top</label>`,p?'Save post':'Publish',async f=>{
+    const file=document.querySelector('#modalForm input[name=postImage]')?.files?.[0];
+    const title=String(f.get('title')||'').trim(),body=String(f.get('body')||'').trim(),link=String(f.get('imageUrl')||'').trim(),category=String(f.get('category')||'general'),pinned=!!f.get('pinned'),remove=!!f.get('removeImage');
     if(!title)throw Error('Enter a title.');
-    if(imageUrl&&!/^https:\/\//i.test(imageUrl))throw Error('Image link must start with https://');
+    if(link&&!/^https:\/\/[^\s"'()<>\\]+$/.test(link))throw Error('Image link must start with https:// and contain no spaces or quotes.');
+    let imageUrl=file?await compressReceipt(file):(link||(!remove&&p?p.imageUrl:'')||'');
     db.posts=Array.isArray(db.posts)?db.posts:[];
-    if(p)Object.assign(p,{title,body,imageUrl,pinned});
-    else db.posts.push({id:id('post'),title,body,imageUrl,pinned,createdAt:Date.now(),authorName:session?.name||''});
+    if(p)Object.assign(p,{title,body,imageUrl,pinned,category});
+    else db.posts.push({id:id('post'),title,body,imageUrl,pinned,category,createdAt:Date.now(),authorName:session?.name||''});
     if(!saveDB())throw Error('Could not save post.');
     closeModal();renderPage();toast(p?'Post updated':'Post published');
   });
 }
 document.addEventListener('click',e=>{
+  const sl=e.target.closest('[data-nw-slide]');
+  if(sl){nwGo(nwIdx+(sl.dataset.nwSlide==='next'?1:-1));return}
+  const dot=e.target.closest('[data-nw-dot]');if(dot){nwGo(Number(dot.dataset.nwDot));return}
+  const tab=e.target.closest('[data-nw-tab]');if(tab){nwTab=tab.dataset.nwTab;nwIdx=0;refreshNews();return}
+  if(e.target.closest('[data-cover-edit]')){if(!canCustomizeCover())return;return coverModal()}
   const nw=e.target.closest('[data-news-new]'),ed=e.target.closest('[data-news-edit]'),dl=e.target.closest('[data-news-del]');
-  if(!(nw||ed||dl))return;
-  if(!isAdmin())return alert('Only the admin can manage announcements.');
-  if(nw)return postModal();
-  if(ed){const p=(db.posts||[]).find(x=>x.id===ed.dataset.newsEdit);if(p)postModal(p);return}
-  const p=(db.posts||[]).find(x=>x.id===dl.dataset.newsDel);
-  if(p&&confirm('Delete this announcement?')){db.posts=db.posts.filter(x=>x.id!==p.id);saveDB();renderPage();toast('Announcement deleted')}
+  if(nw||ed||dl){
+    if(!isAdmin())return alert('Only the admin can manage announcements.');
+    if(nw)return postModal();
+    if(ed){const p=(db.posts||[]).find(x=>x.id===ed.dataset.newsEdit);if(p)postModal(p);return}
+    const p=(db.posts||[]).find(x=>x.id===dl.dataset.newsDel);
+    if(p&&confirm('Delete this announcement?')){db.posts=db.posts.filter(x=>x.id!==p.id);saveDB();renderPage();toast('Announcement deleted')}
+    return;
+  }
+  const op=e.target.closest('[data-news-open]');if(op)nwOpen(op.dataset.newsOpen);
+});
+document.addEventListener('change',e=>{
+  if(e.target.id!=='nwLayoutSel'||!isAdmin())return;
+  db.settings=db.settings||{};db.settings.newsLayout=e.target.value;
+  if(!saveDB())return alert('Could not save the layout.');
+  renderPage();
 });
 function renderPaymentReminders(){
  renderNav();
@@ -2183,8 +2337,29 @@ function renderSupportFooter(){
 
 function welcomeStyle(){
   const st=db.settings||{},url=String(st.coverImageUrl||'');
-  const bg=/^https:\/\/[^\s"'()<>\\]+$/.test(url)?`background-image:linear-gradient(rgba(11,16,32,.78),rgba(11,16,32,.78)),url('${url}');background-size:cover;background-position:center;`:'';
+  const ok=/^https:\/\/[^\s"'()<>\\]+$/.test(url)||/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(url);
+  const bg=ok?`background-image:linear-gradient(rgba(11,16,32,.78),rgba(11,16,32,.78)),url('${url}');background-size:cover;background-position:center;`:'';
   return bg+(st.dashboardLayout==='compact'?'padding:18px 22px;':'');
+}
+function greetLine(){const h=new Date().getHours();const g=h<12?'Good morning':h<17?'Good afternoon':'Good evening';const n=String(session?.name||'').split(' ')[0];return n?`${g}, ${esc(n)}`:g}
+function canCustomizeCover(){return isAdmin()||isTeacher()}
+function coverToolHtml(){
+  return canCustomizeCover()?`<div style="display:flex;justify-content:flex-end;margin:6px 0 0"><button class="btn btn-secondary" data-cover-edit="1">🎨 Customize cover</button></div>`:'';
+}
+function coverModal(){
+  const st=db.settings||{},isData=String(st.coverImageUrl||'').startsWith('data:');
+  openModal('Customize cover',`<p class="muted small">This image is the background of the welcome header on every dashboard. Upload a photo or screenshot (JPG, PNG or WebP), or paste an https:// image link.</p><div class="field"><label>Upload image</label><input type="file" name="coverFile" accept="image/*"></div><div class="field"><label>Or image link (https://)</label><input name="coverLink" type="url" value="${isData?'':esc(st.coverImageUrl||'')}" placeholder="https://..."></div><div class="field"><label>Header layout</label><select name="layout"><option value="banner" ${st.dashboardLayout==='compact'?'':'selected'}>Banner (default)</option><option value="compact" ${st.dashboardLayout==='compact'?'selected':''}>Compact</option></select></div><label style="display:flex;gap:8px;align-items:center;margin:8px 0"><input type="checkbox" name="remove"> Remove cover image</label>`,'Save cover',async f=>{
+    const file=document.querySelector('#modalForm input[name=coverFile]')?.files?.[0];
+    const link=String(f.get('coverLink')||'').trim(),layout=String(f.get('layout')||'banner'),remove=!!f.get('remove');
+    db.settings=db.settings||{};
+    let url=db.settings.coverImageUrl||'';
+    if(remove)url='';
+    else if(file){url=await compressReceipt(file)}
+    else if(link){if(!/^https:\/\/[^\s"'()<>\\]+$/.test(link))throw new Error('The image link must start with https:// and contain no spaces or quotes.');url=link}
+    db.settings.coverImageUrl=url;db.settings.dashboardLayout=layout;
+    if(!saveDB())throw new Error('Could not save the cover.');
+    closeModal();renderPage();toast('Cover saved');
+  });
 }
 function renderSettings(){
  setTitle('Settings','Manage student portal support contact');
@@ -2193,12 +2368,6 @@ function renderSettings(){
  <section class="card" style="max-width:720px;padding:24px;margin-top:18px"><h2>Backup & restore data</h2><p class="muted">Owner-only tools. Download a backup before resetting or restoring the classroom system.</p><div class="toolbar" style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-primary" type="button" id="backupDataBtn">⬇ Download full backup (.json)</button><button class="btn btn-secondary" type="button" id="restoreDataBtn">⬆ Restore from backup</button><input id="restoreDataFile" type="file" accept=".json,application/json" style="display:none"></div><p class="small muted">The backup includes student and teacher accounts, subjects, lessons, PDFs metadata, marks, exams, quizzes, messages, fees, delivery records, permissions and settings. Keep the backup file private because it may contain account details.</p></section>
  <section class="card" style="max-width:720px;padding:24px;margin-top:18px;border:1px solid #d97757"><h2 style="color:#d97757">Reset classroom data</h2><p class="muted">Deletes classroom records from this browser and starts with an empty portal. Your current Dasun owner account and support WhatsApp setting will be kept. This cannot be undone unless you have a backup.</p><button class="btn btn-danger" type="button" id="resetAllDataBtn">Reset all classroom data</button></section>`:''}`;
  $('#settingsForm').onsubmit=e=>{e.preventDefault();const value=$('#supportNumber').value.trim();if(!value) return alert('Enter a WhatsApp support number.');db.settings=db.settings||{};db.settings.whatsappNumber=value;if(!saveDB())return alert('Could not save settings in this browser.');renderPage();toast('Support number updated');};
- if(isOwnerAdmin()){
-  const host=document.createElement('section');host.className='card';host.style='max-width:720px;padding:24px;margin-top:18px';
-  host.innerHTML=`<h2>Dashboard appearance (owner only)</h2><p class="muted">Sets the cover background and layout of the welcome header ("Keep learning…") that students and admins see on their overview.</p><form id="appearanceForm"><div class="field"><label>Cover background image link (https://)</label><input name="coverImageUrl" type="url" value="${esc(db.settings?.coverImageUrl||'')}" placeholder="https://... (leave empty for no image)"></div><div class="field"><label>Header layout</label><select name="dashboardLayout"><option value="banner" ${db.settings?.dashboardLayout==='compact'?'':'selected'}>Banner (default)</option><option value="compact" ${db.settings?.dashboardLayout==='compact'?'selected':''}>Compact</option></select></div><button class="btn btn-primary" type="submit">Save appearance</button></form>`;
-  $('#pageContent').appendChild(host);
-  host.querySelector('#appearanceForm').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target),url=String(f.get('coverImageUrl')||'').trim();if(url&&!/^https:\/\/[^\s"'()<>\\]+$/.test(url))return alert('The image link must start with https:// and contain no spaces or quotes.');db.settings=db.settings||{};db.settings.coverImageUrl=url;db.settings.dashboardLayout=String(f.get('dashboardLayout')||'banner');if(!saveDB())return alert('Could not save appearance.');renderPage();toast('Appearance saved');};
- }
  const lcf=$('#loginContactsForm');if(lcf)lcf.onsubmit=e=>{e.preventDefault();db.settings=db.settings||{};db.settings.joinNumber=$('#lcJoin').value.trim();db.settings.teacherWhatsapp=$('#lcTeacher').value.trim();if(!saveDB())return alert('Could not save contacts.');applyLoginContacts();toast('Login contacts updated');};
  if(isOwnerAdmin()){
   $('#christmasThemeToggle').onchange=e=>{db.settings=db.settings||{};db.settings.christmasThemeEnabled=!!e.target.checked;if(!saveDB()){e.target.checked=!e.target.checked;db.settings.christmasThemeEnabled=!!e.target.checked;return alert('Could not save the theme setting in this browser.');}applyChristmasTheme();renderSettings();toast(db.settings.christmasThemeEnabled?'Christmas theme enabled for the LMS':'Christmas theme turned off');};
@@ -2215,7 +2384,7 @@ function renderOverview(){
   setTitle(isAdmin()?'Admin overview':'Welcome back',isAdmin()?'Manage your learning platform':'Pick up where you left off');
   const cs=allowedCourses(),ls=db.lessons.filter(canSeeLesson),ps=db.papers.filter(p=>isAdmin()||!p.courseId||cs.some(c=>c.id===p.courseId));
 
-  $('#pageContent').innerHTML=`<section class="welcome" style="${welcomeStyle()}"><div class="pill">${isAdmin()?'ADMIN WORKSPACE':'YOUR LEARNING SPACE'}</div><h2>${isAdmin()?'Everything for your classes, in one place.':'Keep learning. One lesson at a time.'}</h2><p class="muted" style="max-width:560px;margin-bottom:0">${isAdmin()?'Add subjects, embed lessons, upload PDFs and manage student access.':'Your class videos and downloadable learning resources are organized by subject.'}</p></section><div class="stats"><div class="stat"><div class="num">${cs.length}</div><div class="label">${isAdmin()?'Subjects':'Available subjects'}</div></div><div class="stat"><div class="num">${ls.length}</div><div class="label">Video lessons</div></div><div class="stat"><div class="num">${ps.length}</div><div class="label">PDF resources</div></div></div>${newsHtml()}${isAdmin()?adminProgressDashboard():studentProgressDashboard()}<div class="section-head"><h2>${isAdmin()?'Manage subjects':'Continue learning'}</h2><button class="btn btn-secondary" id="goCourses">View all →</button></div><div class="course-grid">${cs.slice(0,3).map(courseCard).join('')||'<div class="empty">No subjects available yet.</div>'}</div>${isAdmin()?`<div class="section-head"><h2>Quick actions</h2></div><div class="toolbar"><button class="btn btn-primary" id="quickCourse">＋ Add subject</button><button class="btn btn-secondary" id="quickLesson">＋ Add lesson</button><button class="btn btn-secondary" id="quickPaper">＋ Upload PDF</button><button class="btn btn-secondary" id="quickStudent">＋ Add student</button></div>`:''}`;;
+  $('#pageContent').innerHTML=`<section class="welcome" style="${welcomeStyle()}"><div class="pill">${greetLine()} · ${isAdmin()?'ADMIN WORKSPACE':'YOUR LEARNING SPACE'}</div><h2>${isAdmin()?'Everything for your classes, in one place.':'Keep learning. One lesson at a time.'}</h2><p class="muted" style="max-width:560px;margin-bottom:0">${isAdmin()?'Add subjects, embed lessons, upload PDFs and manage student access.':'Your class videos and downloadable learning resources are organized by subject.'}</p></section><div class="stats"><div class="stat"><div class="num">${cs.length}</div><div class="label">${isAdmin()?'Subjects':'Available subjects'}</div></div><div class="stat"><div class="num">${ls.length}</div><div class="label">Video lessons</div></div><div class="stat"><div class="num">${ps.length}</div><div class="label">PDF resources</div></div></div>${coverToolHtml()}${newsHtml()}${isAdmin()?adminProgressDashboard():studentProgressDashboard()}<div class="section-head"><h2>${isAdmin()?'Manage subjects':'Continue learning'}</h2><button class="btn btn-secondary" id="goCourses">View all →</button></div><div class="course-grid">${cs.slice(0,3).map(courseCard).join('')||'<div class="empty">No subjects available yet.</div>'}</div>${isAdmin()?`<div class="section-head"><h2>Quick actions</h2></div><div class="toolbar"><button class="btn btn-primary" id="quickCourse">＋ Add subject</button><button class="btn btn-secondary" id="quickLesson">＋ Add lesson</button><button class="btn btn-secondary" id="quickPaper">＋ Upload PDF</button><button class="btn btn-secondary" id="quickStudent">＋ Add student</button></div>`:''}`;;
 
   $('#goCourses').onclick=()=>{activePage='courses';renderNav();renderPage()};
   $$('[data-open-course]').forEach(b=>b.onclick=()=>openCourse(b.dataset.openCourse));
@@ -3188,7 +3357,7 @@ function renderTeacherOverview(){
  const topStudents=studentStats.slice().sort((a,b)=>b.pct-a.pct).slice(0,6).map(({u,pct})=>`<div class="dash-bar-row"><div class="dash-bar-label" title="${esc(u.name)}">${esc(u.name)}</div><div class="dash-bar-track"><div class="dash-bar-fill" style="width:${pct}%"></div></div><div class="dash-bar-value">${pct}%</div></div>`).join('')||'<div class="empty">No students have access to your subjects yet.</div>';
  const subjectCards=subjects.map(x=>`<article class="card" style="padding:16px"><div class="row" style="justify-content:space-between;gap:8px"><strong>${esc(x.title)}</strong><span class="pill">${x.lessons} lessons</span></div><div style="height:9px;background:var(--line);border-radius:9px;overflow:hidden;margin:12px 0"><div style="height:100%;width:${x.pct}%;background:linear-gradient(90deg,var(--cyan),#818cf8);border-radius:9px"></div></div><div class="small muted">${x.students} students · ${x.pct}% completion · ${x.marks} marks recorded</div></article>`).join('')||'<div class="empty">No subjects assigned yet.</div>';
  setTitle('Teacher dashboard','Manage your assigned subjects and monitor your students');
- $('#pageContent').innerHTML=`<section class="welcome" style="${welcomeStyle()}"><div class="pill">TEACHER WORKSPACE</div><h2>Guide your students. Track every lesson.</h2><p class="muted" style="max-width:560px;margin-bottom:0">Your assigned subjects, student progress and assessment results in one place.</p></section><div class="stats"><div class="stat"><div class="num">${courses.length}</div><div class="label">Assigned subjects</div></div><div class="stat"><div class="num">${students.length}</div><div class="label">My students</div></div><div class="stat"><div class="num">${donePct}%</div><div class="label">Lesson completion</div></div><div class="stat"><div class="num">${avg}%</div><div class="label">Assessment average</div></div></div>${newsHtml()}<section class="card" style="padding:20px;margin:20px 0"><div class="section-head"><div><h2 style="margin:0">Class progress</h2><p class="muted small">Completion across your subjects and your students.</p></div><button class="btn btn-secondary" id="teacherGoStudents">View students →</button></div><div class="dash-chart-grid"><article class="dash-chart"><h3>Lesson completion</h3><div class="dash-chart-sub">Completed lessons compared with lessons not yet completed</div><div class="dash-donut-wrap"><div class="dash-donut" style="--pct:${donePct}"><div class="dash-donut-center"><strong>${donePct}%</strong><span>complete</span></div></div><div class="dash-legend"><div class="dash-legend-item"><i class="dash-dot done"></i><span>Completed <strong>${completed}</strong></span></div><div class="dash-legend-item"><i class="dash-dot left"></i><span>Not complete <strong>${left}</strong></span></div><div class="dash-legend-item"><i class="dash-dot marks"></i><span>Students finished <strong>${finished}</strong></span></div></div></div></article><article class="dash-chart"><h3>Subject completion</h3><div class="dash-chart-sub">Average completion per assigned subject</div><div class="dash-bars">${subjectBars}</div></article></div></section><div class="section-head"><h2>My subjects</h2></div><div class="course-grid">${subjectCards}</div><div class="dash-chart-grid" style="margin-top:20px"><article class="dash-chart"><h3>Top students</h3><div class="dash-chart-sub">Highest lesson completion among your students</div><div class="dash-bars">${topStudents}</div></article><article class="dash-chart"><h3>Assessment snapshot</h3><div class="dash-highlight"><div class="emoji">📝</div><div><strong>${marks.length} recorded marks</strong><span>Quiz, paper and assignment results in your subjects</span></div></div><div class="dash-highlight"><div class="emoji">🎓</div><div><strong>${finished} students finished assigned lessons</strong><span>Based on accessible lessons within your subjects</span></div></div></article></div>`;
+ $('#pageContent').innerHTML=`<section class="welcome" style="${welcomeStyle()}"><div class="pill">${greetLine()} · TEACHER WORKSPACE</div><h2>Guide your students. Track every lesson.</h2><p class="muted" style="max-width:560px;margin-bottom:0">Your assigned subjects, student progress and assessment results in one place.</p></section><div class="stats"><div class="stat"><div class="num">${courses.length}</div><div class="label">Assigned subjects</div></div><div class="stat"><div class="num">${students.length}</div><div class="label">My students</div></div><div class="stat"><div class="num">${donePct}%</div><div class="label">Lesson completion</div></div><div class="stat"><div class="num">${avg}%</div><div class="label">Assessment average</div></div></div>${coverToolHtml()}${newsHtml()}<section class="card" style="padding:20px;margin:20px 0"><div class="section-head"><div><h2 style="margin:0">Class progress</h2><p class="muted small">Completion across your subjects and your students.</p></div><button class="btn btn-secondary" id="teacherGoStudents">View students →</button></div><div class="dash-chart-grid"><article class="dash-chart"><h3>Lesson completion</h3><div class="dash-chart-sub">Completed lessons compared with lessons not yet completed</div><div class="dash-donut-wrap"><div class="dash-donut" style="--pct:${donePct}"><div class="dash-donut-center"><strong>${donePct}%</strong><span>complete</span></div></div><div class="dash-legend"><div class="dash-legend-item"><i class="dash-dot done"></i><span>Completed <strong>${completed}</strong></span></div><div class="dash-legend-item"><i class="dash-dot left"></i><span>Not complete <strong>${left}</strong></span></div><div class="dash-legend-item"><i class="dash-dot marks"></i><span>Students finished <strong>${finished}</strong></span></div></div></div></article><article class="dash-chart"><h3>Subject completion</h3><div class="dash-chart-sub">Average completion per assigned subject</div><div class="dash-bars">${subjectBars}</div></article></div></section><div class="section-head"><h2>My subjects</h2></div><div class="course-grid">${subjectCards}</div><div class="dash-chart-grid" style="margin-top:20px"><article class="dash-chart"><h3>Top students</h3><div class="dash-chart-sub">Highest lesson completion among your students</div><div class="dash-bars">${topStudents}</div></article><article class="dash-chart"><h3>Assessment snapshot</h3><div class="dash-highlight"><div class="emoji">📝</div><div><strong>${marks.length} recorded marks</strong><span>Quiz, paper and assignment results in your subjects</span></div></div><div class="dash-highlight"><div class="emoji">🎓</div><div><strong>${finished} students finished assigned lessons</strong><span>Based on accessible lessons within your subjects</span></div></div></article></div>`;
  $('#teacherGoStudents').onclick=()=>{activePage='students';renderNav();renderPage()};
 }
 function renderTeacherStudents(){
