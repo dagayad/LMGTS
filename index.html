@@ -1784,6 +1784,20 @@ input[type="radio"]{-webkit-appearance:radio;appearance:auto;}
 .nw-row .nw-rowtxt{padding-right:40px}
 @media (max-width:520px){.nw-row{grid-template-columns:118px minmax(0,1fr);gap:12px}.nw-thumb{height:88px}.nw-row .nw-title{font-size:15px}.nw-row .nw-clamp{-webkit-line-clamp:2}.nw-num{font-size:17px;top:12px;right:10px}}
 
+/* ---- Login announcements feed ---- */
+.lf{margin-top:14px;border:1px solid var(--line,#2a3b58);border-radius:14px;padding:14px;background:linear-gradient(135deg,rgba(109,141,255,.14),rgba(66,214,199,.08))}
+.lf[hidden]{display:none}
+.lf-head{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#42d6c7;margin-bottom:10px}
+.lf-stage{display:grid}
+.lf-slide{grid-area:1/1;opacity:0;transform:translateY(8px);transition:opacity .5s ease,transform .5s ease;pointer-events:none;min-width:0}
+.lf-slide.on{opacity:1;transform:none;pointer-events:auto}
+.lf-slide img{width:100%;height:110px;object-fit:cover;border-radius:10px;display:block;margin-bottom:10px}
+.lf-slide h4{margin:8px 0 4px;font-size:15px;line-height:1.3}
+.lf-slide p{margin:0;font-size:13px;color:#9eb0ce;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.lf-dots{display:flex;gap:6px;justify-content:center;margin-top:12px}
+.lf-dots button{width:8px;height:8px;border-radius:99px;border:0;padding:0;background:rgba(255,255,255,.25);cursor:pointer;transition:width .3s}
+.lf-dots button.on{width:22px;background:#42d6c7}
+.lf-note{font-size:11px;color:#9eb0ce;margin:10px 0 0;text-align:center}
 /* ---- Visual effects: login + dashboard ---- */
 @keyframes fxRise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 @keyframes fxBlob{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,-30px) scale(1.12)}}
@@ -1864,6 +1878,7 @@ input[type="radio"]{-webkit-appearance:radio;appearance:auto;}
     </div>
     <div style="text-align:center;margin-top:18px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:#9eb0ce"><strong style="color:#e9efff">Teachers — Contact for Classes</strong><br><a id="loginTeacherLink" href="https://wa.me/94755103772" target="_blank" rel="noopener noreferrer" style="color:var(--cyan);text-decoration:none;font-weight:700">+94 75 510 3772</a></div>
     <div class="notice"><strong>If you are new, register as a new student</strong><br>Then wait for admin approval.<br><br><strong>Join our Institute &amp; Start your Classes</strong><br>Contact <a id="loginJoinLink" href="https://wa.me/94769103772" target="_blank" rel="noopener noreferrer" style="color:var(--cyan);font-weight:700">076 910 3772</a></div>
+    <div id="loginFeed" class="lf" hidden></div>
   </div>
 </div>
 
@@ -1963,8 +1978,15 @@ function loadDB(){
  }
 }
 
+// Public login-page feed: only posts the admin ticked, with title, category, short text and an https image.
+function syncLoginFeed(){
+  const okImg=u=>/^https:\/\/[^\s"'<>]+$/.test(String(u||''));
+  db.loginFeed={items:(db.posts||[]).filter(p=>p.showOnLogin)
+    .sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(b.createdAt||0)-(a.createdAt||0)).slice(0,6)
+    .map(p=>({id:p.id,title:String(p.title||'').slice(0,140),category:p.category||'general',body:String(p.body||'').slice(0,160),imageUrl:okImg(p.imageUrl)?p.imageUrl:'',createdAt:p.createdAt||0}))};
+}
 function saveDB(){
- try{fbQueuePush();return true}catch(e){console.error(e);return false}
+ try{syncLoginFeed();fbQueuePush();return true}catch(e){console.error(e);return false}
 }
 
 
@@ -2096,8 +2118,29 @@ function toast(msg){
   setTimeout(()=>{if(root)root.innerHTML=''},3000);
 }
 
+async function loadLoginFeed(tries=0){
+  const host=$('#loginFeed');if(!host)return;
+  if(!FB||!fbDb){if(tries<20)setTimeout(()=>loadLoginFeed(tries+1),300);return}
+  try{const snap=await FB.getDoc(FB.doc(fbDb,'kv','loginFeed'));renderLoginFeed(snap.exists()&&Array.isArray(snap.data().v?.items)?snap.data().v.items:[])}
+  catch(e){console.error(e);renderLoginFeed([])}
+}
+function renderLoginFeed(items){
+  const host=$('#loginFeed');if(!host)return;
+  if(!items.length){host.hidden=true;host.innerHTML='';return}
+  host.hidden=false;
+  host.innerHTML=`<div class="lf-head">Latest announcements</div><div class="lf-stage">${items.map((it,i)=>`<article class="lf-slide${i===0?' on':''}">${it.imageUrl?`<img src="${esc(it.imageUrl)}" alt="" loading="lazy">`:''}<span class="pill">${esc(NW_CATS[it.category]||it.category||'News')}</span><h4>${esc(it.title)}</h4><p>${esc(it.body||'')}</p></article>`).join('')}</div>${items.length>1?`<div class="lf-dots">${items.map((_,i)=>`<button type="button" data-lf="${i}" class="${i===0?'on':''}" aria-label="Show announcement ${i+1}"></button>`).join('')}</div>`:''}<p class="lf-note">Log in to read the full announcement.</p>`;
+  const slides=[...host.querySelectorAll('.lf-slide')],dots=[...host.querySelectorAll('[data-lf]')];
+  let i=0,timer=null;
+  const go=n=>{i=(n+slides.length)%slides.length;slides.forEach((x,k)=>x.classList.toggle('on',k===i));dots.forEach((d,k)=>d.classList.toggle('on',k===i))};
+  const start=()=>{if(slides.length>1&&!timer)timer=setInterval(()=>go(i+1),5000)};
+  const stop=()=>{clearInterval(timer);timer=null};
+  dots.forEach(d=>d.onclick=()=>{go(Number(d.dataset.lf));stop();start()});
+  host.onmouseenter=stop;host.onmouseleave=start;
+  start();
+}
 function showLogin(){
   session=null;
+  loadLoginFeed();
   $('#appScreen').classList.add('hidden');
   $('#loginScreen').classList.remove('hidden');
   $('#password').value='';
@@ -2143,6 +2186,7 @@ function navHasScheduledItem(key){
   const today=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
   if(key==='exams')return (db.exams||[]).some(e=>canSeeCourse(e.courseId)&&(!e.date||e.date>=today));
   if(key==='quizzes')return (db.quizzes||[]).some(q=>canSeeCourse(q.courseId)&&q.published!==false&&quizState(q)!=='closed'&&quizState(q)!=='invalid');
+  if(key==='extras')return !isAdmin()&&(db.extras||[]).some(x=>canSeeExtra(x)&&extraAvailableNow(x)&&(x.limited||extraHasUnseen(x)));
   if(key==='calendar')return (db.calendarEvents||[]).some(e=>(isAdmin()||e.published!==false)&&(!e.date||e.date>=today)&&(!e.courseId||canSeeCourse(e.courseId)));
   return false;
 }
@@ -2153,7 +2197,7 @@ function renderNav(){
     [['overview','▦','Teacher dashboard'],['courses','▣','My subjects'],['paperclass','📄','Paper Class'],['masterblast','🚀','Master Blast'],['papers','▤','Subject papers'],['quizzes','✓','Subject quizzes'],['exams','📝','Exams'],['marks','★','Marks'],['messages','✉','Messages'],['notifications','🔔','Notifications'],['fees','＄','Fees'],['deliver','📦','Deliver'],['students','♙','My students'],['admins','♙','Admin details'],['calendar','▦','Monthly calendar']]:
     [['overview','▦','Overview'],['courses','▣','My subjects'],['paperclass','📄','Paper Class'],['masterblast','🚀','Master Blast'],['papers','▤','Notes & papers'],['quizzes','✓','Quiz'],['exams','📝','Exams'],['marks','★','Marks'],['messages','✉','Messages'],['notifications','🔔','Notifications'],['fees','＄','Fees'],['reminder','🔔','Reminder'],['deliver','📦','Deliver'],['calendar','▦','Monthly calendar'],['extras','✦','Exams & programs'],['profile','♙','My profile']];
 
-  $('#nav').innerHTML=items.map(([key,ico,label])=>{const unread=key==='messages'?unreadMessageCount():key==='notifications'?unreadNotificationCount():0;const feeDot=(key==='fees'||key==='reminder')&&studentHasUnpaidFees();const scheduledDot=['exams','quizzes','calendar'].includes(key)&&navHasScheduledItem(key);const dot=feeDot?'<span class="nav-status-dot red" aria-label="Payment pending" title="Payment pending"></span>':scheduledDot?'<span class="nav-status-dot green" aria-label="Scheduled item" title="Scheduled item"></span>':'';return `<button class="${activePage===key?'active':''}" data-page="${key}"><span class="ico">${ico}</span>${label}${unread?` <span class="pill" style="margin-left:auto">${unread}</span>`:''}${dot}</button>`}).join('');
+  $('#nav').innerHTML=items.map(([key,ico,label])=>{const unread=key==='messages'?unreadMessageCount():key==='notifications'?unreadNotificationCount():0;const feeDot=(key==='fees'||key==='reminder')&&studentHasUnpaidFees();const scheduledDot=['exams','quizzes','calendar','extras'].includes(key)&&navHasScheduledItem(key);const dot=feeDot?'<span class="nav-status-dot red" aria-label="Payment pending" title="Payment pending"></span>':scheduledDot?'<span class="nav-status-dot green" aria-label="Scheduled item" title="Scheduled item"></span>':'';return `<button class="${activePage===key?'active':''}" data-page="${key}"><span class="ico">${ico}</span>${label}${unread?` <span class="pill" style="margin-left:auto">${unread}</span>`:''}${dot}</button>`}).join('');
 
   $$('[data-page]').forEach(b=>b.onclick=()=>{
     activePage=b.dataset.page;
@@ -2272,6 +2316,11 @@ function nwSlide(p){return `<article class="nw-slide" data-news-open="${esc(p.id
 function nwCard(p){return `<article class="card nw-card" data-news-open="${esc(p.id)}" style="${nwAcc(p)}">${nwActs(p)}<div class="nw-media">${nwCover(p)}</div><div class="nw-body">${nwCat(p)}${nwLinkChip(p)}${p.pinned?' <span class="nw-pin">📌</span>':''}<strong class="nw-title">${esc(p.title)}</strong><div class="nw-meta">${nwMeta(p)}</div>${p.body?`<p class="nw-clamp">${esc(p.body)}</p>`:''}<span class="nw-cta">${nwCtaTxt(p,'Read more →')}</span></div></article>`}
 function nwRow(p,n){return `<article class="nw-row" data-news-open="${esc(p.id)}" style="${nwAcc(p)}"><div class="nw-thumb">${nwCover(p)}</div>${n?`<span class="nw-num">${String(n).padStart(2,'0')}</span>`:''}<div class="nw-rowtxt">${nwCat(p)}${nwLinkChip(p)}<strong class="nw-title">${esc(p.title)}</strong><div class="nw-meta">${nwMeta(p)}</div>${p.body?`<p class="nw-clamp">${esc(p.body)}</p>`:''}${nwActs(p)}</div></article>`}
 let nwTab='all',nwIdx=0,nwPaused=false;
+function nwSpecialStrip(){
+  const list=(db.extras||[]).filter(x=>x.special&&canSeeExtra(x)&&extraAvailableNow(x));
+  if(!list.length)return '';
+  return `<section class="card" style="padding:16px;margin:20px 0;border:1px solid var(--line,#2a3b58)"><div class="pill">⭐ Special exams &amp; programs</div><div style="display:flex;gap:12px;overflow-x:auto;padding:10px 2px 4px;scroll-snap-type:x mandatory">${list.map(x=>`<article style="flex:0 0 min(78%,280px);scroll-snap-align:start;border:1px solid var(--line,#2a3b58);border-radius:14px;padding:14px;background:var(--card,#131a2e)"><h3 style="margin:6px 0 4px;font-size:16px">${esc(x.title)}</h3><p class="muted small" style="margin:0 0 8px">${esc(extraStatusText(x))}</p><button type="button" class="btn btn-primary" data-go-extras="1">Open</button></article>`).join('')}</div></section>`;
+}
 function newsHtml(){
   nwPaused=false;
   const layout=nwLayout(),all=nwPosts();
@@ -2293,7 +2342,7 @@ function newsHtml(){
       body=(showStrip?strip:'')+`<div class="nw-mag" style="margin-top:18px"><div class="nw-list">${list.map((p,i)=>nwRow(p,i+1)).join('')}</div><aside class="nw-panel"><h4>📌 Pinned</h4>${pinned.map(p=>`<div class="nw-pinitem">${esc(p.title)}<span>${nwMeta(p)}</span></div>`).join('')||'<div class="small muted">Nothing pinned.</div>'}<h4>Categories</h4>${cats.map(c=>`<div class="nw-catrow"><span class="nw-cat nw-${c.k}">${NW_CATS[c.k]}</span><strong>${c.n}</strong></div>`).join('')}</aside></div>`;
     }else body=strip+(rest.length?`<div class="nw-grid" style="margin-top:18px">${rest.map(nwCard).join('')}</div>`:'');
   }
-  return `<section class="card" data-news-section="1" style="padding:20px;margin:20px 0"><div class="nw-head"><div><h2 style="margin:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap">Announcements &amp; news <span class="nw-count">${all.length} ${all.length===1?'update':'updates'}</span></h2><p class="muted small">Latest updates from your admin and teachers.</p></div><div class="row" style="gap:8px;flex-wrap:wrap">${picker}${isAdmin()?'<button class="btn btn-primary" data-news-new="1">＋ New post</button>':''}</div></div>${tabBar}${body}</section>`;
+  return `${nwSpecialStrip()}<section class="card" data-news-section="1" style="padding:20px;margin:20px 0"><div class="nw-head"><div><h2 style="margin:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap">Announcements &amp; news <span class="nw-count">${all.length} ${all.length===1?'update':'updates'}</span></h2><p class="muted small">Latest updates from your admin and teachers.</p></div><div class="row" style="gap:8px;flex-wrap:wrap">${picker}${isAdmin()?'<button class="btn btn-primary" data-news-new="1">＋ New post</button>':''}</div></div>${tabBar}${body}</section>`;
 }
 function refreshNews(){const sec=document.querySelector('[data-news-section]');if(sec)sec.outerHTML=newsHtml()}
 function nwGo(i){
@@ -2312,17 +2361,17 @@ document.addEventListener('mouseover',e=>{if(e.target.closest&&e.target.closest(
 document.addEventListener('mouseout',e=>{if(e.target.closest&&e.target.closest('.nw-slider')&&!(e.relatedTarget&&e.relatedTarget.closest&&e.relatedTarget.closest('.nw-slider')))nwPaused=false});
 document.addEventListener('scroll',e=>{if(e.target.id!=='nwTrack')return;const tr=e.target;if(tr.children.length<2)return;const step=tr.children[1].offsetLeft-tr.children[0].offsetLeft;if(step>0)nwIdx=Math.round(tr.scrollLeft/step)},true);
 function postModal(p=null){
-  openModal(p?'Edit post':'New post',`<div class="field"><label>Title</label><input name="title" required maxlength="140" value="${esc(p?.title||'')}"></div><div class="field"><label>Category</label><select name="category">${Object.keys(NW_CATS).map(k=>`<option value="${k}" ${(p?.category||'general')===k?'selected':''}>${NW_CATS[k]}</option>`).join('')}</select></div><div class="field"><label>Message</label><textarea name="body" rows="4" maxlength="2000">${esc(p?.body||'')}</textarea></div><div class="field"><label>Photo (optional)</label><input type="file" name="postImage" accept="image/*"></div><div class="field"><label>Or image link (https://)</label><input name="imageUrl" type="url" value="${p?.imageUrl&&!p.imageUrl.startsWith('data:')?esc(p.imageUrl):''}" placeholder="https://..."></div><div class="field"><label>Video / post link (optional, https://). Clicking the post opens this link</label><input name="postLink" type="url" value="${esc(p?.link||'')}" placeholder="YouTube, Facebook, TikTok or any https link"></div>${p?.imageUrl?'<label style="display:flex;gap:8px;align-items:center;margin:4px 0"><input type="checkbox" name="removeImage"> Remove current photo</label>':''}<label style="display:flex;gap:8px;align-items:center;margin:8px 0"><input type="checkbox" name="pinned" ${p?.pinned?'checked':''}> Pin to top</label>`,p?'Save post':'Publish',async f=>{
+  openModal(p?'Edit post':'New post',`<div class="field"><label>Title</label><input name="title" required maxlength="140" value="${esc(p?.title||'')}"></div><div class="field"><label>Category</label><select name="category">${Object.keys(NW_CATS).map(k=>`<option value="${k}" ${(p?.category||'general')===k?'selected':''}>${NW_CATS[k]}</option>`).join('')}</select></div><div class="field"><label>Message</label><textarea name="body" rows="4" maxlength="2000">${esc(p?.body||'')}</textarea></div><div class="field"><label>Photo (optional)</label><input type="file" name="postImage" accept="image/*"></div><div class="field"><label>Or image link (https://)</label><input name="imageUrl" type="url" value="${p?.imageUrl&&!p.imageUrl.startsWith('data:')?esc(p.imageUrl):''}" placeholder="https://..."></div><div class="field"><label>Video / post link (optional, https://). Clicking the post opens this link</label><input name="postLink" type="url" value="${esc(p?.link||'')}" placeholder="YouTube, Facebook, TikTok or any https link"></div>${p?.imageUrl?'<label style="display:flex;gap:8px;align-items:center;margin:4px 0"><input type="checkbox" name="removeImage"> Remove current photo</label>':''}<label style="display:flex;gap:8px;align-items:center;margin:8px 0"><input type="checkbox" name="pinned" ${p?.pinned?'checked':''}> Pin to top</label><label style="display:flex;gap:8px;align-items:center;margin:8px 0"><input type="checkbox" name="showOnLogin" ${p?.showOnLogin?'checked':''}> <span>Show on login page (title and short text only, visible to everyone)</span></label>`,p?'Save post':'Publish',async f=>{
     const file=document.querySelector('#modalForm input[name=postImage]')?.files?.[0];
-    const title=String(f.get('title')||'').trim(),body=String(f.get('body')||'').trim(),link=String(f.get('imageUrl')||'').trim(),category=String(f.get('category')||'general'),pinned=!!f.get('pinned'),remove=!!f.get('removeImage');
+    const title=String(f.get('title')||'').trim(),body=String(f.get('body')||'').trim(),link=String(f.get('imageUrl')||'').trim(),category=String(f.get('category')||'general'),pinned=!!f.get('pinned'),remove=!!f.get('removeImage'),showOnLogin=!!f.get('showOnLogin');
     if(!title)throw Error('Enter a title.');
     if(link&&!/^https:\/\/[^\s"'()<>\\]+$/.test(link))throw Error('Image link must start with https:// and contain no spaces or quotes.');
     const postLink=String(f.get('postLink')||'').trim();
     if(postLink&&!/^https:\/\/[^\s"'<>]+$/.test(postLink))throw Error('The post link must start with https://');
     let imageUrl=file?await compressReceipt(file):(link||(!remove&&p?p.imageUrl:'')||'');
     db.posts=Array.isArray(db.posts)?db.posts:[];
-    if(p)Object.assign(p,{title,body,imageUrl,pinned,category,link:postLink});
-    else db.posts.push({id:id('post'),title,body,imageUrl,pinned,category,link:postLink,createdAt:Date.now(),authorName:session?.name||''});
+    if(p)Object.assign(p,{title,body,imageUrl,pinned,category,link:postLink,showOnLogin});
+    else db.posts.push({id:id('post'),title,body,imageUrl,pinned,category,link:postLink,showOnLogin,createdAt:Date.now(),authorName:session?.name||''});
     if(!saveDB())throw Error('Could not save post.');
     closeModal();renderPage();toast(p?'Post updated':'Post published');
   });
@@ -3210,6 +3259,47 @@ function showPendingCalendarNotifications(user){
   $('#cancelModal').onclick=markRead;
 }
 
+// Limited-time items: green dot and live notice only while the window is open.
+function extraAvailableNow(x,now=Date.now()){
+  if(!x.limited)return true;
+  const from=x.availableFrom?Date.parse(x.availableFrom):-Infinity;
+  const until=x.availableUntil?Date.parse(x.availableUntil):Infinity;
+  return now>=from&&now<=until;
+}
+function extraStatusText(x){
+  if(!x.limited)return 'Always available';
+  const now=Date.now();
+  if(extraAvailableNow(x,now))return 'Available now'+(x.availableUntil?' · until '+String(x.availableUntil).replace('T',' '):'');
+  if(x.availableFrom&&Date.parse(x.availableFrom)>now)return 'Opens '+String(x.availableFrom).replace('T',' ');
+  return 'Closed';
+}
+function extraNoticeKey(x){return (x.updatedAt||0)+'|'+(extraAvailableNow(x)?'on':'off')}
+function extraSeenMap(){try{return JSON.parse(localStorage.getItem('lmgts.extraSeen.'+(session?.id||''))||'{}')}catch(_){return {}}}
+function saveExtraSeen(m){try{localStorage.setItem('lmgts.extraSeen.'+(session?.id||''),JSON.stringify(m))}catch(_){}}
+function extraHasUnseen(x){return extraSeenMap()[x.id]!==extraNoticeKey(x)}
+function pendingExtraNotices(){
+  if(!session||isAdmin())return [];
+  return (db.extras||[]).filter(x=>canSeeExtra(x)&&extraAvailableNow(x)&&extraHasUnseen(x));
+}
+function checkExtraUpdates(){
+  if(!session||isAdmin()||document.getElementById('modalBackdrop'))return;
+  const pending=pendingExtraNotices();
+  if(!pending.length)return;
+  const body=`<p class="muted">New or newly opened exams &amp; programs for you:</p>${pending.map(x=>`<article class="card" style="padding:12px;margin:10px 0"><span class="pill">${x.special?'⭐ ':''}${esc(x.type||'Program')}</span><h3 style="margin:8px 0">${esc(x.title)}</h3><div class="small muted">${esc(extraStatusText(x))}</div><p style="margin:8px 0 0">${esc(x.description||'')}</p></article>`).join('')}`;
+  const markRead=()=>{const seen=extraSeenMap();pending.forEach(x=>seen[x.id]=extraNoticeKey(x));saveExtraSeen(seen);closeModal();renderNav()};
+  openModal('📢 Exams & programs update',body,'Got it',()=>markRead());
+  $('#closeModal').onclick=markRead;
+  $('#cancelModal').onclick=markRead;
+}
+let lastExtraDot=null;
+setInterval(()=>{
+  if(!session||isAdmin())return;
+  checkExtraUpdates();
+  const dot=navHasScheduledItem('extras');
+  if(dot!==lastExtraDot){lastExtraDot=dot;renderNav()}
+},60000);
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-go-extras]');if(b){activePage='extras';renderNav();renderPage()}});
+
 // Students see an item only if it is published and they match its audience:
 // all students, students registered to chosen subjects, or chosen students.
 function extraMode(x){return x.audienceMode||(Array.isArray(x.allowedStudentIds)?'students':'all')}
@@ -3234,6 +3324,7 @@ function extraCover(x){
   return `<img src="${src}" alt="" loading="lazy" style="width:100%;height:150px;object-fit:cover;border-radius:12px;margin-bottom:12px;display:block">`;
 }
 function extraLinks(x){
+  if(!isAdmin()&&!extraAvailableNow(x))return `<p class="small muted" style="margin-top:10px">🔒 ${esc(extraStatusText(x))}</p>`;
   const yt=x.videoUrl?normalizeYouTubeId(x.videoUrl):'';
   const v=x.videoUrl&&!yt?safeUrl(x.videoUrl):'#',p=x.pdfUrl?safeUrl(x.pdfUrl):'#';
   let h='';
@@ -3274,7 +3365,7 @@ function renderExtras(){
   const specialItems=items.filter(x=>x.special),regularItems=items.filter(x=>!x.special);
   const specialHtml=specialItems.length?`<section class="card" style="padding:16px;margin-bottom:16px"><div class="section-head"><div><div class="pill">⭐ Special</div><h2 style="margin:6px 0 0">Featured exams &amp; programs</h2></div></div><div style="display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:8px 2px 12px">${specialItems.map(x=>`<article style="flex:0 0 min(80%,300px);scroll-snap-align:start;background:var(--card,#131a2e);border:1px solid var(--line,#2a3b58);border-radius:16px;overflow:hidden">${extraCover(x)}<div style="padding:14px"><span class="pill">${esc(x.type||'Program')}</span><h3 style="margin:8px 0 4px">${esc(x.title)}</h3><p class="muted small" style="margin:0 0 6px">${esc(x.description||'')}</p>${extraLinks(x)}${isAdmin()?`<div class="row" style="margin-top:12px;flex-wrap:wrap;gap:8px"><button class="btn btn-secondary" data-edit-extra="${esc(x.id)}">Edit</button><button class="btn btn-danger" data-delete-extra="${esc(x.id)}">Remove</button></div>`:''}</div></article>`).join('')}</div></section>`:'';
 
-  $('#pageContent').innerHTML=`<div class="toolbar"><input id="extraSearch" placeholder="Search exams and programs...">${isAdmin()?'<button class="btn btn-primary" id="addExtra">＋ Add exam / program</button>':''}</div><div id="extraPlayer"></div>${specialHtml}<div class="content-type-grid">${regularItems.map(x=>`<article class="content-type-card">${extraCover(x)}<div class="type-icon">${x.type==='Exam'?'📝':x.type==='Program'?'🚀':'📚'}</div><span class="pill">${esc(x.type||'Program')}</span><h3>${esc(x.title)}</h3><p class="muted">${esc(x.description||'')}</p><div class="small muted">${esc(x.date||'Date not set')} · ${x.published===false?'Draft':'Published'}${isAdmin()?` · ${extraAudienceText(x)}`:''}</div>${extraLinks(x)}${isAdmin()?`<div class="row" style="margin-top:14px;flex-wrap:wrap;gap:8px"><button class="btn btn-secondary" data-edit-extra="${x.id}">Edit</button><button class="btn btn-danger" data-delete-extra="${x.id}">Remove</button></div>`:''}</article>`).join('')||'<div class="empty">No exams or programs added yet.</div>'}</div>`;
+  $('#pageContent').innerHTML=`<div class="toolbar"><input id="extraSearch" placeholder="Search exams and programs...">${isAdmin()?'<button class="btn btn-primary" id="addExtra">＋ Add exam / program</button>':''}</div><div id="extraPlayer"></div>${specialHtml}<div class="content-type-grid">${regularItems.map(x=>`<article class="content-type-card">${extraCover(x)}<div class="type-icon">${x.type==='Exam'?'📝':x.type==='Program'?'🚀':'📚'}</div><span class="pill">${esc(x.type||'Program')}</span><h3>${esc(x.title)}</h3><p class="muted">${esc(x.description||'')}</p><div class="small muted">${esc(x.date||'Date not set')} · ${x.published===false?'Draft':'Published'}${x.limited?` · ⏱ ${esc(extraStatusText(x))}`:''}${isAdmin()?` · ${extraAudienceText(x)}`:''}</div>${extraLinks(x)}${isAdmin()?`<div class="row" style="margin-top:14px;flex-wrap:wrap;gap:8px"><button class="btn btn-secondary" data-edit-extra="${x.id}">Edit</button><button class="btn btn-danger" data-delete-extra="${x.id}">Remove</button></div>`:''}</article>`).join('')||'<div class="empty">No exams or programs added yet.</div>'}</div>`;
 
   if(isAdmin()){
     $('#addExtra').onclick=()=>extraModal();
@@ -3307,7 +3398,7 @@ function extraAudienceHtml(item){
 }
 function extraModal(item=null){
   const aud=extraAudienceHtml(item);
-  openModal(item?'Edit exam / program':'Add exam / program',`<div class="field"><label>Type</label><select name="type" required><option ${item?.type==='Exam'?'selected':''}>Exam</option><option ${item?.type==='Program'?'selected':''}>Program</option><option ${item?.type==='Event'?'selected':''}>Event</option></select></div><div class="field"><label>Title</label><input name="title" required value="${esc(item?.title||'')}" placeholder="e.g. 2027 Target Paper Program"></div><div class="field"><label>Date / schedule</label><input name="date" value="${esc(item?.date||'')}" placeholder="e.g. Every Sunday 8 AM"></div><div class="field"><label>Description</label><textarea name="description" rows="3">${esc(item?.description||'')}</textarea></div><div class="field"><label>Video link (optional)</label><input name="videoUrl" value="${esc(item?.videoUrl||'')}" placeholder="https://www.youtube.com/..."></div><div class="field"><label>PDF link (optional)</label><input name="pdfUrl" value="${esc(item?.pdfUrl||'')}" placeholder="https://drive.google.com/..."></div><div class="field"><label>Cover image (optional)</label><input type="file" name="coverFile" accept="image/*"></div><div class="field"><label>Or cover link (https://)</label><input name="coverUrl" type="url" value="${item?.coverImage&&!item.coverImage.startsWith('data:')?esc(item.coverImage):''}" placeholder="https://..."></div>${item?.coverImage?'<label class="checkbox-item" style="gap:8px;margin-bottom:12px"><input type="checkbox" name="removeCover"> <span>Remove current cover</span></label>':''}<div class="field"><label class="checkbox-item" style="gap:8px"><input type="checkbox" name="special" ${item?.special?'checked':''}> <span>⭐ Show in Special slider (top of the page)</span></label></div>${aud}<div class="field"><label>Student visibility</label><input type="checkbox" id="published_item" name="published" ${item?.published===false?'':'checked'} style="display:none"><button type="button" id="extraPublishedToggle" class="btn permission-toggle ${(item?.published===false)?'permission-off':'permission-on'}" aria-pressed="${item?.published===false?'false':'true'}" style="min-width:90px;font-weight:800">${item?.published===false?'OFF':'ON'}</button><p class="small muted">ON = students can see this exam/program. OFF = admin-only draft.</p></div>`,item?'Save item':'Create item',async f=>{
+  openModal(item?'Edit exam / program':'Add exam / program',`<div class="field"><label>Type</label><select name="type" required><option ${item?.type==='Exam'?'selected':''}>Exam</option><option ${item?.type==='Program'?'selected':''}>Program</option><option ${item?.type==='Event'?'selected':''}>Event</option></select></div><div class="field"><label>Title</label><input name="title" required value="${esc(item?.title||'')}" placeholder="e.g. 2027 Target Paper Program"></div><div class="field"><label>Date / schedule</label><input name="date" value="${esc(item?.date||'')}" placeholder="e.g. Every Sunday 8 AM"></div><div class="field"><label>Description</label><textarea name="description" rows="3">${esc(item?.description||'')}</textarea></div><div class="field"><label>Video link (optional)</label><input name="videoUrl" value="${esc(item?.videoUrl||'')}" placeholder="https://www.youtube.com/..."></div><div class="field"><label>PDF link (optional)</label><input name="pdfUrl" value="${esc(item?.pdfUrl||'')}" placeholder="https://drive.google.com/..."></div><div class="field"><label>Cover image (optional)</label><input type="file" name="coverFile" accept="image/*"></div><div class="field"><label>Or cover link (https://)</label><input name="coverUrl" type="url" value="${item?.coverImage&&!item.coverImage.startsWith('data:')?esc(item.coverImage):''}" placeholder="https://..."></div>${item?.coverImage?'<label class="checkbox-item" style="gap:8px;margin-bottom:12px"><input type="checkbox" name="removeCover"> <span>Remove current cover</span></label>':''}<div class="field"><label class="checkbox-item" style="gap:8px"><input type="checkbox" id="limitedToggle" name="limited" ${item?.limited?'checked':''}> <span>⏱ Limited time (available only in a set period)</span></label></div><div class="field" id="limitedFields" style="${item?.limited?'':'display:none'}"><label>Available from (leave empty = now)</label><input type="datetime-local" name="availableFrom" value="${esc(item?.availableFrom||'')}"><label style="margin-top:8px">Available until</label><input type="datetime-local" name="availableUntil" value="${esc(item?.availableUntil||'')}"><p class="small muted">Green dot and live notice show only during this time.</p></div><div class="field"><label class="checkbox-item" style="gap:8px"><input type="checkbox" name="special" ${item?.special?'checked':''}> <span>⭐ Show in Special slider (top of the page)</span></label></div>${aud}<div class="field"><label>Student visibility</label><input type="checkbox" id="published_item" name="published" ${item?.published===false?'':'checked'} style="display:none"><button type="button" id="extraPublishedToggle" class="btn permission-toggle ${(item?.published===false)?'permission-off':'permission-on'}" aria-pressed="${item?.published===false?'false':'true'}" style="min-width:90px;font-weight:800">${item?.published===false?'OFF':'ON'}</button><p class="small muted">ON = students can see this exam/program. OFF = admin-only draft.</p></div>`,item?'Save item':'Create item',async f=>{
     let coverImage=item?.coverImage||'';
     if(f.get('removeCover')==='on'){coverImage=''}
     else{
@@ -3319,6 +3410,11 @@ function extraModal(item=null){
     const v={coverImage,type:f.get('type'),title:String(f.get('title')||'').trim(),date:String(f.get('date')||'').trim(),description:String(f.get('description')||'').trim(),published:f.get('published')==='on'};
     if(!v.title)throw Error('Enter a title.');
     v.special=f.get('special')==='on';
+    v.limited=f.get('limited')==='on';
+    v.availableFrom=v.limited?String(f.get('availableFrom')||''):'';
+    v.availableUntil=v.limited?String(f.get('availableUntil')||''):'';
+    if(v.limited&&v.availableFrom&&v.availableUntil&&Date.parse(v.availableUntil)<=Date.parse(v.availableFrom))throw Error('"Available until" must be after "Available from".');
+    v.updatedAt=Date.now();
     v.audienceMode=f.get('audienceMode')||'all';
     v.courseIds=v.audienceMode==='subjects'?f.getAll('courseIds'):[];
     v.allowedStudentIds=v.audienceMode==='students'?f.getAll('studentIds'):null;
@@ -3335,6 +3431,7 @@ function extraModal(item=null){
     renderExtras();
     toast(item?'Item updated':'Item added');
   });
+  $('#limitedToggle').onchange=()=>{$('#limitedFields').style.display=$('#limitedToggle').checked?'':'none'};
   const audSel=$('#audienceMode');
   const audSync=()=>{$('#audSubjects').style.display=audSel.value==='subjects'?'':'none';$('#audStudents').style.display=audSel.value==='students'?'':'none'};
   audSel.onchange=audSync;audSync();
@@ -3661,7 +3758,7 @@ const legacyLoginHandler=async function(e){
   errorEl.textContent='';errorEl.style.display='none';
   try {
     enterApp(user);
-    if(user.role!=='admin'){quizLastStates={};const loginNow=Date.now();(db.quizzes||[]).filter(q=>quizEligibleForStudent(q)).forEach(q=>{const st=quizState(q,loginNow);quizLastStates[q.id]=(st==='open'&&loginNow-Date.parse(q.openingTime)<120000)?'upcoming':st;});setTimeout(checkQuizTransitions,500);setTimeout(()=>showPendingCalendarNotifications(user),450);}
+    if(user.role!=='admin'){quizLastStates={};const loginNow=Date.now();(db.quizzes||[]).filter(q=>quizEligibleForStudent(q)).forEach(q=>{const st=quizState(q,loginNow);quizLastStates[q.id]=(st==='open'&&loginNow-Date.parse(q.openingTime)<120000)?'upcoming':st;});setTimeout(checkQuizTransitions,500);setTimeout(()=>showPendingCalendarNotifications(user),450);setTimeout(checkExtraUpdates,900);}
   } catch(err) {
     console.error('Dashboard error:',err);
     showErr('Login succeeded, but dashboard failed to load. Refresh this file and try again.');
@@ -3836,7 +3933,7 @@ function fbAfterRemote(){
       return;
     }
     session=latest;
-    try{renderNav();if(!document.getElementById('modalBackdrop'))renderPage()}catch(err){console.error(err)}
+    try{renderNav();if(!document.getElementById('modalBackdrop'))renderPage();checkExtraUpdates()}catch(err){console.error(err)}
   },250);
 }
 function fbQueuePush(){
