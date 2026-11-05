@@ -1784,6 +1784,10 @@ input[type="radio"]{-webkit-appearance:radio;appearance:auto;}
 .nw-row .nw-rowtxt{padding-right:40px}
 @media (max-width:520px){.nw-row{grid-template-columns:118px minmax(0,1fr);gap:12px}.nw-thumb{height:88px}.nw-row .nw-title{font-size:15px}.nw-row .nw-clamp{-webkit-line-clamp:2}.nw-num{font-size:17px;top:12px;right:10px}}
 
+/* ---- Exams & programs: clamped description with Read more ---- */
+.xd-clamp{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.xd-more{background:none;border:0;padding:4px 0 0;color:#42d6c7;font-weight:700;font-size:13px;cursor:pointer}
+.xd-more:hover{text-decoration:underline}
 /* ---- Login announcements feed ---- */
 .lf{margin-top:14px;border:1px solid var(--line,#2a3b58);border-radius:14px;padding:14px;background:linear-gradient(135deg,rgba(109,141,255,.14),rgba(66,214,199,.08))}
 .lf[hidden]{display:none}
@@ -3298,7 +3302,8 @@ setInterval(()=>{
   const dot=navHasScheduledItem('extras');
   if(dot!==lastExtraDot){lastExtraDot=dot;renderNav()}
 },60000);
-document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-go-extras]');if(b){activePage='extras';renderNav();renderPage()}});
+document.addEventListener('click',e=>{const m=e.target.closest&&e.target.closest('[data-xd-more]');if(m){const d=m.parentElement.querySelector('.xd');const open=d.classList.toggle('xd-clamp')===false;m.textContent=open?'Show less':'Read more';return}
+  const b=e.target.closest&&e.target.closest('[data-go-extras]');if(b){activePage='extras';renderNav();renderPage()}});
 
 // Students see an item only if it is published and they match its audience:
 // all students, students registered to chosen subjects, or chosen students.
@@ -3322,6 +3327,12 @@ function extraCover(x){
   const src=c.startsWith('data:')?safeImg(c):(c?safeUrl(c):'');
   if(!src||src==='#')return '';
   return `<img src="${src}" alt="" loading="lazy" style="width:100%;height:150px;object-fit:cover;border-radius:12px;margin-bottom:12px;display:block">`;
+}
+function extraDesc(x,cls='muted',style=''){
+  const t=String(x.description||'');
+  if(!t)return '';
+  const long=t.length>160;
+  return `<div class="xd-wrap"><p class="${cls} xd${long?' xd-clamp':''}" style="${style}">${esc(t)}</p>${long?'<button type="button" class="xd-more" data-xd-more="1">Read more</button>':''}</div>`;
 }
 function extraLinks(x){
   if(!isAdmin()&&!extraAvailableNow(x))return `<p class="small muted" style="margin-top:10px">🔒 ${esc(extraStatusText(x))}</p>`;
@@ -3363,9 +3374,9 @@ function renderExtras(){
   setTitle('Exams & programs','Keep exams, revision programs and special learning events organized.');
   const items=(db.extras||[]).filter(canSeeExtra);
   const specialItems=items.filter(x=>x.special),regularItems=items.filter(x=>!x.special);
-  const specialHtml=specialItems.length?`<section class="card" style="padding:16px;margin-bottom:16px"><div class="section-head"><div><div class="pill">⭐ Special</div><h2 style="margin:6px 0 0">Featured exams &amp; programs</h2></div></div><div style="display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:8px 2px 12px">${specialItems.map(x=>`<article style="flex:0 0 min(80%,300px);scroll-snap-align:start;background:var(--card,#131a2e);border:1px solid var(--line,#2a3b58);border-radius:16px;overflow:hidden">${extraCover(x)}<div style="padding:14px"><span class="pill">${esc(x.type||'Program')}</span><h3 style="margin:8px 0 4px">${esc(x.title)}</h3><p class="muted small" style="margin:0 0 6px">${esc(x.description||'')}</p>${extraLinks(x)}${isAdmin()?`<div class="row" style="margin-top:12px;flex-wrap:wrap;gap:8px"><button class="btn btn-secondary" data-edit-extra="${esc(x.id)}">Edit</button><button class="btn btn-danger" data-delete-extra="${esc(x.id)}">Remove</button></div>`:''}</div></article>`).join('')}</div></section>`:'';
+  const specialHtml=specialItems.length?`<section class="card" style="padding:16px;margin-bottom:16px"><div class="section-head"><div><div class="pill">⭐ Special</div><h2 style="margin:6px 0 0">Featured exams &amp; programs</h2></div></div><div style="display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:8px 2px 12px">${specialItems.map(x=>`<article style="flex:0 0 min(80%,300px);scroll-snap-align:start;background:var(--card,#131a2e);border:1px solid var(--line,#2a3b58);border-radius:16px;overflow:hidden">${extraCover(x)}<div style="padding:14px"><span class="pill">${esc(x.type||'Program')}</span><h3 style="margin:8px 0 4px">${esc(x.title)}</h3>${extraDesc(x,'muted small','margin:0 0 6px')}${extraLinks(x)}${isAdmin()?`<div class="row" style="margin-top:12px;flex-wrap:wrap;gap:8px"><button class="btn btn-secondary" data-edit-extra="${esc(x.id)}">Edit</button><button class="btn btn-danger" data-delete-extra="${esc(x.id)}">Remove</button></div>`:''}</div></article>`).join('')}</div></section>`:'';
 
-  $('#pageContent').innerHTML=`<div class="toolbar"><input id="extraSearch" placeholder="Search exams and programs...">${isAdmin()?'<button class="btn btn-primary" id="addExtra">＋ Add exam / program</button>':''}</div><div id="extraPlayer"></div>${specialHtml}<div class="content-type-grid">${regularItems.map(x=>`<article class="content-type-card">${extraCover(x)}<div class="type-icon">${x.type==='Exam'?'📝':x.type==='Program'?'🚀':'📚'}</div><span class="pill">${esc(x.type||'Program')}</span><h3>${esc(x.title)}</h3><p class="muted">${esc(x.description||'')}</p><div class="small muted">${esc(x.date||'Date not set')} · ${x.published===false?'Draft':'Published'}${x.limited?` · ⏱ ${esc(extraStatusText(x))}`:''}${isAdmin()?` · ${extraAudienceText(x)}`:''}</div>${extraLinks(x)}${isAdmin()?`<div class="row" style="margin-top:14px;flex-wrap:wrap;gap:8px"><button class="btn btn-secondary" data-edit-extra="${x.id}">Edit</button><button class="btn btn-danger" data-delete-extra="${x.id}">Remove</button></div>`:''}</article>`).join('')||'<div class="empty">No exams or programs added yet.</div>'}</div>`;
+  $('#pageContent').innerHTML=`<div class="toolbar"><input id="extraSearch" placeholder="Search exams and programs...">${isAdmin()?'<button class="btn btn-primary" id="addExtra">＋ Add exam / program</button>':''}</div><div id="extraPlayer"></div>${specialHtml}<div class="content-type-grid">${regularItems.map(x=>`<article class="content-type-card">${extraCover(x)}<div class="type-icon">${x.type==='Exam'?'📝':x.type==='Program'?'🚀':'📚'}</div><span class="pill">${esc(x.type||'Program')}</span><h3>${esc(x.title)}</h3>${extraDesc(x,'muted')}<div class="small muted">${esc(x.date||'Date not set')} · ${x.published===false?'Draft':'Published'}${x.limited?` · ⏱ ${esc(extraStatusText(x))}`:''}${isAdmin()?` · ${extraAudienceText(x)}`:''}</div>${extraLinks(x)}${isAdmin()?`<div class="row" style="margin-top:14px;flex-wrap:wrap;gap:8px"><button class="btn btn-secondary" data-edit-extra="${x.id}">Edit</button><button class="btn btn-danger" data-delete-extra="${x.id}">Remove</button></div>`:''}</article>`).join('')||'<div class="empty">No exams or programs added yet.</div>'}</div>`;
 
   if(isAdmin()){
     $('#addExtra').onclick=()=>extraModal();
