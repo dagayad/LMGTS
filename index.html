@@ -147,6 +147,7 @@ input[type="number"] {
   box-shadow: var(--shadow);
   backdrop-filter: blur(10px);
 }
+@media (max-width:720px){.login-card,.login-wrap,#loginScreen *{backdrop-filter:none!important}}
 
 .login-card h1 {
   font-size: clamp(24px, 6vw, 30px);
@@ -1710,7 +1711,7 @@ body.yt-lock{overflow:hidden}
 .nw-tab{border:1px solid var(--line);background:transparent;color:var(--muted);padding:7px 14px;border-radius:999px;cursor:pointer;font-size:13px;font-weight:600}
 .nw-tab.on{background:var(--blue);border-color:var(--blue);color:#fff}
 .nw-dots{display:flex;justify-content:center;gap:8px;margin-top:12px}
-.nw-dot{width:9px;height:9px;border-radius:50%;border:none;background:var(--line);cursor:pointer;padding:0;transition:all .3s}
+.nw-dot{width:9px;height:9px;border-radius:50%;border:none;background:var(--line);cursor:pointer;padding:0;transition:background-color .3s,width .3s}
 .nw-dot.on{background:var(--cyan);width:24px;border-radius:9px}
 [data-news-open]{cursor:pointer;transition:transform .15s}
 [data-news-open]:hover{transform:translateY(-2px)}
@@ -1742,7 +1743,7 @@ body.yt-lock{overflow:hidden}
 
 /* ---- Feed: premium look ---- */
 .nw-count{font-size:12px;font-weight:700;padding:4px 11px;border-radius:999px;background:linear-gradient(90deg,#6d8dff,#42d6c7);color:#0b1020;letter-spacing:.2px}
-.nw-tab{transition:all .2s ease}
+.nw-tab{transition:background-color .2s ease,color .2s ease,border-color .2s ease}
 .nw-tab:hover{border-color:var(--blue);color:#fff}
 .nw-tab.on{box-shadow:0 6px 18px rgba(109,141,255,.35)}
 .nw-card{position:relative;border-radius:18px;border:1px solid rgba(255,255,255,.07);background:linear-gradient(180deg,rgba(22,34,58,.92),rgba(12,19,36,.96));box-shadow:0 10px 30px rgba(0,0,0,.25);transition:transform .25s ease,box-shadow .25s ease}
@@ -1807,9 +1808,9 @@ input[type="radio"]{-webkit-appearance:radio;appearance:auto;}
 @keyframes fxBlob{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,-30px) scale(1.12)}}
 @keyframes fxShine{from{transform:translateX(-120%)}to{transform:translateX(120%)}}
 #loginScreen{position:relative;overflow:hidden;isolation:isolate}
-#loginScreen::before,#loginScreen::after{content:"";position:absolute;width:520px;height:520px;border-radius:50%;filter:blur(90px);opacity:.35;z-index:-1;pointer-events:none;animation:fxBlob 14s ease-in-out infinite}
-#loginScreen::before{background:#6d8dff;top:-160px;left:-120px}
-#loginScreen::after{background:#42d6c7;bottom:-180px;right:-140px;animation-duration:18s;animation-direction:reverse}
+#loginScreen::before,#loginScreen::after{content:"";position:absolute;width:560px;height:560px;border-radius:50%;background:radial-gradient(circle,rgba(109,141,255,.45) 0%,rgba(109,141,255,0) 68%);opacity:.9;z-index:-1;pointer-events:none;will-change:transform;animation:fxBlob 14s ease-in-out infinite}
+#loginScreen::before{background:radial-gradient(circle,rgba(109,141,255,.45) 0%,rgba(109,141,255,0) 68%);top:-160px;left:-120px}
+#loginScreen::after{background:radial-gradient(circle,rgba(66,214,199,.4) 0%,rgba(66,214,199,0) 68%);bottom:-180px;right:-140px;animation-duration:18s;animation-direction:reverse}
 .login-card{animation:fxRise .6s cubic-bezier(.2,.8,.2,1) both;box-shadow:0 30px 80px -20px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.04)}
 .login-hero>*{animation:fxRise .7s cubic-bezier(.2,.8,.2,1) both}
 .login-hero>*:nth-child(2){animation-delay:.08s}.login-hero>*:nth-child(3){animation-delay:.16s}.login-hero>*:nth-child(4){animation-delay:.24s}
@@ -3933,6 +3934,14 @@ async function fbStartSync(){
   db=Object.assign(emptyDb(),db);
   fbPullReady=true;
 }
+// Many Firestore snapshots can arrive together at startup; render once after they settle.
+let _renderT=null;
+function scheduleRender(){
+  clearTimeout(_renderT);
+  _renderT=setTimeout(()=>{
+    try{renderNav();if(!document.getElementById('modalBackdrop'))renderPage();checkExtraUpdates()}catch(err){console.error(err)}
+  },120);
+}
 function fbAfterRemote(){
   if(!session)return;
   clearTimeout(fbRenderTimer);
@@ -3944,7 +3953,7 @@ function fbAfterRemote(){
       return;
     }
     session=latest;
-    try{renderNav();if(!document.getElementById('modalBackdrop'))renderPage();checkExtraUpdates()}catch(err){console.error(err)}
+    scheduleRender();
   },250);
 }
 function fbQueuePush(){
