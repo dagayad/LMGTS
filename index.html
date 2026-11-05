@@ -7,6 +7,8 @@
 <meta name="theme-color" content="#0b1020">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@400;600;700&display=swap">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -899,14 +901,51 @@ input[type="number"] {
   right: 20px;
   bottom: calc(20px + var(--safe-bottom));
   z-index: 200;
-  background: #183d3a;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #183d3a, #14303a);
   border: 1px solid #2b746a;
   color: #d5fff6;
-  padding: 13px 17px;
-  border-radius: 12px;
-  box-shadow: var(--shadow);
-  animation: slideIn 0.3s ease;
+  padding: 13px 18px 13px 14px;
+  border-radius: 14px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
+  font-weight: 600;
+  animation: toastIn 0.35s cubic-bezier(.2,.8,.2,1);
 }
+.toast::before {
+  content: "✓";
+  flex: 0 0 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--cyan);
+  color: #06201d;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+}
+@keyframes toastIn { from { opacity: 0; transform: translateY(12px) scale(.97); } to { opacity: 1; transform: none; } }
+/* Friendlier empty states */
+.empty {
+  background: linear-gradient(180deg, rgba(66,214,199,.05), rgba(109,141,255,.04));
+  line-height: 1.6;
+}
+.empty::before {
+  content: "✨";
+  display: block;
+  font-size: 26px;
+  margin-bottom: 8px;
+  opacity: .85;
+}
+/* Sinhala-friendly reading font for body text */
+body { font-family: "Noto Sans Sinhala", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif; }
+/* Skeleton shimmer for loading blocks */
+.skeleton { position: relative; overflow: hidden; background: var(--panel2); border-radius: 12px; min-height: 72px; }
+.skeleton::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,.07), transparent); animation: skeletonSweep 1.4s ease-in-out infinite; }
+@keyframes skeletonSweep { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+@media (prefers-reduced-motion: reduce) { .toast, .skeleton::after { animation: none; } }
 
 @keyframes slideIn {
   from {
@@ -3274,7 +3313,15 @@ function extraAvailableNow(x,now=Date.now()){
 function extraStatusText(x){
   if(!x.limited)return 'Always available';
   const now=Date.now();
-  if(extraAvailableNow(x,now))return 'Available now'+(x.availableUntil?' · until '+String(x.availableUntil).replace('T',' '):'');
+  if(extraAvailableNow(x,now)){
+    const end=x.availableUntil?Date.parse(x.availableUntil):NaN;
+    if(Number.isFinite(end)&&end>now){
+      const mins=Math.floor((end-now)/60000),d=Math.floor(mins/1440),h=Math.floor((mins%1440)/60),m=mins%60;
+      const left=d?`${d}d ${h}h`:h?`${h}h ${m}m`:`${Math.max(1,m)}m`;
+      return `⏳ Closes in ${left}`;
+    }
+    return 'Available now'+(x.availableUntil?' · until '+String(x.availableUntil).replace('T',' '):'');
+  }
   if(x.availableFrom&&Date.parse(x.availableFrom)>now)return 'Opens '+String(x.availableFrom).replace('T',' ');
   return 'Closed';
 }

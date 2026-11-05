@@ -1,6 +1,6 @@
 // Minimal service worker: makes the app installable and keeps the app shell available offline.
 // Only same-origin GET requests are cached; YouTube and Firebase traffic always goes to the network.
-const CACHE = 'classroom-shell-v3';
+const CACHE = 'classroom-shell-v4';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
