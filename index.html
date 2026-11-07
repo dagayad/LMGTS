@@ -941,6 +941,16 @@ input[type="number"] {
 }
 /* Sinhala-friendly reading font for body text */
 body { font-family: "Noto Sans Sinhala", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif; }
+/* Resume card (students) */
+.resume-card{display:flex;align-items:center;gap:16px;padding:18px;margin:0 0 20px;flex-wrap:wrap;background:linear-gradient(135deg,rgba(109,141,255,.14),rgba(66,214,199,.08));border-color:#2e4a7a}
+.resume-ico{flex:0 0 52px;height:52px;border-radius:16px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 10px 24px rgba(109,141,255,.35)}
+.resume-body{flex:1;min-width:200px}
+.resume-body h3{margin:6px 0 2px;font-size:18px}
+.resume-bar{height:7px;background:var(--line);border-radius:9px;overflow:hidden;margin-top:10px}
+.resume-bar span{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),#818cf8);border-radius:9px}
+.resume-done .resume-ico{background:var(--cyan);color:#06201d}
+/* Pending-count badge on nav items */
+.nav-count{margin-left:auto;min-width:20px;height:20px;padding:0 6px;border-radius:99px;background:#f5a524;color:#1a1200;font-size:11px;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
 /* Skeleton shimmer for loading blocks */
 .skeleton { position: relative; overflow: hidden; background: var(--panel2); border-radius: 12px; min-height: 72px; }
 .skeleton::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,.07), transparent); animation: skeletonSweep 1.4s ease-in-out infinite; }
@@ -2241,7 +2251,8 @@ function renderNav(){
     [['overview','▦','Teacher dashboard'],['courses','▣','My subjects'],['paperclass','📄','Paper Class'],['masterblast','🚀','Master Blast'],['papers','▤','Subject papers'],['quizzes','✓','Subject quizzes'],['exams','📝','Exams'],['marks','★','Marks'],['messages','✉','Messages'],['notifications','🔔','Notifications'],['fees','＄','Fees'],['deliver','📦','Deliver'],['students','♙','My students'],['admins','♙','Admin details'],['calendar','▦','Monthly calendar']]:
     [['overview','▦','Overview'],['courses','▣','My subjects'],['paperclass','📄','Paper Class'],['masterblast','🚀','Master Blast'],['papers','▤','Notes & papers'],['quizzes','✓','Quiz'],['exams','📝','Exams'],['marks','★','Marks'],['messages','✉','Messages'],['notifications','🔔','Notifications'],['fees','＄','Fees'],['reminder','🔔','Reminder'],['deliver','📦','Deliver'],['calendar','▦','Monthly calendar'],['extras','✦','Exams & programs'],['profile','♙','My profile']];
 
-  $('#nav').innerHTML=items.map(([key,ico,label])=>{const unread=key==='messages'?unreadMessageCount():key==='notifications'?unreadNotificationCount():0;const feeDot=(key==='fees'||key==='reminder')&&studentHasUnpaidFees();const scheduledDot=['exams','quizzes','calendar','extras'].includes(key)&&navHasScheduledItem(key);const dot=feeDot?'<span class="nav-status-dot red" aria-label="Payment pending" title="Payment pending"></span>':scheduledDot?'<span class="nav-status-dot green" aria-label="Scheduled item" title="Scheduled item"></span>':'';return `<button class="${activePage===key?'active':''}" data-page="${key}"><span class="ico">${ico}</span>${label}${unread?` <span class="pill" style="margin-left:auto">${unread}</span>`:''}${dot}</button>`}).join('');
+  const pendingRegCount=isAdmin()?(db.registrationRequests||[]).filter(r=>(r.status||'pending')==='pending').length:0;
+  $('#nav').innerHTML=items.map(([key,ico,label])=>{const unread=key==='messages'?unreadMessageCount():key==='notifications'?unreadNotificationCount():0;const pendingReg=key==='registrations'?pendingRegCount:0;const feeDot=(key==='fees'||key==='reminder')&&studentHasUnpaidFees();const scheduledDot=['exams','quizzes','calendar','extras'].includes(key)&&navHasScheduledItem(key);const dot=feeDot?'<span class="nav-status-dot red" aria-label="Payment pending" title="Payment pending"></span>':scheduledDot?'<span class="nav-status-dot green" aria-label="Scheduled item" title="Scheduled item"></span>':'';return `<button class="${activePage===key?'active':''}" data-page="${key}"><span class="ico">${ico}</span>${label}${unread?` <span class="pill" style="margin-left:auto">${unread}</span>`:''}${pendingReg?`<span class="nav-count" title="${pendingReg} pending registration request(s)">${pendingReg}</span>`:''}${dot}</button>`}).join('');
 
   $$('[data-page]').forEach(b=>b.onclick=()=>{
     activePage=b.dataset.page;
@@ -2572,15 +2583,30 @@ function renderSettings(){
  }
 }
 
+// Student "continue where you left off" card: the first assigned lesson that is not complete yet.
+function resumeCardHtml(){
+  if(!session||session.role!=='student')return '';
+  const st=progressStats(session.id);
+  const next=st.assigned.find(l=>!isLessonComplete(session.id,l.id));
+  if(!next){
+    if(!st.assigned.length)return '';
+    return `<section class="card resume-card resume-done"><div class="resume-ico">🎉</div><div class="resume-body"><div class="pill">All caught up</div><h3>You have completed every assigned lesson</h3><p class="muted small">Check Exams and Quiz for upcoming work.</p></div></section>`;
+  }
+  const done=st.assigned.filter(l=>isLessonComplete(session.id,l.id)).length;
+  const pct=Math.round(done/st.assigned.length*100);
+  return `<section class="card resume-card"><div class="resume-ico">▶</div><div class="resume-body"><div class="pill">Continue where you left off</div><h3>${esc(next.title)}</h3><p class="muted small">${esc(courseName(next.courseId))} · ${done}/${st.assigned.length} lessons done</p><div class="resume-bar"><span style="width:${pct}%"></span></div></div><button class="btn btn-primary" type="button" data-resume-lesson="${esc(next.id)}" data-resume-course="${esc(next.courseId)}">Continue →</button></section>`;
+}
+
 function renderOverview(){
   if(isTeacher()){renderTeacherOverview();return}
   setTitle(isAdmin()?'Admin overview':'Welcome back',isAdmin()?'Manage your learning platform':'Pick up where you left off');
   const cs=allowedCourses(),ls=db.lessons.filter(canSeeLesson),ps=db.papers.filter(p=>isAdmin()||!p.courseId||cs.some(c=>c.id===p.courseId));
 
-  $('#pageContent').innerHTML=`<section class="welcome" style="${welcomeStyle()}"><div class="pill">${greetLine()} · ${isAdmin()?'ADMIN WORKSPACE':'YOUR LEARNING SPACE'}</div><h2>${isAdmin()?'Everything for your classes, in one place.':'Keep learning. One lesson at a time.'}</h2><p class="muted" style="max-width:560px;margin-bottom:0">${isAdmin()?'Add subjects, embed lessons, upload PDFs and manage student access.':'Your class videos and downloadable learning resources are organized by subject.'}</p></section><div class="stats"><div class="stat"><div class="num">${cs.length}</div><div class="label">${isAdmin()?'Subjects':'Available subjects'}</div></div><div class="stat"><div class="num">${ls.length}</div><div class="label">Video lessons</div></div><div class="stat"><div class="num">${ps.length}</div><div class="label">PDF resources</div></div></div>${coverToolHtml()}${newsHtml()}${isAdmin()?adminProgressDashboard():studentProgressDashboard()}<div class="section-head"><h2>${isAdmin()?'Manage subjects':'Continue learning'}</h2><button class="btn btn-secondary" id="goCourses">View all →</button></div><div class="course-grid">${cs.slice(0,3).map(courseCard).join('')||'<div class="empty">No subjects available yet.</div>'}</div>${isAdmin()?`<div class="section-head"><h2>Quick actions</h2></div><div class="toolbar"><button class="btn btn-primary" id="quickCourse">＋ Add subject</button><button class="btn btn-secondary" id="quickLesson">＋ Add lesson</button><button class="btn btn-secondary" id="quickPaper">＋ Upload PDF</button><button class="btn btn-secondary" id="quickStudent">＋ Add student</button></div>`:''}`;;
+  $('#pageContent').innerHTML=`<section class="welcome" style="${welcomeStyle()}"><div class="pill">${greetLine()} · ${isAdmin()?'ADMIN WORKSPACE':'YOUR LEARNING SPACE'}</div><h2>${isAdmin()?'Everything for your classes, in one place.':'Keep learning. One lesson at a time.'}</h2><p class="muted" style="max-width:560px;margin-bottom:0">${isAdmin()?'Add subjects, embed lessons, upload PDFs and manage student access.':'Your class videos and downloadable learning resources are organized by subject.'}</p></section><div class="stats"><div class="stat"><div class="num">${cs.length}</div><div class="label">${isAdmin()?'Subjects':'Available subjects'}</div></div><div class="stat"><div class="num">${ls.length}</div><div class="label">Video lessons</div></div><div class="stat"><div class="num">${ps.length}</div><div class="label">PDF resources</div></div></div>${coverToolHtml()}${newsHtml()}${isAdmin()?'':resumeCardHtml()}${isAdmin()?adminProgressDashboard():studentProgressDashboard()}<div class="section-head"><h2>${isAdmin()?'Manage subjects':'Continue learning'}</h2><button class="btn btn-secondary" id="goCourses">View all →</button></div><div class="course-grid">${cs.slice(0,3).map(courseCard).join('')||'<div class="empty">No subjects available yet.</div>'}</div>${isAdmin()?`<div class="section-head"><h2>Quick actions</h2></div><div class="toolbar"><button class="btn btn-primary" id="quickCourse">＋ Add subject</button><button class="btn btn-secondary" id="quickLesson">＋ Add lesson</button><button class="btn btn-secondary" id="quickPaper">＋ Upload PDF</button><button class="btn btn-secondary" id="quickStudent">＋ Add student</button></div>`:''}`;;
 
   $('#goCourses').onclick=()=>{activePage='courses';renderNav();renderPage()};
   $$('[data-open-course]').forEach(b=>b.onclick=()=>openCourse(b.dataset.openCourse));
+  $$('[data-resume-lesson]').forEach(b=>b.onclick=()=>openCourse(b.dataset.resumeCourse,b.dataset.resumeLesson));
 
   if(isAdmin()){
     $('#quickCourse').onclick=()=>courseModal();
@@ -2615,7 +2641,7 @@ function wireCourseButtons(){
   $$('[data-open-course]').forEach(b=>b.onclick=()=>openCourse(b.dataset.openCourse))
 }
 
-function openCourse(cid){
+function openCourse(cid,lessonId=null){
   const c=db.courses.find(x=>x.id===cid);
   if(!c)return;
   activePage='courses';
@@ -2623,7 +2649,7 @@ function openCourse(cid){
   if(!$('#courseDetail'))renderPage();
   activeCourse=cid;
   const lessons=db.lessons.filter(l=>l.courseId===cid&&canSeeLesson(l));
-  activeLesson=lessons[0]?.id||null;
+  activeLesson=(lessonId&&lessons.some(l=>l.id===lessonId))?lessonId:(lessons[0]?.id||null);
   renderCourseDetail();
   const detail=$('#courseDetail');
   if(detail)setTimeout(()=>detail.scrollIntoView({behavior:'smooth',block:'start'}),100);
@@ -2881,28 +2907,71 @@ function renderRegistrations(){
      
      const sio=db.users.find(u=>u.username&&u.username.toLowerCase()==='dasun'&&u.role==='admin');if(sio){sio.name='Sio Creations';sio.isOwner=true;}
   const requests=db.registrationRequests;
-  $('#pageContent').innerHTML=`<div class="toolbar"><input id="registrationSearch" placeholder="Search name, username or email..."><span class="pill">${requests.filter(r=>r.status==='pending').length} pending</span></div><div class="table-wrap"><table class="table"><thead><tr><th>Student</th><th>Contact / institution</th><th>Status</th><th>Actions</th></tr></thead><tbody id="registrationRows">${requests.map(registrationRow).join('')||'<tr><td colspan="4">No registration requests yet.</td></tr>'}</tbody></table></div>`;
+  $('#pageContent').innerHTML=`<div class="toolbar"><input id="registrationSearch" placeholder="Search name, username or email..."><button class="btn btn-primary" id="bulkApprove" disabled>Approve selected (0)</button><span class="pill">${requests.filter(r=>r.status==='pending').length} pending</span></div><div class="table-wrap"><table class="table"><thead><tr><th style="width:36px"><input type="checkbox" id="regSelectAll" aria-label="Select all pending requests"></th><th>Student</th><th>Contact / institution</th><th>Status</th><th>Actions</th></tr></thead><tbody id="registrationRows">${requests.map(registrationRow).join('')||'<tr><td colspan="5">No registration requests yet.</td></tr>'}</tbody></table></div>`;
   $('#registrationSearch').oninput=()=>{
     const q=$('#registrationSearch').value.toLowerCase();
-    $('#registrationRows').innerHTML=requests.filter(r=>(r.name+' '+r.username+' '+r.email+' '+r.institution).toLowerCase().includes(q)).map(registrationRow).join('')||'<tr><td colspan="4">No matching requests.</td></tr>';
+    $('#registrationRows').innerHTML=requests.filter(r=>(r.name+' '+r.username+' '+r.email+' '+r.institution).toLowerCase().includes(q)).map(registrationRow).join('')||'<tr><td colspan="5">No matching requests.</td></tr>';
     wireRegistrationButtons();
   };
   wireRegistrationButtons();
+  renderNav();
 }
 function registrationRow(r){
-  return `<tr><td><strong>${esc(r.name)}</strong><br><span class="muted">${esc(r.username)}</span></td><td>${esc(r.email)}<br>${esc(r.phone||'No phone')}<br><span class="muted">${esc(r.institution)}<br><span class="pill">${esc('A/L')} · ${esc((r.grades||[r.grade]).filter(Boolean).join(', ')||'Grade not set')}</span><br><span class="small muted">Subjects requested: ${(r.requestedCourseIds||[]).map(cid=>esc(courseName(cid))).join(', ')||'None selected'}</span></span></td><td><span class="pill">${esc(r.status||'pending')}</span></td><td><div class="actions">${(r.status||'pending')==='pending'?`<button class="btn btn-primary" data-approve-registration="${r.id}">Approve</button><button class="btn btn-danger" data-reject-registration="${r.id}">Reject</button>`:'—'}</div></td></tr>`;
+  return `<tr><td>${(r.status||'pending')==='pending'?`<input type="checkbox" data-reg-select="${esc(r.id)}" aria-label="Select ${esc(r.name)}">`:''}</td><td><strong>${esc(r.name)}</strong><br><span class="muted">${esc(r.username)}</span></td><td>${esc(r.email)}<br>${esc(r.phone||'No phone')}<br><span class="muted">${esc(r.institution)}<br><span class="pill">${esc('A/L')} · ${esc((r.grades||[r.grade]).filter(Boolean).join(', ')||'Grade not set')}</span><br><span class="small muted">Subjects requested: ${(r.requestedCourseIds||[]).map(cid=>esc(courseName(cid))).join(', ')||'None selected'}</span></span></td><td><span class="pill">${esc(r.status||'pending')}</span></td><td><div class="actions">${(r.status||'pending')==='pending'?`<button class="btn btn-primary" data-approve-registration="${r.id}">Approve</button><button class="btn btn-danger" data-reject-registration="${r.id}">Reject</button>`:'—'}</div></td></tr>`;
+}
+// Approves pending requests as one transaction: if the save fails, every change is rolled back.
+function approveRegistrationBatch(reqs){
+  const snap={users:db.users.slice(),access:{...db.studentCourseAccess},status:new Map()};
+  const names=new Set();
+  const taken=u=>db.users.some(x=>String(x.username||'').toLowerCase()===String(u||'').toLowerCase());
+  let approved=0;
+  for(const r of reqs){
+    if((r.status||'pending')!=='pending')continue;
+    const key=String(r.username||'').toLowerCase();
+    if(taken(r.username)||names.has(key))return {error:`"${r.username}" already exists. Remove or resolve the duplicate before approving.`};
+    names.add(key);
+  }
+  for(const r of reqs){
+    if((r.status||'pending')!=='pending')continue;
+    const user={id:r.authUid||r.id,studentId:'',name:r.name,username:r.username,role:'student',active:true,email:r.email,phone:r.phone,institution:r.institution,level:r.level||'AL',grades:(r.grades&&r.grades.length?r.grades:[r.grade].filter(Boolean)),grade:(r.grades?.[0]||r.grade||'')};
+    db.users.push(user);
+    db.studentCourseAccess[user.id]=Array.isArray(r.requestedCourseIds)?r.requestedCourseIds.filter(cid=>db.courses.some(c=>c.id===cid&&courseLevel(c)===(r.level||'AL')&&(!courseGrades(c).filter(Boolean).length||(r.grades||[r.grade]).some(g=>courseGrades(c).includes(g))))):[];
+    snap.status.set(r,r.status);
+    r.status='approved';r.reviewedAt=new Date().toISOString();
+    approved++;
+  }
+  ensureStudentIds();
+  if(!saveDB()){
+    db.users=snap.users;db.studentCourseAccess=snap.access;
+    snap.status.forEach((st,r)=>{r.status=st});
+    return {error:'Could not save. Browser storage may be full or blocked.'};
+  }
+  return {approved};
 }
 function wireRegistrationButtons(){
   $$('[data-approve-registration]').forEach(b=>b.onclick=()=>{
     const r=db.registrationRequests.find(x=>x.id===b.dataset.approveRegistration);
-    if(!r||r.status!=='pending')return;
-    if(db.users.some(u=>u.username.toLowerCase()===r.username.toLowerCase())){alert('That username already exists. Remove or resolve the duplicate before approving.');return}
-    const user={id:r.authUid||r.id,studentId:'',name:r.name,username:r.username,role:'student',active:true,email:r.email,phone:r.phone,institution:r.institution,level:r.level||'AL',grades:(r.grades&&r.grades.length?r.grades:[r.grade].filter(Boolean)),grade:(r.grades?.[0]||r.grade||'')};
-    db.users.push(user);ensureStudentIds(); db.studentCourseAccess[user.id]=Array.isArray(r.requestedCourseIds)?r.requestedCourseIds.filter(cid=>db.courses.some(c=>c.id===cid&&courseLevel(c)===(r.level||'AL')&&(!courseGrades(c).filter(Boolean).length||(r.grades||[r.grade]).some(g=>courseGrades(c).includes(g))))):[];
-    r.status='approved'; r.reviewedAt=new Date().toISOString();
-    if(!saveDB()){db.users=db.users.filter(u=>u.id!==user.id);delete db.studentCourseAccess[user.id];r.status='pending';alert('Could not save. Browser storage may be full or blocked.');return}
+    if(!r||(r.status||'pending')!=='pending')return;
+    const res=approveRegistrationBatch([r]);
+    if(res.error)return alert(res.error);
     renderRegistrations();toast('Registration approved. Assign subjects from Students.');
   });
+  // Bulk approve: tick several pending requests, then approve them in one save.
+  const refreshBulk=()=>{const n=$$('[data-reg-select]:checked').length;const bb=$('#bulkApprove');if(bb){bb.disabled=!n;bb.textContent=`Approve selected (${n})`}};
+  $$('[data-reg-select]').forEach(c=>c.onchange=refreshBulk);
+  const all=$('#regSelectAll');
+  if(all)all.onchange=()=>{$$('[data-reg-select]').forEach(c=>{c.checked=all.checked});refreshBulk()};
+  const bulk=$('#bulkApprove');
+  if(bulk)bulk.onclick=()=>{
+    const ids=$$('[data-reg-select]:checked').map(c=>c.dataset.regSelect);
+    const reqs=ids.map(i=>db.registrationRequests.find(x=>x.id===i)).filter(Boolean);
+    if(!reqs.length)return;
+    if(!confirm(`Approve ${reqs.length} registration request(s)?`))return;
+    const res=approveRegistrationBatch(reqs);
+    if(res.error)return alert(res.error);
+    renderRegistrations();
+    toast(`${res.approved} student(s) approved. Assign subjects from Students.`);
+  };
   $$('[data-reject-registration]').forEach(b=>b.onclick=()=>{
     const r=db.registrationRequests.find(x=>x.id===b.dataset.rejectRegistration);
     if(!r||!confirm('Reject this registration request?'))return;
