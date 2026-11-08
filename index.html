@@ -2046,13 +2046,6 @@ function saveDB(){
 
 // ===== Security & sync helpers (added in audit) =====
 let lastRaw=null;
-const PW_ITER=150000;
-function toHex(bytes){return [...bytes].map(b=>b.toString(16).padStart(2,'0')).join('')}
-function fromHex(h){const out=new Uint8Array(h.length/2);for(let i=0;i<out.length;i++)out[i]=parseInt(h.substr(i*2,2),16);return out}
-async function pbkdf2(pw,salt,iter){const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(String(pw)),'PBKDF2',false,['deriveBits']);const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt,iterations:iter,hash:'SHA-256'},key,256);return new Uint8Array(bits)}
-async function hashPassword(pw){const salt=crypto.getRandomValues(new Uint8Array(16));return `pbkdf2$${PW_ITER}$${toHex(salt)}$${toHex(await pbkdf2(pw,salt,PW_ITER))}`}
-function isHashed(stored){return typeof stored==='string'&&stored.startsWith('pbkdf2$')}
-async function checkPassword(stored,pw){if(typeof stored!=='string')return false;if(!isHashed(stored))return stored===pw;const p=stored.split('$');if(p.length!==4)return false;const h=toHex(await pbkdf2(pw,fromHex(p[2]),Number(p[1])));return h===p[3]}
 // Only allow http(s) links, or PDF data URLs produced by readPdfDataUrl. Anything else (javascript:, html data:) becomes inert.
 function safeUrl(u){const s=String(u||'').trim();if(/^https?:\/\/[^\s"<>]+$/i.test(s))return esc(s);if(/^data:application\/pdf;base64,[A-Za-z0-9+/=]+$/.test(s))return s;return '#'}
 function safeImg(u){const s=String(u||'');return /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(s)?s:''}
@@ -3857,42 +3850,6 @@ function applyLoginContacts(){
 }
 applyLoginContacts();
 window.addEventListener('load',applyLoginContacts);
-let loginFails=0,lockUntil=0;
-const legacyLoginHandler=async function(e){
-  e.preventDefault();
-  const errorEl=$('#loginError');
-  const showErr=m=>{errorEl.textContent=m;errorEl.style.display='block'};
-  if(Date.now()<lockUntil){const s=Math.ceil((lockUntil-Date.now())/1000);return showErr(`Too many failed attempts. Try again in ${s} seconds.`)}
-  const username=String($('#username').value||'').trim().toLowerCase();
-  const password=String($('#password').value||'');
-  const selectedRole=String($('#role').value||'');
-  if(!username||!password)return showErr('Enter your username and password.');
-  let user=db.users.find(u=>String(u.username).toLowerCase()===username);
-  if(!user){
-    // Demo accounts are created only when the username does not exist at all; existing accounts are never overwritten.
-    const demo=seed.users.find(u=>u.username.toLowerCase()===username&&u.password===password);
-    if(demo){
-      user={...JSON.parse(JSON.stringify(demo)),password:await hashPassword(demo.password)};
-      db.users.push(user);
-      if(demo.role==='student'&&!db.studentCourseAccess[demo.id])db.studentCourseAccess[demo.id]=[...seed.studentCourseAccess[demo.id]];
-      saveDB();
-    }
-  }
-  const ok=user?await checkPassword(user.password,password):false;
-  if(!ok){loginFails++;if(loginFails>=5){lockUntil=Date.now()+60000;loginFails=0}return showErr('Login failed. Check your username and password.')}
-  loginFails=0;
-  if(selectedRole&&selectedRole!==user.role)$('#role').value=user.role;
-  if(!isHashed(user.password)){user.password=await hashPassword(password);saveDB()}
-  errorEl.textContent='';errorEl.style.display='none';
-  try {
-    enterApp(user);
-    if(user.role!=='admin'){quizLastStates={};const loginNow=Date.now();(db.quizzes||[]).filter(q=>quizEligibleForStudent(q)).forEach(q=>{const st=quizState(q,loginNow);quizLastStates[q.id]=(st==='open'&&loginNow-Date.parse(q.openingTime)<120000)?'upcoming':st;});setTimeout(checkQuizTransitions,500);setTimeout(()=>showPendingCalendarNotifications(user),450);setTimeout(checkExtraUpdates,900);}
-  } catch(err) {
-    console.error('Dashboard error:',err);
-    showErr('Login succeeded, but dashboard failed to load. Refresh this file and try again.');
-  }
-};
-
 $('#loginForm').addEventListener('submit',fbLoginSubmit);
 $('#logoutBtn').onclick=fbLogout;
 $('#changePwBtn').onclick=fbChangeOwnPassword;
@@ -4058,8 +4015,21 @@ function scheduleRender(){
     try{renderNav();if(!document.getElementById('modalBackdrop'))renderPage();checkExtraUpdates()}catch(err){console.error(err)}
   },120);
 }
+// One-time cleanup: the owner's session removes leftover password hashes from user records in Firestore.
+// Logins use Firebase Auth, so these fields are no longer needed.
+let _legacyPwPurged=false;
+function purgeLegacyPasswords(){
+  if(_legacyPwPurged||!session||!isOwnerAdmin())return;
+  const hits=(db.users||[]).filter(u=>u&&Object.prototype.hasOwnProperty.call(u,'password'));
+  _legacyPwPurged=true;
+  if(!hits.length)return;
+  hits.forEach(u=>{delete u.password});
+  saveDB();
+  console.info('Removed legacy password fields from '+hits.length+' user record(s).');
+}
 function fbAfterRemote(){
   if(!session)return;
+  purgeLegacyPasswords();
   clearTimeout(fbRenderTimer);
   fbRenderTimer=setTimeout(()=>{
     const latest=(db.users||[]).find(u=>u.id===session.id);
