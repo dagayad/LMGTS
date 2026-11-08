@@ -2927,7 +2927,7 @@ function approveRegistrationBatch(reqs){
   }
   for(const r of reqs){
     if((r.status||'pending')!=='pending')continue;
-    const user={id:r.authUid||r.id,studentId:'',name:r.name,username:r.username,role:'student',active:true,email:r.email,phone:r.phone,institution:r.institution,level:r.level||'AL',grades:(r.grades&&r.grades.length?r.grades:[r.grade].filter(Boolean)),grade:(r.grades?.[0]||r.grade||'')};
+    const user={id:r.authUid||r.id,studentId:'',selfRegistered:!!r.selfRegistered,name:r.name,username:r.username,role:'student',active:true,email:r.email,phone:r.phone,institution:r.institution,level:r.level||'AL',grades:(r.grades&&r.grades.length?r.grades:[r.grade].filter(Boolean)),grade:(r.grades?.[0]||r.grade||'')};
     db.users.push(user);
     db.studentCourseAccess[user.id]=Array.isArray(r.requestedCourseIds)?r.requestedCourseIds.filter(cid=>db.courses.some(c=>c.id===cid&&courseLevel(c)===(r.level||'AL')&&(!courseGrades(c).filter(Boolean).length||(r.grades||[r.grade]).some(g=>courseGrades(c).includes(g))))):[];
     snap.status.set(r,r.status);
@@ -3014,7 +3014,7 @@ $('#registerForm').addEventListener('submit',async function(e){
   const grades=Array.from(document.querySelectorAll('[name=regGrades]:checked')).map(x=>x.value);if(!grades.length)return fail('Select at least one A/L year.');const level=$('#regLevel')?.value||'AL',subjects=Array.from(document.querySelectorAll('[name=regSubjects]:checked')).map(x=>x.value);const request={id:id('reg'),name,email,username,password:'',phone,institution,level,grade:grades[0]||'',grades,requestedCourseIds:subjects,status:'pending',createdAt:new Date().toISOString()};
   try{await fbSubmitRegistration(request,password)}catch(err){return fail(err.message)}
   this.reset();
-  success.textContent='Registration submitted successfully. Please wait for admin approval before signing in.';
+  success.textContent='Registration submitted. We sent a verification link to your email: click it, then wait for admin approval before signing in with your email and password.';
   success.style.display='block';
 });
 function refreshRegGradeOptions(){const level=$('#regLevel')?.value||'AL',box=$('#regGradeBox');if(!box)return;const selected=Array.from(document.querySelectorAll('[name=regGrades]:checked')).map(x=>x.value);box.innerHTML=gradeOptions(level).map(g=>`<label class="checkbox-item" style="display:inline-flex;align-items:center;gap:6px;margin:3px 8px 3px 0;padding:6px 9px"><input type="checkbox" name="regGrades" value="${esc(g)}" ${selected.includes(g)?'checked':''}><span>${esc(g)}</span></label>`).join('');refreshRegistrationSubjects();}
@@ -3926,6 +3926,7 @@ async function fbOnAuth(user){
       await fbFailSignOut(removed?'This account was removed by the admin.':'This account is not approved yet. Please wait for admin approval.');return
     }
     if(snap.data().active===false){await fbFailSignOut('This account is disabled. Contact the owner.');return}
+    if(snap.data().selfRegistered&&!user.emailVerified){await fbFailSignOut('Please verify your email first. Open the link we sent to '+user.email+', then sign in again. Check your spam folder too.');return}
     await fbStartSync({...snap.data(),id:user.uid});
     const me=(db.users||[]).find(u=>u.id===user.uid);
     if(!me){await fbFailSignOut('Your profile could not be loaded. '+(window.fbLastError?'Database: '+window.fbLastError:'Please try again.'));return}
@@ -4142,12 +4143,13 @@ async function fbSubmitRegistration(request,password){
   if(!fbSecondary)fbSecondary=FB.initializeApp(FB_CONFIG,'secondary');
   const sAuth=FB.getAuth(fbSecondary),sDb=FB.getFirestore(fbSecondary);
   let cred;
-  try{cred=await FB.createUserWithEmailAndPassword(sAuth,fbEmail(request.username),password)}
+  try{cred=await FB.createUserWithEmailAndPassword(sAuth,fbEmail(request.email),password)}
   catch(e){throw new Error(fbFriendly(e))}
   const rid=cred.user.uid;
+  try{await FB.sendEmailVerification?.(cred.user)}catch(err){console.error('verification email',err)}
   try{
     const clean=JSON.parse(JSON.stringify(request));delete clean.password;
-    await FB.setDoc(FB.doc(sDb,'c_registrationRequests',rid),{...clean,id:rid,authUid:rid,status:'pending'});
+    await FB.setDoc(FB.doc(sDb,'c_registrationRequests',rid),{...clean,id:rid,authUid:rid,status:'pending',selfRegistered:true});
   }catch(e){throw new Error(fbFriendly(e))}
   finally{try{await FB.signOut(sAuth)}catch(_){}}
   return rid;
