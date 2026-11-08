@@ -1,5 +1,6 @@
-// DRAFT v2 — aligned with the rules currently live (old_rules) so nothing the owner/admin does breaks.
-// Only change: the catch-all "allow read, write: if activeUser()" is replaced by an explicit list.
+// DRAFT v3 — step 3: students may read only their own private records.
+// Deploy ORDER matters: 1) publish the app code (students then query only their own records),
+// 2) then publish these rules. Before step 1, these read limits would break student sync.
 // TEST in Rules Playground first (owner, admin, teacher, student) before Publish.
 rules_version = '2';
 service cloud.firestore {
@@ -56,7 +57,7 @@ service cloud.firestore {
     match /c_papers/{id}         { allow read: if activeUser(); allow write: if isStaff(); }
     match /c_quizzes/{id}        { allow read: if activeUser(); allow write: if isStaff(); }
     match /c_exams/{id}          { allow read: if activeUser(); allow write: if isStaff(); }
-    match /c_marks/{id}          { allow read: if activeUser(); allow write: if isStaff(); }
+    match /c_marks/{id}          { allow read: if isStaff() || (activeUser() && resource.data.studentId == request.auth.uid); allow write: if isStaff(); }
     match /c_extras/{id}         { allow read: if activeUser(); allow write: if isStaff(); }
     match /c_calendarEvents/{id} { allow read: if activeUser(); allow write: if isStaff(); }
     match /c_specialClasses/{id} { allow read: if activeUser(); allow write: if isStaff(); }
@@ -64,14 +65,14 @@ service cloud.firestore {
 
     // ---- Notifications: staff create; the recipient can mark theirs as read ----
     match /c_notifications/{id} {
-      allow read: if activeUser();
+      allow read: if isStaff() || (activeUser() && resource.data.toId == request.auth.uid);
       allow create, delete: if isStaff();
       allow update: if isStaff() || (activeUser() && resource.data.toId == request.auth.uid);
     }
 
     // ---- Messages: any active user sends as themselves; staff manage ----
     match /c_messages/{id} {
-      allow read: if activeUser();
+      allow read: if isStaff() || (activeUser() && (resource.data.fromId == request.auth.uid || resource.data.toId == request.auth.uid));
       allow create: if isStaff() || (activeUser() && request.resource.data.fromId == request.auth.uid);
       allow update: if isStaff() || (activeUser() && (resource.data.toId == request.auth.uid || resource.data.fromId == request.auth.uid));
       allow delete: if isStaff();
@@ -79,7 +80,7 @@ service cloud.firestore {
 
     // ---- Fees: staff manage; a student may attach a payment slip to their own fee only ----
     match /c_fees/{id} {
-      allow read: if activeUser();
+      allow read: if isStaff() || (activeUser() && resource.data.studentId == request.auth.uid);
       allow create, delete: if isStaff();
       allow update: if isStaff()
         || (activeUser() && resource.data.studentId == request.auth.uid

@@ -3921,7 +3921,7 @@ async function fbOnAuth(user){
       await fbFailSignOut(removed?'This account was removed by the admin.':'This account is not approved yet. Please wait for admin approval.');return
     }
     if(snap.data().active===false){await fbFailSignOut('This account is disabled. Contact the owner.');return}
-    await fbStartSync();
+    await fbStartSync(snap.data());
     const me=(db.users||[]).find(u=>u.id===user.uid);
     if(!me){await fbFailSignOut('Your profile could not be loaded. '+(window.fbLastError?'Database: '+window.fbLastError:'Please try again.'));return}
     session=me;
@@ -3977,10 +3977,11 @@ function fbChangeOwnPassword(){
 }
 async function fbLogout(){if(FB&&fbAuth)await FB.signOut(fbAuth);else showLogin()}
 function fbStop(){fbUnsubs.forEach(u=>{try{u()}catch(_){}});fbUnsubs=[];fbPullReady=false;clearTimeout(fbPushTimer)}
-function fbWatch(col,apply){
+function fbWatch(col,apply,cons=null){
   return new Promise(resolve=>{
     let first=true;
-    const un=FB.onSnapshot(FB.collection(fbDb,col),snap=>{
+    const ref=cons&&cons.length?FB.query(FB.collection(fbDb,col),...cons):FB.collection(fbDb,col);
+    const un=FB.onSnapshot(ref,snap=>{
       const local=snap.metadata.hasPendingWrites;
       if(first||!local)apply(snap);
       if(first){first=false;resolve()}
@@ -3989,14 +3990,41 @@ function fbWatch(col,apply){
     fbUnsubs.push(un);
   });
 }
-async function fbStartSync(){
+// Students only download their own private records. Staff keep full listeners.
+// Each entry lists one query per listener; results from several queries are merged (messages sent or received).
+function fbScopeFor(me,k){
+  if(!me||me.role!=='student'||me.isOwner)return null;
+  const uid=me.id;
+  if(k==='marks'||k==='fees')return [[FB.where('studentId','==',uid)]];
+  if(k==='notifications')return [[FB.where('toId','==',uid)]];
+  if(k==='messages')return [[FB.where('fromId','==',uid)],[FB.where('toId','==',uid)]];
+  return null;
+}
+function fbWatchScoped(k,queries){
+  const parts=queries.map(()=>new Map());
+  const publish=()=>{
+    const syn=new Map(),items=[];
+    parts.forEach(m=>m.forEach((v,id)=>{if(!syn.has(id)){syn.set(id,JSON.stringify(v));items.push(v)}}));
+    db[k]=items;fbSynced[k]=syn;
+  };
+  return Promise.all(queries.map((cons,i)=>fbWatch(fbColName(k),snap=>{
+    const m=new Map();
+    snap.forEach(d=>{const v=d.data();if(v.id===undefined)v.id=d.id;m.set(String(v.id),v)});
+    parts[i]=m;publish();
+  },cons)));
+}
+async function fbStartSync(me=null){
   fbStop();fbSynced={};
   const jobs=[];
-  FB_ARRAY_KEYS.forEach(k=>jobs.push(fbWatch(fbColName(k),snap=>{
-    const items=[],syn=new Map();
-    snap.forEach(d=>{const v=d.data();if(v.id===undefined)v.id=d.id;items.push(v);syn.set(String(v.id),JSON.stringify(v))});
-    db[k]=items;fbSynced[k]=syn;
-  })));
+  FB_ARRAY_KEYS.forEach(k=>{
+    const scope=fbScopeFor(me,k);
+    if(scope){jobs.push(fbWatchScoped(k,scope));return}
+    jobs.push(fbWatch(fbColName(k),snap=>{
+      const items=[],syn=new Map();
+      snap.forEach(d=>{const v=d.data();if(v.id===undefined)v.id=d.id;items.push(v);syn.set(String(v.id),JSON.stringify(v))});
+      db[k]=items;fbSynced[k]=syn;
+    }));
+  });
   FB_MAP_KEYS.forEach(k=>jobs.push(fbWatch('m_'+k,snap=>{
     const obj={},syn=new Map();
     snap.forEach(d=>{const v=d.data().v;obj[d.id]=v;syn.set(d.id,JSON.stringify(v??null))});
