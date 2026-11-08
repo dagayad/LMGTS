@@ -2218,7 +2218,7 @@ function enterApp(user){
   const lastSeen=Number(user.lastLoginAt)||0;
   const pendingLoginUpdates=(db.notifications||[]).filter(n=>n.toId===user.id&&!n.readAt&&Number(n.createdAt||0)>lastSeen);
   user.lastLoginAt=now;
-  session=user;
+  session=user;liveSince=Date.now();
   knownMessageIds=new Set((db.messages||[]).filter(m=>m.toId===user.id).map(m=>m.id));knownNotificationIds=new Set((db.notifications||[]).filter(n=>n.toId===user.id).map(n=>n.id));
   $('#loginScreen').classList.add('hidden');
   $('#appScreen').classList.remove('hidden');
@@ -4092,8 +4092,25 @@ function purgeLegacyPasswords(){
   saveDB();
   console.info('Removed legacy password fields from '+hits.length+' user record(s).');
 }
+let liveSince=0;
+// Live popup for every new notification addressed to this account (and staff broadcasts for owner/admin/teacher).
+function fbToastNewNotices(){
+  if(!session||!Array.isArray(db.notifications))return;
+  const staff=isOwnerAdmin()||isTeacher();
+  db.notifications.forEach(n=>{
+    if(!n||!n.id||knownNotificationIds.has(n.id))return;
+    const mine=n.toId===session.id, broadcast=n.toId==='staff'&&staff;
+    if(!mine&&!broadcast)return;
+    knownNotificationIds.add(n.id);
+    if(n.readAt||Number(n.createdAt||0)<liveSince)return;
+    toast(`🔔 ${n.title}`);
+  });
+  if(activePage==='notifications')renderNotifications();
+  renderNav();
+}
 function fbAfterRemote(){
   if(!session)return;
+  fbToastNewNotices();
   purgeLegacyPasswords();
   clearTimeout(fbRenderTimer);
   fbRenderTimer=setTimeout(()=>{
@@ -4179,6 +4196,7 @@ async function fbSubmitRegistration(request,password){
   try{
     const clean=JSON.parse(JSON.stringify(request));delete clean.password;
     await FB.setDoc(FB.doc(sDb,'c_registrationRequests',rid),{...clean,id:rid,authUid:rid,status:'pending',selfRegistered:true});
+    try{await FB.setDoc(FB.doc(sDb,'c_notifications','reg_'+rid),{id:'reg_'+rid,toId:'staff',kind:'registration',courseId:'',title:'New registration request',body:`${request.name||'A student'} applied (${request.examType==='OTHER'?'Other exam / program':'A/L'}). Review it in Registration Requests.`,createdAt:Date.now(),readAt:null})}catch(err){console.warn('staff alert not sent',err)}
   }catch(e){throw new Error(fbFriendly(e))}
   finally{try{await FB.signOut(sAuth)}catch(_){}}
   return rid;

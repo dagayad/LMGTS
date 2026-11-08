@@ -68,7 +68,8 @@ service cloud.firestore {
     // ---- Notifications: staff create; the recipient can mark theirs as read ----
     match /c_notifications/{id} {
       allow read: if isStaff() || (activeUser() && resource.data.toId == request.auth.uid);
-      allow create, delete: if isStaff();
+      allow create: if isStaff() || (signedIn() && request.resource.data.toId == 'staff' && request.resource.data.kind == 'registration');
+      allow delete: if isStaff();
       allow update: if isStaff() || (activeUser() && resource.data.toId == request.auth.uid);
     }
 
