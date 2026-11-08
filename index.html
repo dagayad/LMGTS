@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://www.youtube.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com wss://*.googleapis.com https://www.gstatic.com; frame-src https://www.youtube-nocookie.com https://www.youtube.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://www.google.com https://www.youtube.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com wss://*.googleapis.com https://www.gstatic.com; frame-src https://www.youtube-nocookie.com https://www.youtube.com https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
 <meta name="description" content="Classroom - Private Learning Portal">
@@ -1923,7 +1923,7 @@ input[type="radio"]{-webkit-appearance:radio;appearance:auto;}
         <div class="field"><label for="regName">Full Name</label><input id="regName" type="text" placeholder="Your full name" required></div>
         <div class="field"><label for="regEmail">Email</label><input id="regEmail" type="email" placeholder="your@email.com" required></div>
         <div class="field"><label for="regUsername">Username</label><input id="regUsername" type="text" placeholder="Unique username" required></div>
-        <div class="field"><label for="regPassword">Password</label><input id="regPassword" type="password" minlength="6" placeholder="At least 6 characters" required></div>
+        <div class="field"><label for="regPassword">Password</label><input id="regPassword" type="password" minlength="8" placeholder="At least 8 characters" required></div>
         <div class="field"><label for="regPhone">Phone (Optional)</label><input id="regPhone" type="tel" placeholder="+94 123456789"></div>
         <div class="field"><label for="regInstitution">Institution</label><input id="regInstitution" type="text" placeholder="Your school/university name" required></div><input type="hidden" name="regLevel" id="regLevel" value="AL"><div class="field"><label>A/L years (select one or more)</label><div id="regGradeBox" class="checkbox-group"></div></div><div class="field"><label>Subjects applying for</label><div id="regSubjectsBox" class="checkbox-group"></div><p class="small muted">Select the subjects you want to apply for. Admin will review access.</p></div>
         <button class="btn btn-primary full" type="submit">Submit Registration</button>
@@ -3004,7 +3004,7 @@ $('#registerForm').addEventListener('submit',async function(e){
   if(!name||!email||!username||!password||!institution)return fail('Please complete all required fields.');
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return fail('Enter a valid email address.');
   if(!/^[a-zA-Z0-9_.-]{3,30}$/.test(username))return fail('Username must be 3–30 characters (letters, numbers, dot, underscore or hyphen).');
-  if(password.length<6)return fail('Password must be at least 6 characters.');
+  if(password.length<8)return fail('Password must be at least 8 characters.');
   if(db.users.some(u=>String(u.username).toLowerCase()===username.toLowerCase())||
      (db.registrationRequests||[]).some(r=>String(r.username).toLowerCase()===username.toLowerCase()&&r.status!=='rejected'))
     return fail('That username is already registered or awaiting approval.');
@@ -3752,7 +3752,7 @@ function teacherModal(t=null){
  const name=String(f.get('name')||'').trim(),username=String(f.get('username')||'').trim(),password=String(f.get('password')||'');
  if(!name||!username)throw Error('Name and username are required.');
  if(db.users.some(x=>x.username.toLowerCase()===username.toLowerCase()&&x.id!==t?.id))throw Error('That username is already in use.');
- if(!t&&!password)throw Error('Enter a temporary password.');if(password&&password.length<6)throw Error('Password must be at least 6 characters.');
+ if(!t&&!password)throw Error('Enter a temporary password.');if(password&&password.length<8)throw Error('Password must be at least 8 characters.');
  db.teacherCourseAccess=db.teacherCourseAccess||{};let teacherId;
  if(t){Object.assign(t,{name,username,email:String(f.get('email')||'').trim(),phone:String(f.get('phone')||'').trim(),teachingLevel:String(f.get('teachingLevel')||'both'),teachingGrades:f.getAll('teacherGrades')});if(password)fbNoPwChange();teacherId=t.id;}
  else{const loginEmail=String(f.get('email')||'').trim();if(loginEmail&&!/^\S+@\S+\.\S+$/.test(loginEmail))return alert('Enter a valid email or leave it empty.');const nu={id:await fbCreateAccount(loginEmail||username,password),name,username,email:loginEmail,phone:String(f.get('phone')||'').trim(),role:'teacher',teachingLevel:String(f.get('teachingLevel')||'both'),teachingGrades:f.getAll('teacherGrades')};db.users.push(nu);teacherId=nu.id;}
@@ -3818,7 +3818,7 @@ function studentModal(u=null){
     if(!name||!username)throw Error('Name and username are required.');
     if(db.users.some(x=>x.username.toLowerCase()===username.toLowerCase()&&x.id!==u?.id))throw Error('That username is already in use.');
     if(!u&&!password)throw Error('Enter a temporary password.');
-    if(password&&password.length<6)throw Error('Password must be at least 6 characters.');
+    if(password&&password.length<8)throw Error('Password must be at least 8 characters.');
     let studentId;
     if(u){u.name=name;u.username=username;u.level=String(f.get('level')||'AL');u.grades=f.getAll('studentGrades');u.grade=u.grades[0]||'';u.phone=String(f.get('phone')||'').trim();u.accountNumber=String(f.get('accountNumber')||'').trim();u.address=String(f.get('address')||'').trim();u.tutePackNumber=String(f.get('tutePackNumber')||'').trim();u.email=String(f.get('email')||'').trim();if(password)fbNoPwChange();studentId=u.id;}
     else{const loginEmail=String(f.get('email')||'').trim();if(loginEmail&&!/^\S+@\S+\.\S+$/.test(loginEmail))return alert('Enter a valid email or leave it empty.');const nu={id:await fbCreateAccount(loginEmail||username,password),studentId:'',name,username,level:String(f.get('level')||'AL'),grades:f.getAll('studentGrades'),grade:(f.getAll('studentGrades')[0]||''),phone:String(f.get('phone')||'').trim(),accountNumber:String(f.get('accountNumber')||'').trim(),address:String(f.get('address')||'').trim(),tutePackNumber:String(f.get('tutePackNumber')||'').trim(),email:String(f.get('email')||'').trim(),role:'student'};db.users.push(nu);ensureStudentIds();studentId=nu.id;db.studentCourseAccess[studentId]=[];}
@@ -3872,6 +3872,8 @@ function applyChristmasTheme(){
 
 
 // ===== Firebase layer (Firestore data + Firebase Auth login) =====
+// reCAPTCHA v3 site key for Firebase App Check. Leave empty until App Check is set up in the console.
+const APPCHECK_SITE_KEY='';
 const FB_CONFIG={apiKey:"AIzaSyCbEOXp2YP3yU1fw6zVZQogcsQ3cSPl_8w",authDomain:"classroom-5af10.firebaseapp.com",projectId:"classroom-5af10",storageBucket:"classroom-5af10.firebasestorage.app",messagingSenderId:"649216716192",appId:"1:649216716192:web:da8d355191a68b9a1bc8c5"};
 const FB_OWNER_EMAIL='dasun1730@gmail.com';
 const FB_LOGIN_DOMAIN='classroom.local';
@@ -3893,8 +3895,10 @@ async function fbInit(){
     import('https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js'),
     import('https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js'),
     import('https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js')]);
-  FB=Object.assign({},a,b,c);
+  const appCheckMod=await import('https://www.gstatic.com/firebasejs/10.14.1/firebase-app-check.js').catch(()=>({}));
+  FB=Object.assign({},a,b,c,appCheckMod);
   const app=FB.initializeApp(FB_CONFIG);
+  if(APPCHECK_SITE_KEY&&FB.initializeAppCheck&&FB.ReCaptchaV3Provider){FB.initializeAppCheck(app,{provider:new FB.ReCaptchaV3Provider(APPCHECK_SITE_KEY),isTokenAutoRefreshEnabled:true})}
   fbAuth=FB.getAuth(app);
   try{fbDb=FB.initializeFirestore(app,{localCache:FB.persistentLocalCache({tabManager:FB.persistentMultipleTabManager()})})}catch(_){fbDb=FB.getFirestore(app)}
   FB.onAuthStateChanged(fbAuth,fbOnAuth);
@@ -3922,7 +3926,7 @@ async function fbOnAuth(user){
       await fbFailSignOut(removed?'This account was removed by the admin.':'This account is not approved yet. Please wait for admin approval.');return
     }
     if(snap.data().active===false){await fbFailSignOut('This account is disabled. Contact the owner.');return}
-    await fbStartSync(snap.data());
+    await fbStartSync({...snap.data(),id:user.uid});
     const me=(db.users||[]).find(u=>u.id===user.uid);
     if(!me){await fbFailSignOut('Your profile could not be loaded. '+(window.fbLastError?'Database: '+window.fbLastError:'Please try again.'));return}
     session=me;
@@ -3957,10 +3961,10 @@ async function fbLoginSubmit(e){
 // Each signed-in user changes their own password (Firebase allows this without Admin tools).
 function fbChangeOwnPassword(){
   if(!FB||!fbAuth?.currentUser){toast('Sign in first.');return}
-  openModal('Change password','<div class="field"><label>Current password</label><input name="oldPw" type="password" required autocomplete="current-password"></div><div class="field"><label>New password</label><input name="newPw" type="password" minlength="6" required autocomplete="new-password"></div><div class="field"><label>Confirm new password</label><input name="newPw2" type="password" minlength="6" required autocomplete="new-password"></div>','Change password',async f=>{
+  openModal('Change password','<div class="field"><label>Current password</label><input name="oldPw" type="password" required autocomplete="current-password"></div><div class="field"><label>New password</label><input name="newPw" type="password" minlength="8" required autocomplete="new-password"></div><div class="field"><label>Confirm new password</label><input name="newPw2" type="password" minlength="6" required autocomplete="new-password"></div>','Change password',async f=>{
     const oldPw=String(f.get('oldPw')||''),newPw=String(f.get('newPw')||''),newPw2=String(f.get('newPw2')||'');
     if(newPw!==newPw2)throw Error('The new passwords do not match.');
-    if(newPw.length<6)throw Error('The new password must be at least 6 characters.');
+    if(newPw.length<8)throw Error('The new password must be at least 8 characters.');
     if(newPw===oldPw)throw Error('Choose a password different from the current one.');
     const user=fbAuth.currentUser;
     if(!user)throw Error('Please sign in again.');
@@ -3996,16 +4000,18 @@ function fbWatch(col,apply,cons=null){
 function fbScopeFor(me,k){
   if(!me||me.role!=='student'||me.isOwner)return null;
   const uid=me.id;
+  if(k==='users')return [[FB.where('role','in',['admin','teacher'])]];
   if(k==='marks'||k==='fees')return [[FB.where('studentId','==',uid)]];
   if(k==='notifications')return [[FB.where('toId','==',uid)]];
   if(k==='messages')return [[FB.where('fromId','==',uid)],[FB.where('toId','==',uid)]];
   return null;
 }
-function fbWatchScoped(k,queries){
+function fbWatchScoped(k,queries,extra=null){
   const parts=queries.map(()=>new Map());
+  const extraPart=extra?new Map(extra.map(v=>[String(v.id),v])):null;
   const publish=()=>{
     const syn=new Map(),items=[];
-    parts.forEach(m=>m.forEach((v,id)=>{if(!syn.has(id)){syn.set(id,JSON.stringify(v));items.push(v)}}));
+    [...parts,...(extraPart?[extraPart]:[])].forEach(m=>m.forEach((v,id)=>{if(!syn.has(id)){syn.set(id,JSON.stringify(v));items.push(v)}}));
     db[k]=items;fbSynced[k]=syn;
   };
   return Promise.all(queries.map((cons,i)=>fbWatch(fbColName(k),snap=>{
@@ -4019,7 +4025,7 @@ async function fbStartSync(me=null){
   const jobs=[];
   FB_ARRAY_KEYS.forEach(k=>{
     const scope=fbScopeFor(me,k);
-    if(scope){jobs.push(fbWatchScoped(k,scope));return}
+    if(scope){jobs.push(fbWatchScoped(k,scope,k==='users'?[me]:null));return}
     jobs.push(fbWatch(fbColName(k),snap=>{
       const items=[],syn=new Map();
       snap.forEach(d=>{const v=d.data();if(v.id===undefined)v.id=d.id;items.push(v);syn.set(String(v.id),JSON.stringify(v))});

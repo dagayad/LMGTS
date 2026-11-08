@@ -1,4 +1,5 @@
-// DRAFT v3 — step 3: students may read only their own private records.
+// DRAFT v4 — step 3 + user privacy: students read only their own user record and staff (admin/teacher) profiles.
+// Deploy ORDER: 1) app code (students query only staff profiles + own record), 2) then publish these rules.
 // Deploy ORDER matters: 1) publish the app code (students then query only their own records),
 // 2) then publish these rules. Before step 1, these read limits would break student sync.
 // TEST in Rules Playground first (owner, admin, teacher, student) before Publish.
@@ -17,7 +18,8 @@ service cloud.firestore {
 
     // ---- Users ----
     match /users/{uid} {
-      allow read: if signedIn() && (uid == request.auth.uid || activeUser());
+      allow read: if signedIn() && (uid == request.auth.uid || isStaff()
+        || (activeUser() && (resource.data.role == 'admin' || resource.data.role == 'teacher')));
       // Owner creates anyone; staff add students only; first owner bootstrap.
       allow create: if isOwner()
         || (isStaff() && request.resource.data.role == 'student')
