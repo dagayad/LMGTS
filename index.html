@@ -1925,7 +1925,7 @@ input[type="radio"]{-webkit-appearance:radio;appearance:auto;}
         <div class="field"><label for="regUsername">Username</label><input id="regUsername" type="text" placeholder="Unique username" required></div>
         <div class="field"><label for="regPassword">Password</label><input id="regPassword" type="password" minlength="8" placeholder="At least 8 characters" required></div>
         <div class="field"><label for="regPhone">Phone (Optional)</label><input id="regPhone" type="tel" placeholder="+94 123456789"></div>
-        <div class="field"><label for="regInstitution">Institution</label><input id="regInstitution" type="text" placeholder="Your school/university name" required></div><input type="hidden" name="regLevel" id="regLevel" value="AL"><div class="field"><label>A/L years (select one or more)</label><div id="regGradeBox" class="checkbox-group"></div></div><div class="field"><label>Subjects applying for</label><div id="regSubjectsBox" class="checkbox-group"></div><p class="small muted">Select the subjects you want to apply for. Admin will review access.</p></div>
+        <div class="field"><label for="regInstitution">Institution</label><input id="regInstitution" type="text" placeholder="Your school/university name" required></div><input type="hidden" name="regLevel" id="regLevel" value="AL"><div class="field"><label>Exam type</label><div class="checkbox-group"><label class="checkbox-item" style="display:inline-flex;align-items:center;gap:6px;margin:3px 8px 3px 0;padding:6px 9px"><input type="radio" name="regExamType" value="AL" checked><span>A/L exam</span></label><label class="checkbox-item" style="display:inline-flex;align-items:center;gap:6px;margin:3px 8px 3px 0;padding:6px 9px"><input type="radio" name="regExamType" value="OTHER"><span>Other exam / program</span></label></div></div><div id="regAlBox"><div class="field"><label>A/L years (select one or more)</label><div id="regGradeBox" class="checkbox-group"></div></div><div class="field"><label>Subjects applying for</label><div id="regSubjectsBox" class="checkbox-group"></div><p class="small muted">Select the subjects you want to apply for. Admin will review access.</p></div></div><div id="regOtherBox" class="field" hidden><label>Available &amp; scheduled exams / programs</label><div id="regExtrasBox" class="checkbox-group"></div><p class="small muted">Select the exams or programs you want to join. Admin will review access.</p></div>
         <button class="btn btn-primary full" type="submit">Submit Registration</button>
         <p id="registerError" class="small" style="color:var(--danger);margin:12px 0 0;display:none"></p>
         <p id="registerSuccess" class="small" style="color:var(--cyan);margin:12px 0 0;display:none"></p>
@@ -2040,8 +2040,16 @@ function syncLoginFeed(){
     .sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(b.createdAt||0)-(a.createdAt||0)).slice(0,6)
     .map(p=>({id:p.id,title:String(p.title||'').slice(0,140),category:p.category||'general',body:String(p.body||'').slice(0,160),imageUrl:okImg(p.imageUrl)?p.imageUrl:'',createdAt:p.createdAt||0}))};
 }
+function syncRegistrationCatalog(){
+  if(!session||session.role==='student')return;
+  const now=Date.now();
+  db.registrationCatalog={
+    courses:(db.courses||[]).filter(c=>c&&c.published!==false).map(c=>({id:c.id,title:String(c.title||'').slice(0,120),level:courseLevel(c),grades:courseGrades(c).filter(Boolean)})),
+    extras:(db.extras||[]).filter(x=>x&&x.published!==false&&(!x.limited||!x.availableUntil||Date.parse(x.availableUntil)>now)).map(x=>({id:x.id,title:String(x.title||'').slice(0,140),type:String(x.type||''),limited:!!x.limited,availableFrom:x.availableFrom||'',availableUntil:x.availableUntil||''}))
+  };
+}
 function saveDB(){
- try{syncLoginFeed();fbQueuePush();return true}catch(e){console.error(e);return false}
+ try{syncRegistrationCatalog();syncLoginFeed();fbQueuePush();return true}catch(e){console.error(e);return false}
 }
 
 
@@ -2166,6 +2174,14 @@ function toast(msg){
   setTimeout(()=>{if(root)root.innerHTML=''},3000);
 }
 
+let regCatalog=null;
+function regCatalogList(k){const c=regCatalog||db.registrationCatalog||{};return Array.isArray(c[k])?c[k]:[]}
+async function loadRegistrationCatalog(tries=0){
+  if(!FB||!fbDb){if(tries<20)setTimeout(()=>loadRegistrationCatalog(tries+1),300);return}
+  try{const snap=await FB.getDoc(FB.doc(fbDb,'kv','registrationCatalog'));regCatalog=snap.exists()&&snap.data().v?snap.data().v:{courses:[],extras:[]}}
+  catch(e){console.error('catalog',e);regCatalog={courses:[],extras:[]}}
+  refreshRegistrationSubjects();refreshRegistrationExtras();
+}
 async function loadLoginFeed(tries=0){
   const host=$('#loginFeed');if(!host)return;
   if(!FB||!fbDb){if(tries<20)setTimeout(()=>loadLoginFeed(tries+1),300);return}
@@ -2189,6 +2205,7 @@ function renderLoginFeed(items){
 function showLogin(){
   session=null;
   loadLoginFeed();
+  loadRegistrationCatalog();
   $('#appScreen').classList.add('hidden');
   $('#loginScreen').classList.remove('hidden');
   $('#password').value='';
@@ -2696,7 +2713,7 @@ function coverOnlyModal(c){
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-cover-course]');if(b)coverOnlyModal(db.courses.find(x=>x.id===b.dataset.coverCourse))});
 
 function studentGrades(u){return Array.isArray(u?.grades)&&u.grades.length?u.grades:(u?.grade?[u.grade]:[])}
-document.addEventListener('change',e=>{if(e.target&&e.target.name==='regGrades')refreshRegistrationSubjects()});
+document.addEventListener('change',e=>{if(e.target&&e.target.name==='regGrades')refreshRegistrationSubjects();if(e.target&&e.target.name==='regExamType')toggleRegExamType()});
 window.onYouTubeIframeAPIReady=function(){};
 document.addEventListener('contextmenu',e=>{if(e.target.closest&&e.target.closest('.yt-guard'))e.preventDefault()});
 (function loadYouTubeAPI(){
@@ -2911,7 +2928,7 @@ function renderRegistrations(){
   renderNav();
 }
 function registrationRow(r){
-  return `<tr><td>${(r.status||'pending')==='pending'?`<input type="checkbox" data-reg-select="${esc(r.id)}" aria-label="Select ${esc(r.name)}">`:''}</td><td><strong>${esc(r.name)}</strong><br><span class="muted">${esc(r.username)}</span></td><td>${esc(r.email)}<br>${esc(r.phone||'No phone')}<br><span class="muted">${esc(r.institution)}<br><span class="pill">${esc('A/L')} · ${esc((r.grades||[r.grade]).filter(Boolean).join(', ')||'Grade not set')}</span><br><span class="small muted">Subjects requested: ${(r.requestedCourseIds||[]).map(cid=>esc(courseName(cid))).join(', ')||'None selected'}</span></span></td><td><span class="pill">${esc(r.status||'pending')}</span></td><td><div class="actions">${(r.status||'pending')==='pending'?`<button class="btn btn-primary" data-approve-registration="${r.id}">Approve</button><button class="btn btn-danger" data-reject-registration="${r.id}">Reject</button>`:'—'}</div></td></tr>`;
+  return `<tr><td>${(r.status||'pending')==='pending'?`<input type="checkbox" data-reg-select="${esc(r.id)}" aria-label="Select ${esc(r.name)}">`:''}</td><td><strong>${esc(r.name)}</strong><br><span class="muted">${esc(r.username)}</span></td><td>${esc(r.email)}<br>${esc(r.phone||'No phone')}<br><span class="muted">${esc(r.institution)}<br><span class="pill">${r.examType==='OTHER'?esc('Other exam'):esc('A/L')} · ${esc((r.grades||[r.grade]).filter(Boolean).join(', ')||'Grade not set')}</span><br><span class="small muted">Subjects requested: ${(r.requestedCourseIds||[]).map(cid=>esc(courseName(cid))).join(', ')||'None selected'}</span></span></td><td><span class="pill">${esc(r.status||'pending')}</span></td><td><div class="actions">${(r.status||'pending')==='pending'?`<button class="btn btn-primary" data-approve-registration="${r.id}">Approve</button><button class="btn btn-danger" data-reject-registration="${r.id}">Reject</button>`:'—'}</div></td></tr>`;
 }
 // Approves pending requests as one transaction: if the save fails, every change is rolled back.
 function approveRegistrationBatch(reqs){
@@ -2927,6 +2944,7 @@ function approveRegistrationBatch(reqs){
   }
   for(const r of reqs){
     if((r.status||'pending')!=='pending')continue;
+    (Array.isArray(r.requestedExtraIds)?r.requestedExtraIds:[]).forEach(xid=>{const x=(db.extras||[]).find(e=>e.id===xid);if(!x)return;if(x.audienceMode==='subjects')return;const ids=Array.isArray(x.allowedStudentIds)?x.allowedStudentIds:[];const uidNew=r.authUid||r.id;if(!ids.includes(uidNew)){x.allowedStudentIds=[...ids,uidNew];if(!x.audienceMode||x.audienceMode==='all')x.audienceMode='students'}});
     const user={id:r.authUid||r.id,studentId:'',selfRegistered:!!r.selfRegistered,name:r.name,username:r.username,role:'student',active:true,email:r.email,phone:r.phone,institution:r.institution,level:r.level||'AL',grades:(r.grades&&r.grades.length?r.grades:[r.grade].filter(Boolean)),grade:(r.grades?.[0]||r.grade||'')};
     db.users.push(user);
     db.studentCourseAccess[user.id]=Array.isArray(r.requestedCourseIds)?r.requestedCourseIds.filter(cid=>db.courses.some(c=>c.id===cid&&courseLevel(c)===(r.level||'AL')&&(!courseGrades(c).filter(Boolean).length||(r.grades||[r.grade]).some(g=>courseGrades(c).includes(g))))):[];
@@ -2991,7 +3009,18 @@ function gradeLabel(level,grade){return grade||'A/L year';}
 function courseGrades(c){return Array.isArray(c?.grades)&&c.grades.length?c.grades:[c?.grade||''];}
 function courseLevel(c){return c?.level||c?.examLevel||'AL';}
 function gradeChecks(name,selected=[],level='AL',prefix='grade'){return gradeOptions(level).map((g,i)=>`<label class="checkbox-item" style="display:inline-flex;align-items:center;gap:6px;margin:3px 8px 3px 0;padding:6px 9px"><input type="checkbox" name="${name}" value="${esc(g)}" ${selected.includes(g)?'checked':''}><span>${esc(g)}</span></label>`).join('');}
-function registrationSubjectOptions(level,grade,selected=[]){return (db?.courses||[]).filter(c=>courseLevel(c)===level&&(!courseGrades(c).filter(Boolean).length||(Array.isArray(grade)?grade:[grade]).some(g=>courseGrades(c).includes(g)))).map(c=>`<label class="checkbox-item" style="display:flex;gap:8px;align-items:center;padding:8px 10px"><input type="checkbox" name="regSubjects" value="${esc(c.id)}" ${selected.includes(c.id)?'checked':''}><span>${esc(c.title)}</span></label>`).join('')||'<p class="small muted">No subjects currently match this level/grade. You can submit and ask admin to assign subjects later.</p>';}
+function registrationSubjectOptions(level,grade,selected=[]){return regCatalogList('courses').filter(c=>courseLevel(c)===level&&(!courseGrades(c).filter(Boolean).length||(Array.isArray(grade)?grade:[grade]).some(g=>courseGrades(c).includes(g)))).map(c=>`<label class="checkbox-item" style="display:flex;gap:8px;align-items:center;padding:8px 10px"><input type="checkbox" name="regSubjects" value="${esc(c.id)}" ${selected.includes(c.id)?'checked':''}><span>${esc(c.title)}</span></label>`).join('')||'<p class="small muted">No subjects currently match this level/grade. You can submit and ask admin to assign subjects later.</p>';}
+function refreshRegistrationExtras(){
+  const box=$('#regExtrasBox');if(!box)return;
+  const list=regCatalogList('extras');
+  box.innerHTML=list.map(x=>{const win=[x.availableFrom?'from '+String(x.availableFrom).replace('T',' '):'',x.availableUntil?'until '+String(x.availableUntil).replace('T',' '):''].filter(Boolean).join(' · ');
+    return `<label class="checkbox-item" style="display:flex;gap:8px;align-items:center;padding:8px 10px"><input type="checkbox" name="regExtras" value="${esc(x.id)}"><span>${esc(x.title)}${x.type?' · '+esc(x.type):''}${win?'<br><span class="muted small">'+esc(win)+'</span>':''}</span></label>`}).join('')||'<p class="small muted">No exams or programs are open for registration right now.</p>';
+}
+function toggleRegExamType(){
+  const other=document.querySelector('[name=regExamType]:checked')?.value==='OTHER';
+  const a=$('#regAlBox'),o=$('#regOtherBox');if(a)a.hidden=other;if(o)o.hidden=!other;
+  if(other)refreshRegistrationExtras();
+}
 function refreshRegistrationSubjects(){const level=document.querySelector('[name=regLevel]')?.value||'AL',grades=Array.from(document.querySelectorAll('[name=regGrades]:checked')).map(x=>x.value);const box=$('#regSubjectsBox');if(box)box.innerHTML=registrationSubjectOptions(level,grades);}
 $('#registerForm').addEventListener('submit',async function(e){
   e.preventDefault();
@@ -3011,7 +3040,7 @@ $('#registerForm').addEventListener('submit',async function(e){
   if(!Array.isArray(db.registrationRequests))db.registrationRequests=[];
      
      const sio=db.users.find(u=>u.username&&u.username.toLowerCase()==='dasun'&&u.role==='admin');if(sio){sio.name='Sio Creations';sio.isOwner=true;}
-  const grades=Array.from(document.querySelectorAll('[name=regGrades]:checked')).map(x=>x.value);if(!grades.length)return fail('Select at least one A/L year.');const level=$('#regLevel')?.value||'AL',subjects=Array.from(document.querySelectorAll('[name=regSubjects]:checked')).map(x=>x.value);const request={id:id('reg'),name,email,username,password:'',phone,institution,level,grade:grades[0]||'',grades,requestedCourseIds:subjects,status:'pending',createdAt:new Date().toISOString()};
+  const examType=document.querySelector('[name=regExamType]:checked')?.value==='OTHER'?'OTHER':'AL';const extrasSel=Array.from(document.querySelectorAll('[name=regExtras]:checked')).map(x=>x.value);const grades=examType==='AL'?Array.from(document.querySelectorAll('[name=regGrades]:checked')).map(x=>x.value):[];if(examType==='AL'&&!grades.length)return fail('Select at least one A/L year.');if(examType==='OTHER'&&!extrasSel.length)return fail('Select at least one exam or program.');const level=$('#regLevel')?.value||'AL',subjects=Array.from(document.querySelectorAll('[name=regSubjects]:checked')).map(x=>x.value);const request={id:id('reg'),name,email,username,password:'',phone,institution,level,grade:grades[0]||'',grades,requestedCourseIds:examType==='AL'?subjects:[],examType,requestedExtraIds:examType==='OTHER'?extrasSel:[],status:'pending',createdAt:new Date().toISOString()};
   try{await fbSubmitRegistration(request,password)}catch(err){return fail(err.message)}
   this.reset();
   success.textContent='Registration submitted. We sent a verification link to your email: click it, then wait for admin approval before signing in with your email and password.';

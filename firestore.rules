@@ -101,6 +101,10 @@ service cloud.firestore {
     }
 
     // ---- kv: login feed is public; other settings are owner/admin only ----
+    match /kv/registrationCatalog {
+      allow read: if true;
+      allow write: if isOwner() || isAdmin();
+    }
     match /kv/loginFeed {
       allow read: if true;
       allow write: if isOwner() || isAdmin();
