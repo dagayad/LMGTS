@@ -1,0 +1,116 @@
+// DRAFT v2 — aligned with the rules currently live (old_rules) so nothing the owner/admin does breaks.
+// Only change: the catch-all "allow read, write: if activeUser()" is replaced by an explicit list.
+// TEST in Rules Playground first (owner, admin, teacher, student) before Publish.
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function me() { return get(/databases/$(database)/documents/users/$(request.auth.uid)).data; }
+    function activeUser() { return signedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid)) && me().active != false; }
+    function isOwner() { return activeUser() && me().isOwner == true; }
+    function isAdmin() { return activeUser() && me().role == 'admin'; }
+    function isTeacher() { return activeUser() && me().role == 'teacher'; }
+    function isStaff() { return isOwner() || isAdmin() || isTeacher(); }
+    function isOwnerBootstrap() { return signedIn() && request.auth.token.email == 'dasun1730@gmail.com'; }
+
+    // ---- Users ----
+    match /users/{uid} {
+      allow read: if signedIn() && (uid == request.auth.uid || activeUser());
+      // Owner creates anyone; staff add students only; first owner bootstrap.
+      allow create: if isOwner()
+        || (isStaff() && request.resource.data.role == 'student')
+        || (isOwnerBootstrap() && uid == request.auth.uid);
+      // Owner edits anyone. Staff edit students only, without changing role.
+      // A user may edit their own record but cannot change role, isOwner or active.
+      allow update: if isOwner()
+        || (isStaff() && resource.data.role == 'student' && request.resource.data.role == 'student')
+        || (uid == request.auth.uid
+            && request.resource.data.role == resource.data.role
+            && request.resource.data.isOwner == resource.data.isOwner
+            && request.resource.data.active == resource.data.active);
+      allow delete: if isOwner() || (isStaff() && resource.data.role == 'student');
+    }
+
+    // ---- Registration requests: anyone signed in files one; owner/admin review ----
+    match /c_registrationRequests/{rid} {
+      allow create: if signedIn();
+      allow read, update, delete: if isOwner() || isAdmin();
+    }
+
+    // ---- Removed-user cleanup marker ----
+    match /c_authCleanup/{uid} {
+      allow read, delete: if signedIn() && (uid == request.auth.uid || isOwner() || isAdmin());
+      allow create, update: if isOwner() || isAdmin();
+    }
+
+    // ---- Announcements: everyone active reads; owner/admin write ----
+    match /c_posts/{pid} {
+      allow read: if activeUser();
+      allow write: if isOwner() || isAdmin();
+    }
+
+    // ---- Content written by staff (owner, admin, teacher) ----
+    match /c_courses/{id}        { allow read: if activeUser(); allow write: if isStaff(); }
+    match /c_lessons/{id}        { allow read: if activeUser(); allow write: if isStaff(); }
+    match /c_papers/{id}         { allow read: if activeUser(); allow write: if isStaff(); }
+    match /c_quizzes/{id}        { allow read: if activeUser(); allow write: if isStaff(); }
+    match /c_exams/{id}          { allow read: if activeUser(); allow write: if isStaff(); }
+    match /c_marks/{id}          { allow read: if activeUser(); allow write: if isStaff(); }
+    match /c_extras/{id}         { allow read: if activeUser(); allow write: if isStaff(); }
+    match /c_calendarEvents/{id} { allow read: if activeUser(); allow write: if isStaff(); }
+    match /c_specialClasses/{id} { allow read: if activeUser(); allow write: if isStaff(); }
+    match /c_deliveries/{id}     { allow read: if activeUser(); allow write: if isStaff(); }
+
+    // ---- Notifications: staff create; the recipient can mark theirs as read ----
+    match /c_notifications/{id} {
+      allow read: if activeUser();
+      allow create, delete: if isStaff();
+      allow update: if isStaff() || (activeUser() && resource.data.toId == request.auth.uid);
+    }
+
+    // ---- Messages: any active user sends as themselves; staff manage ----
+    match /c_messages/{id} {
+      allow read: if activeUser();
+      allow create: if isStaff() || (activeUser() && request.resource.data.fromId == request.auth.uid);
+      allow update: if isStaff() || (activeUser() && (resource.data.toId == request.auth.uid || resource.data.fromId == request.auth.uid));
+      allow delete: if isStaff();
+    }
+
+    // ---- Fees: staff manage; a student may attach a payment slip to their own fee only ----
+    match /c_fees/{id} {
+      allow read: if activeUser();
+      allow create, delete: if isStaff();
+      allow update: if isStaff()
+        || (activeUser() && resource.data.studentId == request.auth.uid
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['paymentSubmission']));
+    }
+
+    // ---- Course access maps (doc id = user id) ----
+    match /m_studentCourseAccess/{uid} { allow read: if activeUser(); allow write: if isStaff(); }
+    match /m_teacherCourseAccess/{uid} { allow read: if activeUser(); allow write: if isOwner() || isAdmin(); }
+    match /m_adminCourseAccess/{uid}   { allow read: if activeUser(); allow write: if isOwner(); }
+
+    // Lesson progress: a student writes only their own; staff may write any.
+    match /m_lessonProgress/{uid} {
+      allow read: if activeUser();
+      allow write: if isStaff() || (activeUser() && uid == request.auth.uid);
+    }
+
+    // ---- kv: login feed is public; other settings are owner/admin only ----
+    match /kv/loginFeed {
+      allow read: if true;
+      allow write: if isOwner() || isAdmin();
+    }
+    match /kv/{doc} {
+      allow read: if activeUser();
+      allow write: if isOwner() || isAdmin();
+    }
+
+    // Anything not listed above: nobody can write it. Add a rule here if the app needs a new collection.
+    match /{document=**} {
+      allow read: if activeUser();
+      allow write: if false;
+    }
+  }
+}
