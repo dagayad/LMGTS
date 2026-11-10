@@ -29,9 +29,9 @@ service cloud.firestore {
       allow update: if isOwner()
         || (isStaff() && resource.data.role == 'student' && request.resource.data.role == 'student')
         || (uid == request.auth.uid
-            && request.resource.data.role == resource.data.role
-            && request.resource.data.isOwner == resource.data.isOwner
-            && request.resource.data.active == resource.data.active);
+            && request.resource.data.get('role', '') == resource.data.get('role', '')
+            && request.resource.data.get('isOwner', false) == resource.data.get('isOwner', false)
+            && request.resource.data.get('active', true) == resource.data.get('active', true));
       allow delete: if isOwner() || (isStaff() && resource.data.role == 'student');
     }
 
