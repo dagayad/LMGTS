@@ -14,6 +14,9 @@ service cloud.firestore {
     function isAdmin() { return activeUser() && me().role == 'admin'; }
     function isTeacher() { return activeUser() && me().role == 'teacher'; }
     function isStaff() { return isOwner() || isAdmin() || isTeacher(); }
+    function isStr(v, max) { return v is string && v.size() <= max; }
+    function isOptStr(data, key, max) { return !(key in data) || isStr(data[key], max); }
+    function isIdList(data, key, max) { return !(key in data) || (data[key] is list && data[key].size() <= max); }
     function isOwnerBootstrap() { return signedIn() && request.auth.token.email == 'dasun1730@gmail.com'; }
 
     // ---- Users ----
@@ -37,7 +40,20 @@ service cloud.firestore {
 
     // ---- Registration requests: anyone signed in files one; owner/admin review ----
     match /c_registrationRequests/{rid} {
-      allow create: if signedIn();
+      // Applicant may only create their own request, pending, with typed and size-limited fields.
+      allow create: if signedIn()
+        && request.resource.data.authUid == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && !('password' in request.resource.data)
+        && isStr(request.resource.data.name, 120)
+        && isStr(request.resource.data.email, 254)
+        && isStr(request.resource.data.username, 40)
+        && isOptStr(request.resource.data, 'phone', 30)
+        && isOptStr(request.resource.data, 'institution', 160)
+        && isOptStr(request.resource.data, 'level', 10)
+        && isIdList(request.resource.data, 'requestedCourseIds', 50)
+        && isIdList(request.resource.data, 'requestedExtraIds', 50)
+        && isIdList(request.resource.data, 'grades', 10);
       allow read, update, delete: if isOwner() || isAdmin();
     }
 
@@ -50,7 +66,11 @@ service cloud.firestore {
     // ---- Announcements: everyone active reads; owner/admin write ----
     match /c_posts/{pid} {
       allow read: if activeUser();
-      allow write: if isOwner() || isAdmin();
+      allow write: if (isOwner() || isAdmin())
+        && isStr(request.resource.data.title, 140)
+        && isStr(request.resource.data.body, 5000)
+        && isOptStr(request.resource.data, 'imageUrl', 700000)
+        && isOptStr(request.resource.data, 'link', 500);
     }
 
     // ---- Content written by staff (owner, admin, teacher) ----
@@ -68,7 +88,9 @@ service cloud.firestore {
     // ---- Notifications: staff create; the recipient can mark theirs as read ----
     match /c_notifications/{id} {
       allow read: if isStaff() || (activeUser() && resource.data.toId == request.auth.uid);
-      allow create: if isStaff() || (signedIn() && request.resource.data.toId == 'staff' && request.resource.data.kind == 'registration');
+      allow create: if (isStaff() || (signedIn() && request.resource.data.toId == 'staff' && request.resource.data.kind == 'registration'))
+        && isStr(request.resource.data.title, 200)
+        && isOptStr(request.resource.data, 'body', 1000);
       allow delete: if isStaff();
       allow update: if isStaff() || (activeUser() && resource.data.toId == request.auth.uid);
     }
@@ -76,7 +98,9 @@ service cloud.firestore {
     // ---- Messages: any active user sends as themselves; staff manage ----
     match /c_messages/{id} {
       allow read: if isStaff() || (activeUser() && (resource.data.fromId == request.auth.uid || resource.data.toId == request.auth.uid));
-      allow create: if isStaff() || (activeUser() && request.resource.data.fromId == request.auth.uid);
+      allow create: if (isStaff() || (activeUser() && request.resource.data.fromId == request.auth.uid))
+        && isOptStr(request.resource.data, 'subject', 200)
+        && isOptStr(request.resource.data, 'body', 5000);
       allow update: if isStaff() || (activeUser() && (resource.data.toId == request.auth.uid || resource.data.fromId == request.auth.uid));
       allow delete: if isStaff();
     }
